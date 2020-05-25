@@ -54,31 +54,6 @@ func TestAssembleString(t *testing.T) {
 	}
 }
 
-func TestAssemble(t *testing.T) {
-	code := []interface{}{
-		addi, // r1 = r0 + 1
-		r1,
-		r0,
-		1,
-		halt,
-	}
-
-	got, err := assemble(code)
-	if err != nil {
-		t.Fatalf("assemble(%v) error: %v", code, err)
-	}
-
-	want := make(memory, 256)
-	want[0] = int(addi)
-	want[1] = int(r1)
-	want[2] = int(r0)
-	want[3] = 1
-	want[4] = int(halt)
-	if diff := cmp.Diff(want, got); diff != "" {
-		t.Errorf("assemble diff (-want,+got):\n%v", diff)
-	}
-}
-
 func TestProgram(t *testing.T) {
 	tests := map[string]struct {
 		code []interface{}
