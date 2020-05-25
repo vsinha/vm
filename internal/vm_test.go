@@ -107,6 +107,53 @@ func TestProgram(t *testing.T) {
 			},
 			registers{0, 5, 3, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
 		},
+		"sub": {
+			[]interface{}{
+				loadi, // r1 = 5
+				r1,
+				5,
+				loadi, // r2 = 3
+				r2,
+				3,
+				sub, // r3 = r1 - r2
+				r3,
+				r1,
+				r2,
+				halt,
+			},
+			registers{0, 5, 3, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		},
+		"jumpi": {
+			[]interface{}{
+				loadi, // r1 = 5
+				r1,
+				5,
+				jumpi,
+				8,
+				loadi, // r2 = 3
+				r2,
+				1,
+				halt,
+			},
+			registers{0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		},
+		"jump": {
+			[]interface{}{
+				loadi, // r1 = 5
+				r1,
+				5,
+				loadi, // r1 = 5
+				r2,
+				11,
+				jump,
+				r2,
+				loadi, // r2 = 3
+				r2,
+				1,
+				halt,
+			},
+			registers{0, 5, 11, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		},
 	}
 	for name, test := range tests {
 		t.Run(name, func(t *testing.T) {

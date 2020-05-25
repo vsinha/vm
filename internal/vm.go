@@ -12,6 +12,8 @@ const (
 	add
 	addi
 	halt
+	jump
+	jumpi
 	load
 	loadi
 	sub
@@ -40,6 +42,7 @@ var (
 	riType        = opKind{4} // works on registers (with immediate values)
 	lType         = opKind{3} // works on addresses
 	liType        = opKind{3} // works on addresses (with immediate values)
+	jType         = opKind{2} // works for control flow instructions (eg jump)
 )
 
 // opExec is a map that points from an opcode to the operational parameters of the opcode.
@@ -59,6 +62,8 @@ var opExec = map[op]struct {
 	loadi: {"loadi", (*vm).loadi, liType}, // loadi r1 5    // r1 = 5
 	load:  {"load", (*vm).load, lType},    // loadi r1 r2   // r1 = r2
 	sub:   {"sub", (*vm).sub, rType},      // sub r1 r2 r3  // r1 = r2 - r3
+	jump:  {"jump", (*vm).jump, jType},    // jump 5 // jumps to address 5
+	jumpi: {"jumpi", (*vm).jumpi, jType},  // jumpi r1 // jumps to the address stored in r1
 }
 
 type registers [15]int
@@ -107,7 +112,11 @@ func (v *vm) run() error {
 		v.log("PC: %d Executing: %s\n", v.pc, ex.name)
 		ex.f(v)
 
-		v.pc += ex.kind.size
+		if ex.kind != jType {
+			// If we're jType, we assume the implmentation handled moving the pc by itself
+			v.pc += ex.kind.size
+
+		}
 		if v.pc == uint(len(v.mem)) {
 			return fmt.Errorf("finished VM without halting")
 		}
@@ -151,8 +160,25 @@ func (v *vm) addi() {
 	v.r[dest] = v.r[src] + constant
 }
 
-func (v *vm) sub()  {}
+func (v *vm) sub() {
+	dest, reg1, reg2 := v.mem[v.pc+1], v.mem[v.pc+2], v.mem[v.pc+3]
+	v.log("dest: %v, r1: %v, r2: %v, r[%v]: %v, r[%v]: %v\n",
+		dest, reg1, reg2, reg1, v.r[reg1], reg2, v.r[reg2])
+	v.r[dest] = v.r[reg1] - v.r[reg2]
+}
+
 func (v *vm) halt() {}
+
+func (v *vm) jump() {
+	reg := v.mem[v.pc+1]
+	v.log("r[%v]: %v", reg, v.r[reg])
+	v.pc = uint(v.r[reg])
+}
+
+func (v *vm) jumpi() {
+	location := v.mem[v.pc+1]
+	v.pc = uint(location)
+}
 
 func assemble(instructions []interface{}) (memory, error) {
 	empty := make(memory, 256)
