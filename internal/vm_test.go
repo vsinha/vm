@@ -1,0 +1,113 @@
+package internal
+
+import (
+	"testing"
+
+	"github.com/google/go-cmp/cmp"
+)
+
+func TestInit(t *testing.T) {
+	err := Main()
+	if err != nil {
+		t.Errorf("doSomething() error: %v", err)
+	}
+}
+
+func TestAssemble(t *testing.T) {
+	code := []interface{}{
+		addi, // r1 = r0 + 1
+		r1,
+		r0,
+		1,
+		halt,
+	}
+
+	got, err := assemble(code)
+	if err != nil {
+		t.Fatalf("assemble(%v) error: %v", code, err)
+	}
+
+	want := make(memory, 256)
+	want[0] = int(addi)
+	want[1] = int(r1)
+	want[2] = int(r0)
+	want[3] = 1
+	want[4] = int(halt)
+	if diff := cmp.Diff(want, got); diff != "" {
+		t.Errorf("assemble diff (-want,+got):\n%v", diff)
+	}
+}
+
+func TestProgram(t *testing.T) {
+	tests := map[string]struct {
+		code []interface{}
+		reg  registers
+	}{
+		"addi": {
+			[]interface{}{
+				addi, // r1 = r0 + 1
+				r1,
+				r0,
+				1,
+				halt,
+			},
+			registers{0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		},
+		"load": {
+			[]interface{}{
+				addi, // r1 = r0 + 1
+				r1,
+				r0,
+				1,
+				load, // r2 = r1
+				r2,
+				r1,
+				halt,
+			},
+			registers{0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		},
+		"loadi": {
+			[]interface{}{
+				loadi, // r2 = 2
+				r2,
+				2,
+				halt,
+			},
+			registers{0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		},
+		"add": {
+			[]interface{}{
+				loadi, // r1 = 5
+				r1,
+				5,
+				loadi, // r2 = 3
+				r2,
+				3,
+				add, // r3 = r1 + r2
+				r3,
+				r1,
+				r2,
+				halt,
+			},
+			registers{0, 5, 3, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+		},
+	}
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			mem, err := assemble(test.code)
+			if err != nil {
+				t.Errorf("assemble(%v) error: %v", test.code, err)
+			}
+			vm := &vm{
+				mem: mem,
+			}
+			if err := vm.run(); err != nil {
+				t.Errorf("vm.run() error: %v", err)
+			}
+
+			if diff := cmp.Diff(test.reg, vm.r); diff != "" {
+				t.Errorf("vm registers diff (-test.reg,+got):\n%s", diff)
+			}
+		})
+	}
+}
