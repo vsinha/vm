@@ -1,6 +1,7 @@
 package vm_test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -9,6 +10,31 @@ import (
 	"github.com/vsinha/vm/internal/assembler"
 	"github.com/vsinha/vm/internal/vm"
 )
+
+func Example() {
+	mem, err := assembler.Assemble([]interface{}{
+		vm.Loadi, // r1 = 5
+		vm.R1,
+		5,
+		vm.J,
+		8,
+		vm.Loadi, // r2 = 3
+		vm.R2,
+		1,
+		vm.Halt,
+	})
+	if err != nil {
+		fmt.Printf("error assembling: %v", err)
+	}
+
+	v := vm.New(mem)
+	if err := v.Run(); err != nil {
+		fmt.Printf("v.Run() error: %v", err)
+	}
+
+	fmt.Printf("Registers: %v", v.Registers())
+	// Output: Registers: [0 5 0 0 0 0 0 0 0 0 0 0 0 0 0]
+}
 
 func TestNoZeroLength(t *testing.T) {
 	for _, opex := range vm.OpExec {
