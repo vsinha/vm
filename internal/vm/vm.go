@@ -43,6 +43,51 @@ const (
 	R14
 )
 
+// FlagRegister provides easier encapsulation for the Accumulator and Flag registers
+type FlagRegister uint8
+
+// FlagRegisterFlag does things
+type FlagRegisterFlag uint8
+
+// These are the accessors for the flags in the F flag register
+const (
+	FlagZf FlagRegisterFlag = 1 << 7 // Zero Flag
+	FlagN                   = 1 << 6 // Add/Sub Flag (BCD)
+	FlagH                   = 1 << 5 // Half Carry Flag
+	FlagCy                  = 1 << 4 // Carry Flag
+)
+
+func hasBit(n uint8, pos uint8) bool {
+	val := n & (1 << pos)
+	return (val > 0)
+}
+
+func (af FlagRegister) isFlagSet(which FlagRegisterFlag) bool {
+	return hasBit(uint8(af), uint8(which))
+}
+
+type gbRegisters struct {
+	A  uint8 // Accumulator % & flags
+	B  uint8
+	C  uint8
+	D  uint8
+	E  uint8
+	F  FlagRegister
+	H  uint8
+	L  uint8
+	SP uint8
+	PC uint8
+}
+
+func (reg gbRegisters) GetBC() uint16 {
+	return uint16(reg.B) << 8 & uint16(reg.C)
+}
+
+func (reg *gbRegisters) SetBC(val uint16) {
+	reg.B = uint8(val >> 8 & 0xFF)
+	reg.C = uint8(val & 0xFF)
+}
+
 // OpKind stores informationa about the kind of the opcode
 type OpKind struct {
 	Size uint
@@ -137,7 +182,7 @@ func (v *VM) Run() error {
 		ex.f(v)
 
 		if ex.Kind != jType {
-			// If we're jType, we assume the implmentation handled moving the pc by itself
+			// If we're jType, we assume the implementation handled moving the pc by itself
 			v.pc += ex.Kind.Size
 
 		}
