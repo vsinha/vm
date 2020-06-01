@@ -1,4 +1,7 @@
 {
+    "comments": {
+        "github": "https://github.com/lmmendes/game-boy-opcodes"
+    },
     "unprefixed": {
         "0x0": {
             "mnemonic": "NOP",

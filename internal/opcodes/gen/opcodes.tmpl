@@ -1,0 +1,23 @@
+package vm
+
+// TODO this has problems because many of the opcodes have the same mnemonic,
+// so we have to think about how to disambiguate them or if we even want to
+type Op int
+
+type OpCode interface {
+	Execute(*vm.VM) 
+}
+
+{{range $key, $value := .}}
+type {{ $value.ExtendedMnemonic }} struct {}
+
+func (o *{{ $value.ExtendedMnemonic }}) Execute(v *vm.VM) {
+	{{ if eq $value.Mnemonic "LD" -}}
+		v.{{$value.Operand1}}(v.{{$value.Operand2}}())
+	{{- end }}
+}
+
+func (o *{{ $value.ExtendedMnemonic }}) String() string {
+	return "{{ $value.Mnemonic }}{{ if $value.Operand1 }} {{ $value.Operand1 }}{{end}}{{ if $value.Operand2 }} {{ $value.Operand2 }}{{end}}"
+}
+{{end}}
