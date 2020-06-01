@@ -25,8 +25,32 @@ type opcode struct {
 	Cycles           []uint   `json:"cycles"`
 	Flags            []string `json:"flags"`
 	Addr             string   `json:"addr"`
-	Operand1         string   `json:"operand1"`
-	Operand2         string   `json:"operand2"`
+	RawOperand1      string   `json:"operand1"`
+	RawOperand2      string   `json:"operand2"`
+}
+
+func (o *opcode) Operand1() string {
+	// Matches (a16) and (d16)
+	if strings.HasSuffix(o.RawOperand1, "16)") {
+		// ("+o.operand1+")
+		return "(\"+o.operand1+\")"
+	} else if strings.HasSuffix(o.RawOperand1, "16") {
+		return "o.operand1"
+	}
+
+	return o.RawOperand1
+}
+
+func (o *opcode) Operand2() string {
+	// Matches (a16) and (d16)
+	if strings.HasSuffix(o.RawOperand2, "16)") {
+		// ("+o.operand1+")
+		return "(\"+o.operand1+\")"
+	} else if strings.HasSuffix(o.RawOperand2, "16") {
+		return "o.operand1"
+	}
+
+	return o.RawOperand2
 }
 
 var templates = generateTemplate()
@@ -69,6 +93,8 @@ func cleanMnemonic(s string) string {
 			panic(fmt.Sprintf("%q is not a valid opcode argument, no matching paren.", s))
 		}
 		return s[1:len(s)-1] + "Deref"
+	case s == "SP+r8":
+		return "SP_plus_r8"
 	default:
 		return s
 	}
@@ -111,10 +137,10 @@ func parse() []opcode {
 	for i, v := range opcodes {
 		var args []string
 		args = append(args, cleanMnemonic(v.Mnemonic))
-		args = append(args, cleanMnemonic(v.Operand1))
+		args = append(args, cleanMnemonic(v.RawOperand1))
 
-		if v.Operand2 != "" {
-			args = append(args, cleanMnemonic(v.Operand2))
+		if v.RawOperand2 != "" {
+			args = append(args, cleanMnemonic(v.RawOperand2))
 		}
 
 		extended := strings.Join(args, "_")

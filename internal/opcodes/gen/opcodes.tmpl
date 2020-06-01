@@ -1,5 +1,14 @@
 package vm
 
+import (
+	"errors"
+	"fmt"
+
+	"github.com/vsinha/vm/internal/vm"
+)
+
+var ErrNoOpCode = errors.New("no opcode with that address exists")
+
 // TODO this has problems because many of the opcodes have the same mnemonic,
 // so we have to think about how to disambiguate them or if we even want to
 type Op int
@@ -9,15 +18,50 @@ type OpCode interface {
 }
 
 {{range $key, $value := .}}
-type {{ $value.ExtendedMnemonic }} struct {}
+type {{ $value.ExtendedMnemonic }} struct {
+	operand1 string
+	operand2 string
+}
 
 func (o *{{ $value.ExtendedMnemonic }}) Execute(v *vm.VM) {
-	{{ if eq $value.Mnemonic "LD" -}}
-		v.{{$value.Operand1}}(v.{{$value.Operand2}}())
-	{{- end }}
 }
 
 func (o *{{ $value.ExtendedMnemonic }}) String() string {
 	return "{{ $value.Mnemonic }}{{ if $value.Operand1 }} {{ $value.Operand1 }}{{end}}{{ if $value.Operand2 }} {{ $value.Operand2 }}{{end}}"
 }
 {{end}}
+
+// ReadOpCode returns an executable opcode by taking an io.Reader
+// and reading a single instruction off it. If there is no more data
+// returns undelying io.Reader's EOF error type.
+func ReadOpCode(data io.Reader) (*OpCode, error) {
+	var d [1]byte
+	err, _ := data.Read(d)
+	if err != nil {
+		return nil, err
+	}
+
+	switch d[0] {
+	{{ range $key, $value := . }}
+	case {{$value.Addr}}: // {{$value.Mnemonic}}
+		o := &{{$value.ExtendedMnemonic}}{}
+		{{- if ge $value.Length 2 }}
+		err, _ = data.Read(d)
+		if err != nil {
+			return nil, err
+		}
+		o.Operand1 = d
+		{{ end }}
+		{{- if ge $value.Length 3 }}
+		err, _ = data.Read(d)
+		if err != nil {
+			return nil, err
+		}
+		o.Operand2 = d
+		{{ end }}
+		return o, nil
+	{{ end }}
+	default:
+		return nil, fmt.Errorf("the proposed opcode (dec %d, hex %x) doesn't exist: %v", d[0], d[0], ErrNoOpCode)
+	}
+}

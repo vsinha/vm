@@ -52,12 +52,9 @@ func (reg Registers) BC() uint16 {
 
 // SetBC sets the B register and the C register individually as int8.
 func (reg *Registers) SetBC(val uint16) {
-	reg.b = uint8(val >> 8 & 0xFF)
-	reg.c = uint8(val & 0xFF)
+	reg.b = Reg(val >> 8 & 0xFF)
+	reg.c = Reg(val & 0xFF)
 }
-
-// Registers are the registers of our VM
-type Registers [15]int
 
 // Memory is the initialized starting memory to be passed into the VM
 type Memory []int
