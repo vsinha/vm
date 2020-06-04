@@ -1,4 +1,4 @@
-package vm
+package opcodes
 
 // func TestParse(t *testing.T) {
 // 	opcodes := parse()

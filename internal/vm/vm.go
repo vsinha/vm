@@ -2,7 +2,6 @@ package vm
 
 import (
 	"fmt"
-	"strings"
 )
 
 // Reg is an enum alias of the named registers
@@ -59,6 +58,7 @@ func (reg *Registers) SetBC(val uint16) {
 // Memory is the initialized starting memory to be passed into the VM
 type Memory []int
 
+/*
 func (m Memory) String() string {
 	b := &strings.Builder{}
 
@@ -84,6 +84,7 @@ func (m Memory) String() string {
 	}
 	return b.String()
 }
+*/
 
 // VM is the in-memory virtual machine!
 type VM struct {
@@ -104,40 +105,42 @@ func New(mem Memory) *VM {
 
 // Run executes the virtual machine.
 func (v *VM) Run() error {
-	o := Op(v.mem[v.pc])
+	//o := Op(v.mem[v.pc])
 
-	for o != Halt {
+	/*
+		for o != Halt {
 
-		// while !timeForVblank
-		// fetch (this depends on width)
-		// Go to memory, read instruction, decode instruction (generated) returns a *opcodes.NOP
+			// while !timeForVblank
+			// fetch (this depends on width)
+			// Go to memory, read instruction, decode instruction (generated) returns a *opcodes.NOP
 
-		// execute  instruction.Execute(vm)
-		// exceute vm.Execute(instruction)
-		// instruction.Execute(vm)
-		// cycles += instrucntion.Cycles()
-		//
+			// execute  instruction.Execute(vm)
+			// exceute vm.Execute(instruction)
+			// instruction.Execute(vm)
+			// cycles += instrucntion.Cycles()
+			//
 
-		// increment something
+			// increment something
 
-		// vblank
-		// sound things
+			// vblank
+			// sound things
 
-		ex := OpExec[o]
+			ex := OpExec[o]
 
-		v.log("PC: %d Executing: %s\n", v.pc, ex.Name)
-		ex.f(v)
+			v.log("PC: %d Executing: %s\n", v.pc, ex.Name)
+			ex.f(v)
 
-		if ex.Kind != jType {
-			// If we're jType, we assume the implementation handled moving the pc by itself
-			v.pc += ex.Kind.Size
+			if ex.Kind != jType {
+				// If we're jType, we assume the implementation handled moving the pc by itself
+				v.pc += ex.Kind.Size
 
+			}
+			if v.pc == uint(len(v.mem)) {
+				return fmt.Errorf("finished VM without halting")
+			}
+			o = Op(v.mem[v.pc])
 		}
-		if v.pc == uint(len(v.mem)) {
-			return fmt.Errorf("finished VM without halting")
-		}
-		o = Op(v.mem[v.pc])
-	}
+	*/
 
 	v.log("Found halt instruction. Done.\n")
 	return nil

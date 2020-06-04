@@ -2,10 +2,11 @@ package main
 
 //go:generate go run main.go -name=String -type=string
 
+// The https://www.pastraiser.com/cpu/gameboy/gameboy_opcodes.html will guide your way.
+
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -53,7 +54,17 @@ func (o *opcode) Operand2() string {
 	return o.RawOperand2
 }
 
-var templates = generateTemplate()
+type opcodes struct {
+	Unprefixed map[string]*opcode `json:"unprefixed"`
+
+	// An optional prefix byte may appear before the opcode, changing its
+	// meaning and causing the Z80 to look up the opcode in a different
+	// bank of instructions. The prefix byte, if present, may have the values
+	// CB. Although there are opcodes which have these values too, there is
+	// no ambiguity: the first byte in the instruction, if it has one of
+	// these values, is always a prefix byte.
+	CBPrefixed map[string]*opcode `json:"cbprefixed"`
+}
 
 // LD A,(C)    has alternative mnemonic LD A,($FF00+C)
 // LD C,(A)    has alternative mnemonic LD ($FF00+C),A
@@ -100,41 +111,8 @@ func cleanMnemonic(s string) string {
 	}
 }
 
-// Parse parses the opcodes.json file into nice struct
-// to be used by the codgen tool
-func parse() []opcode {
-	jsonFile, err := os.Open(jsonFile)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	defer jsonFile.Close()
-
-	fmt.Printf("Succesfully opened %s\n", jsonFile.Name())
-
-	bytes, err := ioutil.ReadAll(jsonFile)
-	if err != nil {
-		panic(fmt.Sprintf("ioutil.ReadAll(%q) error: %v", jsonFile.Name(), err))
-	}
-
-	var data struct {
-		Unprefixed map[string]opcode `json:"unprefixed"`
-		CBPrefixed map[string]opcode `json:"cbprefixed"`
-	}
-	if err := json.Unmarshal(bytes, &data); err != nil {
-		panic(fmt.Sprintf("Unmarshal error: %v", err))
-	}
-
-	var opcodes []opcode
-	for _, v := range data.Unprefixed {
-		opcodes = append(opcodes, v)
-	}
-	for _, v := range data.CBPrefixed {
-		v.CBPrefixed = true
-		opcodes = append(opcodes, v)
-	}
-
-	for i, v := range opcodes {
+func cleanMnemonics(opcodes map[string]*opcode) {
+	for k, v := range opcodes {
 		var args []string
 		args = append(args, cleanMnemonic(v.Mnemonic))
 		args = append(args, cleanMnemonic(v.RawOperand1))
@@ -145,14 +123,44 @@ func parse() []opcode {
 
 		extended := strings.Join(args, "_")
 
-		opcodes[i].ExtendedMnemonic = extended
+		opcodes[k].ExtendedMnemonic = extended
+	}
+}
+
+// Parse parses the opcodes.json file into nice struct
+// to be used by the codgen tool
+func parse() (*opcodes, error) {
+	jsonFile, err := os.Open(jsonFile)
+	if err != nil {
+		return nil, err
 	}
 
-	return opcodes
+	defer jsonFile.Close()
+
+	fmt.Printf("Succesfully opened %s\n", jsonFile.Name())
+
+	bytes, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		return nil, fmt.Errorf("ioutil.ReadAll(%q) error: %v", jsonFile.Name(), err)
+	}
+
+	var data opcodes
+	if err := json.Unmarshal(bytes, &data); err != nil {
+		return nil, fmt.Errorf("Unmarshal error: %v", err)
+	}
+
+	return &data, nil
 }
 
 func main() {
-	opcodes := parse()
+	opcodes, err := parse()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	cleanMnemonics(opcodes.Unprefixed)
+	cleanMnemonics(opcodes.CBPrefixed)
 
 	outFile, err := os.Create("../opcodes_generated.go")
 	if err != nil {
@@ -161,21 +169,20 @@ func main() {
 	}
 	defer outFile.Close()
 
-	// Synchronus reader/writer
-	r, _ := io.Pipe()
-
-	cmd := exec.Command("goimports")
-	cmd.Stdin = r
-	cmd.Stdout = outFile
-	if err := cmd.Start(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+	templates := generateTemplate()
+	if err := templates.ExecuteTemplate(outFile, "opcodes.tmpl", opcodes); err != nil {
+		log.Fatalf("Error rendering template %v: %v", templates, err)
+	}
+	if err := outFile.Close(); err != nil {
+		log.Fatalf("Unable to close pipe", err)
 	}
 
-	for _, t := range templates.Templates() {
-		if err := t.Execute(outFile, opcodes); err != nil {
-			log.Fatalf("Error rendering template %v: %v", t, err)
-		}
+	cmd := exec.Command("gofmt", "-w", outFile.Name())
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }
 
