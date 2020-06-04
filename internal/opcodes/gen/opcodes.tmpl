@@ -16,20 +16,35 @@ type Op int
 
 type OpCode interface {
 	Execute(*vm.VM) 
+	String() string
 }
 
 {{define "opcodeTypeStruct" }}
 {{range $key, $value := .}}
 type {{.ExtendedMnemonic}} struct {
-	operand1 string
-	operand2 string
+	addr string // 0x50
+	operand1 string // literal, or reg name, or (HL)...
+	operand2 string // same
 }
 
 func (o *{{.ExtendedMnemonic}}) Execute(v *vm.VM) {
 }
 
+func (o *{{.ExtendedMnemonic}}) Write(w io.Writer) (int, error) {
+	var written int
+	n, err := fmt.Fprintf(w, "%c", {{.Addr}})
+	if err != nil {
+		return 0, err
+	}
+	written += n
+	return n, nil
+}
+
 func (o *{{.ExtendedMnemonic}}) String() string {
-	return "{{.Mnemonic}}{{if .Operand1}} {{.Operand1}}{{end}}{{if .Operand2}} {{.Operand2}}{{end}}"
+	return "{{.Mnemonic}} "+o.operand1+","+o.operand2
+}
+func (o *{{.ExtendedMnemonic}}) SymbolicString() string {
+	return "{{.Mnemonic}}{{if .Operand1}} {{.Operand1}}{{end}}{{if .Operand2}},{{.Operand2}}{{end}}"
 }
 {{end}}
 {{end}}
@@ -65,11 +80,11 @@ func (o *{{.ExtendedMnemonic}}) String() string {
 // and reading a single instruction off it. If there is no more data
 // returns undelying io.Reader's EOF error type.
 func ReadOpCode(data io.Reader) (OpCode, error) {
-	d, err := readByte(data)
+	d := make([]byte, 1)
+	_, err := data.Read(d)
 	if err != nil {
 		return nil, err
 	}
-
 	switch d[0] {
 	{{ range $key, $value := .Unprefixed }}
 	case {{$value.Addr}}: // {{$value.Addr}} - {{$value.Mnemonic}}

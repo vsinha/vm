@@ -115,7 +115,10 @@ func cleanMnemonics(opcodes map[string]*opcode) {
 	for k, v := range opcodes {
 		var args []string
 		args = append(args, cleanMnemonic(v.Mnemonic))
-		args = append(args, cleanMnemonic(v.RawOperand1))
+
+		if v.RawOperand1 != "" {
+			args = append(args, cleanMnemonic(v.RawOperand1))
+		}
 
 		if v.RawOperand2 != "" {
 			args = append(args, cleanMnemonic(v.RawOperand2))

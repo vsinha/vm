@@ -5,12 +5,12 @@ import (
 	"io"
 )
 
-func readBytesAsString(reader io.Reader, n int) (string, error) {
+func readBytesAsString(r io.Reader, n int) (string, error) {
 	d := make([]byte, n)
 
-	_, err := data.Read(d)
+	_, err := r.Read(d)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	s := fmt.Sprintf("%x", d)
