@@ -4,10 +4,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"strconv"
+	"unicode/utf8"
 
 	"github.com/vsinha/vm/internal/vm"
 )
 
+// ErrNoOpCode is a little alias for the error message returned below
 var ErrNoOpCode = errors.New("no opcode with that address exists")
 
 // TODO this has problems because many of the opcodes have the same mnemonic,
@@ -17,51 +20,79 @@ type Op int
 type OpCode interface {
 	Execute(*vm.VM)
 	String() string
+	Write(io.Writer) (int, error)
+}
+
+// Fake converting UTF-8 internal string representation to standard
+// ASCII bytes for serial connections.
+func StringToAsciiBytes(s string) []byte {
+	t := make([]byte, utf8.RuneCountInString(s))
+	i := 0
+	for _, r := range s {
+		t[i] = byte(r)
+		i++
+	}
+	return t
 }
 
 type NOP struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *NOP) Execute(v *vm.VM) {
 }
 
 func (o *NOP) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *NOP) String() string {
-	return "NOP " + o.operand1 + "," + o.operand2
+	return "NOP " + o.operand1
 }
 func (o *NOP) SymbolicString() string {
 	return "NOP"
 }
 
 type LD_BC_d16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_BC_d16) Execute(v *vm.VM) {
 }
 
 func (o *LD_BC_d16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1)
+	var b []byte
+
+	b = append(b, 0x1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *LD_BC_d16) String() string {
@@ -72,48 +103,63 @@ func (o *LD_BC_d16) SymbolicString() string {
 }
 
 type STOP_0 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *STOP_0) Execute(v *vm.VM) {
 }
 
 func (o *STOP_0) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x10)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x10)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *STOP_0) String() string {
-	return "STOP " + o.operand1 + "," + o.operand2
+	return "STOP " + o.operand1
 }
 func (o *STOP_0) SymbolicString() string {
 	return "STOP 0"
 }
 
 type LD_DE_d16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_DE_d16) Execute(v *vm.VM) {
 }
 
 func (o *LD_DE_d16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x11)
+	var b []byte
+
+	b = append(b, 0x11)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *LD_DE_d16) String() string {
@@ -124,22 +170,26 @@ func (o *LD_DE_d16) SymbolicString() string {
 }
 
 type LD_DEDeref_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_DEDeref_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_DEDeref_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x12)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x12)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_DEDeref_A) String() string {
@@ -150,100 +200,123 @@ func (o *LD_DEDeref_A) SymbolicString() string {
 }
 
 type INC_DE struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *INC_DE) Execute(v *vm.VM) {
 }
 
 func (o *INC_DE) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x13)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x13)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *INC_DE) String() string {
-	return "INC " + o.operand1 + "," + o.operand2
+	return "INC " + o.operand1
 }
 func (o *INC_DE) SymbolicString() string {
 	return "INC DE"
 }
 
 type INC_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *INC_D) Execute(v *vm.VM) {
 }
 
 func (o *INC_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x14)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x14)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *INC_D) String() string {
-	return "INC " + o.operand1 + "," + o.operand2
+	return "INC " + o.operand1
 }
 func (o *INC_D) SymbolicString() string {
 	return "INC D"
 }
 
 type DEC_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DEC_D) Execute(v *vm.VM) {
 }
 
 func (o *DEC_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x15)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x15)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DEC_D) String() string {
-	return "DEC " + o.operand1 + "," + o.operand2
+	return "DEC " + o.operand1
 }
 func (o *DEC_D) SymbolicString() string {
 	return "DEC D"
 }
 
 type LD_D_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_D_d8) Execute(v *vm.VM) {
 }
 
 func (o *LD_D_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x16)
+	var b []byte
+
+	b = append(b, 0x16)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *LD_D_d8) String() string {
@@ -254,74 +327,86 @@ func (o *LD_D_d8) SymbolicString() string {
 }
 
 type RLA struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RLA) Execute(v *vm.VM) {
 }
 
 func (o *RLA) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x17)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x17)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RLA) String() string {
-	return "RLA " + o.operand1 + "," + o.operand2
+	return "RLA " + o.operand1
 }
 func (o *RLA) SymbolicString() string {
 	return "RLA"
 }
 
 type JR_r8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *JR_r8) Execute(v *vm.VM) {
 }
 
 func (o *JR_r8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x18)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x18)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *JR_r8) String() string {
-	return "JR " + o.operand1 + "," + o.operand2
+	return "JR " + o.operand1
 }
 func (o *JR_r8) SymbolicString() string {
 	return "JR r8"
 }
 
 type ADD_HL_DE struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_HL_DE) Execute(v *vm.VM) {
 }
 
 func (o *ADD_HL_DE) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x19)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x19)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_HL_DE) String() string {
@@ -332,22 +417,26 @@ func (o *ADD_HL_DE) SymbolicString() string {
 }
 
 type LD_A_DEDeref struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_DEDeref) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_DEDeref) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x1a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_DEDeref) String() string {
@@ -358,100 +447,123 @@ func (o *LD_A_DEDeref) SymbolicString() string {
 }
 
 type DEC_DE struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DEC_DE) Execute(v *vm.VM) {
 }
 
 func (o *DEC_DE) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x1b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DEC_DE) String() string {
-	return "DEC " + o.operand1 + "," + o.operand2
+	return "DEC " + o.operand1
 }
 func (o *DEC_DE) SymbolicString() string {
 	return "DEC DE"
 }
 
 type INC_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *INC_E) Execute(v *vm.VM) {
 }
 
 func (o *INC_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x1c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *INC_E) String() string {
-	return "INC " + o.operand1 + "," + o.operand2
+	return "INC " + o.operand1
 }
 func (o *INC_E) SymbolicString() string {
 	return "INC E"
 }
 
 type DEC_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DEC_E) Execute(v *vm.VM) {
 }
 
 func (o *DEC_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x1d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DEC_E) String() string {
-	return "DEC " + o.operand1 + "," + o.operand2
+	return "DEC " + o.operand1
 }
 func (o *DEC_E) SymbolicString() string {
 	return "DEC E"
 }
 
 type LD_E_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_E_d8) Execute(v *vm.VM) {
 }
 
 func (o *LD_E_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1e)
+	var b []byte
+
+	b = append(b, 0x1e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *LD_E_d8) String() string {
@@ -462,48 +574,56 @@ func (o *LD_E_d8) SymbolicString() string {
 }
 
 type RRA struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RRA) Execute(v *vm.VM) {
 }
 
 func (o *RRA) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x1f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RRA) String() string {
-	return "RRA " + o.operand1 + "," + o.operand2
+	return "RRA " + o.operand1
 }
 func (o *RRA) SymbolicString() string {
 	return "RRA"
 }
 
 type LD_BCDeref_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_BCDeref_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_BCDeref_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_BCDeref_A) String() string {
@@ -514,22 +634,26 @@ func (o *LD_BCDeref_A) SymbolicString() string {
 }
 
 type JR_NZ_r8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *JR_NZ_r8) Execute(v *vm.VM) {
 }
 
 func (o *JR_NZ_r8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x20)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x20)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *JR_NZ_r8) String() string {
@@ -540,22 +664,33 @@ func (o *JR_NZ_r8) SymbolicString() string {
 }
 
 type LD_HL_d16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_HL_d16) Execute(v *vm.VM) {
 }
 
 func (o *LD_HL_d16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x21)
+	var b []byte
+
+	b = append(b, 0x21)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *LD_HL_d16) String() string {
@@ -566,22 +701,26 @@ func (o *LD_HL_d16) SymbolicString() string {
 }
 
 type LD_HLPtrInc_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_HLPtrInc_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_HLPtrInc_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x22)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x22)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_HLPtrInc_A) String() string {
@@ -592,100 +731,123 @@ func (o *LD_HLPtrInc_A) SymbolicString() string {
 }
 
 type INC_HL struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *INC_HL) Execute(v *vm.VM) {
 }
 
 func (o *INC_HL) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x23)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x23)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *INC_HL) String() string {
-	return "INC " + o.operand1 + "," + o.operand2
+	return "INC " + o.operand1
 }
 func (o *INC_HL) SymbolicString() string {
 	return "INC HL"
 }
 
 type INC_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *INC_H) Execute(v *vm.VM) {
 }
 
 func (o *INC_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x24)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x24)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *INC_H) String() string {
-	return "INC " + o.operand1 + "," + o.operand2
+	return "INC " + o.operand1
 }
 func (o *INC_H) SymbolicString() string {
 	return "INC H"
 }
 
 type DEC_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DEC_H) Execute(v *vm.VM) {
 }
 
 func (o *DEC_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x25)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x25)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DEC_H) String() string {
-	return "DEC " + o.operand1 + "," + o.operand2
+	return "DEC " + o.operand1
 }
 func (o *DEC_H) SymbolicString() string {
 	return "DEC H"
 }
 
 type LD_H_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_H_d8) Execute(v *vm.VM) {
 }
 
 func (o *LD_H_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x26)
+	var b []byte
+
+	b = append(b, 0x26)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *LD_H_d8) String() string {
@@ -696,48 +858,56 @@ func (o *LD_H_d8) SymbolicString() string {
 }
 
 type DAA struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DAA) Execute(v *vm.VM) {
 }
 
 func (o *DAA) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x27)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x27)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DAA) String() string {
-	return "DAA " + o.operand1 + "," + o.operand2
+	return "DAA " + o.operand1
 }
 func (o *DAA) SymbolicString() string {
 	return "DAA"
 }
 
 type JR_Z_r8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *JR_Z_r8) Execute(v *vm.VM) {
 }
 
 func (o *JR_Z_r8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x28)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x28)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *JR_Z_r8) String() string {
@@ -748,22 +918,26 @@ func (o *JR_Z_r8) SymbolicString() string {
 }
 
 type ADD_HL_HL struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_HL_HL) Execute(v *vm.VM) {
 }
 
 func (o *ADD_HL_HL) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x29)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x29)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_HL_HL) String() string {
@@ -774,22 +948,26 @@ func (o *ADD_HL_HL) SymbolicString() string {
 }
 
 type LD_A_HLPtrInc struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_HLPtrInc) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_HLPtrInc) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x2a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_HLPtrInc) String() string {
@@ -800,100 +978,123 @@ func (o *LD_A_HLPtrInc) SymbolicString() string {
 }
 
 type DEC_HL struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DEC_HL) Execute(v *vm.VM) {
 }
 
 func (o *DEC_HL) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x2b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DEC_HL) String() string {
-	return "DEC " + o.operand1 + "," + o.operand2
+	return "DEC " + o.operand1
 }
 func (o *DEC_HL) SymbolicString() string {
 	return "DEC HL"
 }
 
 type INC_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *INC_L) Execute(v *vm.VM) {
 }
 
 func (o *INC_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x2c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *INC_L) String() string {
-	return "INC " + o.operand1 + "," + o.operand2
+	return "INC " + o.operand1
 }
 func (o *INC_L) SymbolicString() string {
 	return "INC L"
 }
 
 type DEC_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DEC_L) Execute(v *vm.VM) {
 }
 
 func (o *DEC_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x2d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DEC_L) String() string {
-	return "DEC " + o.operand1 + "," + o.operand2
+	return "DEC " + o.operand1
 }
 func (o *DEC_L) SymbolicString() string {
 	return "DEC L"
 }
 
 type LD_L_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_L_d8) Execute(v *vm.VM) {
 }
 
 func (o *LD_L_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2e)
+	var b []byte
+
+	b = append(b, 0x2e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *LD_L_d8) String() string {
@@ -904,74 +1105,86 @@ func (o *LD_L_d8) SymbolicString() string {
 }
 
 type CPL struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CPL) Execute(v *vm.VM) {
 }
 
 func (o *CPL) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x2f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *CPL) String() string {
-	return "CPL " + o.operand1 + "," + o.operand2
+	return "CPL " + o.operand1
 }
 func (o *CPL) SymbolicString() string {
 	return "CPL"
 }
 
 type INC_BC struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *INC_BC) Execute(v *vm.VM) {
 }
 
 func (o *INC_BC) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x3)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *INC_BC) String() string {
-	return "INC " + o.operand1 + "," + o.operand2
+	return "INC " + o.operand1
 }
 func (o *INC_BC) SymbolicString() string {
 	return "INC BC"
 }
 
 type JR_NC_r8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *JR_NC_r8) Execute(v *vm.VM) {
 }
 
 func (o *JR_NC_r8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x30)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x30)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *JR_NC_r8) String() string {
@@ -982,22 +1195,33 @@ func (o *JR_NC_r8) SymbolicString() string {
 }
 
 type LD_SP_d16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_SP_d16) Execute(v *vm.VM) {
 }
 
 func (o *LD_SP_d16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x31)
+	var b []byte
+
+	b = append(b, 0x31)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *LD_SP_d16) String() string {
@@ -1008,22 +1232,26 @@ func (o *LD_SP_d16) SymbolicString() string {
 }
 
 type LD_HLPtrDec_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_HLPtrDec_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_HLPtrDec_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x32)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x32)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_HLPtrDec_A) String() string {
@@ -1034,100 +1262,123 @@ func (o *LD_HLPtrDec_A) SymbolicString() string {
 }
 
 type INC_SP struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *INC_SP) Execute(v *vm.VM) {
 }
 
 func (o *INC_SP) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x33)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x33)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *INC_SP) String() string {
-	return "INC " + o.operand1 + "," + o.operand2
+	return "INC " + o.operand1
 }
 func (o *INC_SP) SymbolicString() string {
 	return "INC SP"
 }
 
 type INC_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *INC_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *INC_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x34)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x34)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *INC_HLPtr) String() string {
-	return "INC " + o.operand1 + "," + o.operand2
+	return "INC " + o.operand1
 }
 func (o *INC_HLPtr) SymbolicString() string {
 	return "INC (HL)"
 }
 
 type DEC_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DEC_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *DEC_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x35)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x35)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DEC_HLPtr) String() string {
-	return "DEC " + o.operand1 + "," + o.operand2
+	return "DEC " + o.operand1
 }
 func (o *DEC_HLPtr) SymbolicString() string {
 	return "DEC (HL)"
 }
 
 type LD_HLPtr_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_HLPtr_d8) Execute(v *vm.VM) {
 }
 
 func (o *LD_HLPtr_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x36)
+	var b []byte
+
+	b = append(b, 0x36)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *LD_HLPtr_d8) String() string {
@@ -1138,48 +1389,56 @@ func (o *LD_HLPtr_d8) SymbolicString() string {
 }
 
 type SCF struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SCF) Execute(v *vm.VM) {
 }
 
 func (o *SCF) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x37)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x37)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SCF) String() string {
-	return "SCF " + o.operand1 + "," + o.operand2
+	return "SCF " + o.operand1
 }
 func (o *SCF) SymbolicString() string {
 	return "SCF"
 }
 
 type JR_C_r8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *JR_C_r8) Execute(v *vm.VM) {
 }
 
 func (o *JR_C_r8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x38)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x38)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *JR_C_r8) String() string {
@@ -1190,22 +1449,26 @@ func (o *JR_C_r8) SymbolicString() string {
 }
 
 type ADD_HL_SP struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_HL_SP) Execute(v *vm.VM) {
 }
 
 func (o *ADD_HL_SP) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x39)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x39)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_HL_SP) String() string {
@@ -1216,22 +1479,26 @@ func (o *ADD_HL_SP) SymbolicString() string {
 }
 
 type LD_A_HLPtrDec struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_HLPtrDec) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_HLPtrDec) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x3a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_HLPtrDec) String() string {
@@ -1242,100 +1509,123 @@ func (o *LD_A_HLPtrDec) SymbolicString() string {
 }
 
 type DEC_SP struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DEC_SP) Execute(v *vm.VM) {
 }
 
 func (o *DEC_SP) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x3b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DEC_SP) String() string {
-	return "DEC " + o.operand1 + "," + o.operand2
+	return "DEC " + o.operand1
 }
 func (o *DEC_SP) SymbolicString() string {
 	return "DEC SP"
 }
 
 type INC_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *INC_A) Execute(v *vm.VM) {
 }
 
 func (o *INC_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x3c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *INC_A) String() string {
-	return "INC " + o.operand1 + "," + o.operand2
+	return "INC " + o.operand1
 }
 func (o *INC_A) SymbolicString() string {
 	return "INC A"
 }
 
 type DEC_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DEC_A) Execute(v *vm.VM) {
 }
 
 func (o *DEC_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x3d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DEC_A) String() string {
-	return "DEC " + o.operand1 + "," + o.operand2
+	return "DEC " + o.operand1
 }
 func (o *DEC_A) SymbolicString() string {
 	return "DEC A"
 }
 
 type LD_A_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_d8) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3e)
+	var b []byte
+
+	b = append(b, 0x3e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *LD_A_d8) String() string {
@@ -1346,74 +1636,86 @@ func (o *LD_A_d8) SymbolicString() string {
 }
 
 type CCF struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CCF) Execute(v *vm.VM) {
 }
 
 func (o *CCF) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x3f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *CCF) String() string {
-	return "CCF " + o.operand1 + "," + o.operand2
+	return "CCF " + o.operand1
 }
 func (o *CCF) SymbolicString() string {
 	return "CCF"
 }
 
 type INC_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *INC_B) Execute(v *vm.VM) {
 }
 
 func (o *INC_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x4)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *INC_B) String() string {
-	return "INC " + o.operand1 + "," + o.operand2
+	return "INC " + o.operand1
 }
 func (o *INC_B) SymbolicString() string {
 	return "INC B"
 }
 
 type LD_B_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_B_B) Execute(v *vm.VM) {
 }
 
 func (o *LD_B_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x40)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x40)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_B_B) String() string {
@@ -1424,22 +1726,26 @@ func (o *LD_B_B) SymbolicString() string {
 }
 
 type LD_B_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_B_C) Execute(v *vm.VM) {
 }
 
 func (o *LD_B_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x41)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x41)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_B_C) String() string {
@@ -1450,22 +1756,26 @@ func (o *LD_B_C) SymbolicString() string {
 }
 
 type LD_B_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_B_D) Execute(v *vm.VM) {
 }
 
 func (o *LD_B_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x42)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x42)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_B_D) String() string {
@@ -1476,22 +1786,26 @@ func (o *LD_B_D) SymbolicString() string {
 }
 
 type LD_B_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_B_E) Execute(v *vm.VM) {
 }
 
 func (o *LD_B_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x43)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x43)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_B_E) String() string {
@@ -1502,22 +1816,26 @@ func (o *LD_B_E) SymbolicString() string {
 }
 
 type LD_B_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_B_H) Execute(v *vm.VM) {
 }
 
 func (o *LD_B_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x44)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x44)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_B_H) String() string {
@@ -1528,22 +1846,26 @@ func (o *LD_B_H) SymbolicString() string {
 }
 
 type LD_B_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_B_L) Execute(v *vm.VM) {
 }
 
 func (o *LD_B_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x45)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x45)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_B_L) String() string {
@@ -1554,22 +1876,26 @@ func (o *LD_B_L) SymbolicString() string {
 }
 
 type LD_B_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_B_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *LD_B_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x46)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x46)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_B_HLPtr) String() string {
@@ -1580,22 +1906,26 @@ func (o *LD_B_HLPtr) SymbolicString() string {
 }
 
 type LD_B_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_B_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_B_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x47)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x47)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_B_A) String() string {
@@ -1606,22 +1936,26 @@ func (o *LD_B_A) SymbolicString() string {
 }
 
 type LD_C_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_C_B) Execute(v *vm.VM) {
 }
 
 func (o *LD_C_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x48)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x48)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_C_B) String() string {
@@ -1632,22 +1966,26 @@ func (o *LD_C_B) SymbolicString() string {
 }
 
 type LD_C_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_C_C) Execute(v *vm.VM) {
 }
 
 func (o *LD_C_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x49)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x49)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_C_C) String() string {
@@ -1658,22 +1996,26 @@ func (o *LD_C_C) SymbolicString() string {
 }
 
 type LD_C_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_C_D) Execute(v *vm.VM) {
 }
 
 func (o *LD_C_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x4a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_C_D) String() string {
@@ -1684,22 +2026,26 @@ func (o *LD_C_D) SymbolicString() string {
 }
 
 type LD_C_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_C_E) Execute(v *vm.VM) {
 }
 
 func (o *LD_C_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x4b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_C_E) String() string {
@@ -1710,22 +2056,26 @@ func (o *LD_C_E) SymbolicString() string {
 }
 
 type LD_C_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_C_H) Execute(v *vm.VM) {
 }
 
 func (o *LD_C_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x4c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_C_H) String() string {
@@ -1736,22 +2086,26 @@ func (o *LD_C_H) SymbolicString() string {
 }
 
 type LD_C_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_C_L) Execute(v *vm.VM) {
 }
 
 func (o *LD_C_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x4d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_C_L) String() string {
@@ -1762,22 +2116,26 @@ func (o *LD_C_L) SymbolicString() string {
 }
 
 type LD_C_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_C_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *LD_C_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x4e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_C_HLPtr) String() string {
@@ -1788,22 +2146,26 @@ func (o *LD_C_HLPtr) SymbolicString() string {
 }
 
 type LD_C_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_C_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_C_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x4f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_C_A) String() string {
@@ -1814,48 +2176,56 @@ func (o *LD_C_A) SymbolicString() string {
 }
 
 type DEC_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DEC_B) Execute(v *vm.VM) {
 }
 
 func (o *DEC_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DEC_B) String() string {
-	return "DEC " + o.operand1 + "," + o.operand2
+	return "DEC " + o.operand1
 }
 func (o *DEC_B) SymbolicString() string {
 	return "DEC B"
 }
 
 type LD_D_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_D_B) Execute(v *vm.VM) {
 }
 
 func (o *LD_D_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x50)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x50)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_D_B) String() string {
@@ -1866,22 +2236,26 @@ func (o *LD_D_B) SymbolicString() string {
 }
 
 type LD_D_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_D_C) Execute(v *vm.VM) {
 }
 
 func (o *LD_D_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x51)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x51)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_D_C) String() string {
@@ -1892,22 +2266,26 @@ func (o *LD_D_C) SymbolicString() string {
 }
 
 type LD_D_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_D_D) Execute(v *vm.VM) {
 }
 
 func (o *LD_D_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x52)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x52)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_D_D) String() string {
@@ -1918,22 +2296,26 @@ func (o *LD_D_D) SymbolicString() string {
 }
 
 type LD_D_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_D_E) Execute(v *vm.VM) {
 }
 
 func (o *LD_D_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x53)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x53)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_D_E) String() string {
@@ -1944,22 +2326,26 @@ func (o *LD_D_E) SymbolicString() string {
 }
 
 type LD_D_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_D_H) Execute(v *vm.VM) {
 }
 
 func (o *LD_D_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x54)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x54)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_D_H) String() string {
@@ -1970,22 +2356,26 @@ func (o *LD_D_H) SymbolicString() string {
 }
 
 type LD_D_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_D_L) Execute(v *vm.VM) {
 }
 
 func (o *LD_D_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x55)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x55)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_D_L) String() string {
@@ -1996,22 +2386,26 @@ func (o *LD_D_L) SymbolicString() string {
 }
 
 type LD_D_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_D_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *LD_D_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x56)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x56)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_D_HLPtr) String() string {
@@ -2022,22 +2416,26 @@ func (o *LD_D_HLPtr) SymbolicString() string {
 }
 
 type LD_D_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_D_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_D_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x57)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x57)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_D_A) String() string {
@@ -2048,22 +2446,26 @@ func (o *LD_D_A) SymbolicString() string {
 }
 
 type LD_E_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_E_B) Execute(v *vm.VM) {
 }
 
 func (o *LD_E_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x58)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x58)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_E_B) String() string {
@@ -2074,22 +2476,26 @@ func (o *LD_E_B) SymbolicString() string {
 }
 
 type LD_E_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_E_C) Execute(v *vm.VM) {
 }
 
 func (o *LD_E_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x59)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x59)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_E_C) String() string {
@@ -2100,22 +2506,26 @@ func (o *LD_E_C) SymbolicString() string {
 }
 
 type LD_E_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_E_D) Execute(v *vm.VM) {
 }
 
 func (o *LD_E_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x5a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_E_D) String() string {
@@ -2126,22 +2536,26 @@ func (o *LD_E_D) SymbolicString() string {
 }
 
 type LD_E_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_E_E) Execute(v *vm.VM) {
 }
 
 func (o *LD_E_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x5b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_E_E) String() string {
@@ -2152,22 +2566,26 @@ func (o *LD_E_E) SymbolicString() string {
 }
 
 type LD_E_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_E_H) Execute(v *vm.VM) {
 }
 
 func (o *LD_E_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x5c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_E_H) String() string {
@@ -2178,22 +2596,26 @@ func (o *LD_E_H) SymbolicString() string {
 }
 
 type LD_E_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_E_L) Execute(v *vm.VM) {
 }
 
 func (o *LD_E_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x5d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_E_L) String() string {
@@ -2204,22 +2626,26 @@ func (o *LD_E_L) SymbolicString() string {
 }
 
 type LD_E_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_E_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *LD_E_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x5e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_E_HLPtr) String() string {
@@ -2230,22 +2656,26 @@ func (o *LD_E_HLPtr) SymbolicString() string {
 }
 
 type LD_E_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_E_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_E_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x5f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_E_A) String() string {
@@ -2256,22 +2686,33 @@ func (o *LD_E_A) SymbolicString() string {
 }
 
 type LD_B_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_B_d8) Execute(v *vm.VM) {
 }
 
 func (o *LD_B_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6)
+	var b []byte
+
+	b = append(b, 0x6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *LD_B_d8) String() string {
@@ -2282,22 +2723,26 @@ func (o *LD_B_d8) SymbolicString() string {
 }
 
 type LD_H_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_H_B) Execute(v *vm.VM) {
 }
 
 func (o *LD_H_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x60)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x60)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_H_B) String() string {
@@ -2308,22 +2753,26 @@ func (o *LD_H_B) SymbolicString() string {
 }
 
 type LD_H_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_H_C) Execute(v *vm.VM) {
 }
 
 func (o *LD_H_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x61)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x61)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_H_C) String() string {
@@ -2334,22 +2783,26 @@ func (o *LD_H_C) SymbolicString() string {
 }
 
 type LD_H_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_H_D) Execute(v *vm.VM) {
 }
 
 func (o *LD_H_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x62)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x62)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_H_D) String() string {
@@ -2360,22 +2813,26 @@ func (o *LD_H_D) SymbolicString() string {
 }
 
 type LD_H_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_H_E) Execute(v *vm.VM) {
 }
 
 func (o *LD_H_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x63)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x63)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_H_E) String() string {
@@ -2386,22 +2843,26 @@ func (o *LD_H_E) SymbolicString() string {
 }
 
 type LD_H_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_H_H) Execute(v *vm.VM) {
 }
 
 func (o *LD_H_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x64)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x64)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_H_H) String() string {
@@ -2412,22 +2873,26 @@ func (o *LD_H_H) SymbolicString() string {
 }
 
 type LD_H_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_H_L) Execute(v *vm.VM) {
 }
 
 func (o *LD_H_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x65)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x65)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_H_L) String() string {
@@ -2438,22 +2903,26 @@ func (o *LD_H_L) SymbolicString() string {
 }
 
 type LD_H_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_H_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *LD_H_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x66)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x66)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_H_HLPtr) String() string {
@@ -2464,22 +2933,26 @@ func (o *LD_H_HLPtr) SymbolicString() string {
 }
 
 type LD_H_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_H_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_H_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x67)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x67)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_H_A) String() string {
@@ -2490,22 +2963,26 @@ func (o *LD_H_A) SymbolicString() string {
 }
 
 type LD_L_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_L_B) Execute(v *vm.VM) {
 }
 
 func (o *LD_L_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x68)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x68)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_L_B) String() string {
@@ -2516,22 +2993,26 @@ func (o *LD_L_B) SymbolicString() string {
 }
 
 type LD_L_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_L_C) Execute(v *vm.VM) {
 }
 
 func (o *LD_L_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x69)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x69)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_L_C) String() string {
@@ -2542,22 +3023,26 @@ func (o *LD_L_C) SymbolicString() string {
 }
 
 type LD_L_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_L_D) Execute(v *vm.VM) {
 }
 
 func (o *LD_L_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x6a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_L_D) String() string {
@@ -2568,22 +3053,26 @@ func (o *LD_L_D) SymbolicString() string {
 }
 
 type LD_L_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_L_E) Execute(v *vm.VM) {
 }
 
 func (o *LD_L_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x6b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_L_E) String() string {
@@ -2594,22 +3083,26 @@ func (o *LD_L_E) SymbolicString() string {
 }
 
 type LD_L_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_L_H) Execute(v *vm.VM) {
 }
 
 func (o *LD_L_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x6c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_L_H) String() string {
@@ -2620,22 +3113,26 @@ func (o *LD_L_H) SymbolicString() string {
 }
 
 type LD_L_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_L_L) Execute(v *vm.VM) {
 }
 
 func (o *LD_L_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x6d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_L_L) String() string {
@@ -2646,22 +3143,26 @@ func (o *LD_L_L) SymbolicString() string {
 }
 
 type LD_L_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_L_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *LD_L_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x6e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_L_HLPtr) String() string {
@@ -2672,22 +3173,26 @@ func (o *LD_L_HLPtr) SymbolicString() string {
 }
 
 type LD_L_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_L_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_L_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x6f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_L_A) String() string {
@@ -2698,48 +3203,56 @@ func (o *LD_L_A) SymbolicString() string {
 }
 
 type RLCA struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RLCA) Execute(v *vm.VM) {
 }
 
 func (o *RLCA) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RLCA) String() string {
-	return "RLCA " + o.operand1 + "," + o.operand2
+	return "RLCA " + o.operand1
 }
 func (o *RLCA) SymbolicString() string {
 	return "RLCA"
 }
 
 type LD_HLPtr_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_HLPtr_B) Execute(v *vm.VM) {
 }
 
 func (o *LD_HLPtr_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x70)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x70)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_HLPtr_B) String() string {
@@ -2750,22 +3263,26 @@ func (o *LD_HLPtr_B) SymbolicString() string {
 }
 
 type LD_HLPtr_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_HLPtr_C) Execute(v *vm.VM) {
 }
 
 func (o *LD_HLPtr_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x71)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x71)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_HLPtr_C) String() string {
@@ -2776,22 +3293,26 @@ func (o *LD_HLPtr_C) SymbolicString() string {
 }
 
 type LD_HLPtr_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_HLPtr_D) Execute(v *vm.VM) {
 }
 
 func (o *LD_HLPtr_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x72)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x72)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_HLPtr_D) String() string {
@@ -2802,22 +3323,26 @@ func (o *LD_HLPtr_D) SymbolicString() string {
 }
 
 type LD_HLPtr_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_HLPtr_E) Execute(v *vm.VM) {
 }
 
 func (o *LD_HLPtr_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x73)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x73)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_HLPtr_E) String() string {
@@ -2828,22 +3353,26 @@ func (o *LD_HLPtr_E) SymbolicString() string {
 }
 
 type LD_HLPtr_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_HLPtr_H) Execute(v *vm.VM) {
 }
 
 func (o *LD_HLPtr_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x74)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x74)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_HLPtr_H) String() string {
@@ -2854,22 +3383,26 @@ func (o *LD_HLPtr_H) SymbolicString() string {
 }
 
 type LD_HLPtr_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_HLPtr_L) Execute(v *vm.VM) {
 }
 
 func (o *LD_HLPtr_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x75)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x75)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_HLPtr_L) String() string {
@@ -2880,48 +3413,56 @@ func (o *LD_HLPtr_L) SymbolicString() string {
 }
 
 type HALT struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *HALT) Execute(v *vm.VM) {
 }
 
 func (o *HALT) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x76)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x76)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *HALT) String() string {
-	return "HALT " + o.operand1 + "," + o.operand2
+	return "HALT " + o.operand1
 }
 func (o *HALT) SymbolicString() string {
 	return "HALT"
 }
 
 type LD_HLPtr_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_HLPtr_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_HLPtr_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x77)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x77)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_HLPtr_A) String() string {
@@ -2932,22 +3473,26 @@ func (o *LD_HLPtr_A) SymbolicString() string {
 }
 
 type LD_A_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_B) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x78)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x78)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_B) String() string {
@@ -2958,22 +3503,26 @@ func (o *LD_A_B) SymbolicString() string {
 }
 
 type LD_A_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_C) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x79)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x79)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_C) String() string {
@@ -2984,22 +3533,26 @@ func (o *LD_A_C) SymbolicString() string {
 }
 
 type LD_A_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_D) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x7a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_D) String() string {
@@ -3010,22 +3563,26 @@ func (o *LD_A_D) SymbolicString() string {
 }
 
 type LD_A_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_E) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x7b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_E) String() string {
@@ -3036,22 +3593,26 @@ func (o *LD_A_E) SymbolicString() string {
 }
 
 type LD_A_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_H) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x7c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_H) String() string {
@@ -3062,22 +3623,26 @@ func (o *LD_A_H) SymbolicString() string {
 }
 
 type LD_A_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_L) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x7d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_L) String() string {
@@ -3088,22 +3653,26 @@ func (o *LD_A_L) SymbolicString() string {
 }
 
 type LD_A_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x7e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_HLPtr) String() string {
@@ -3114,22 +3683,26 @@ func (o *LD_A_HLPtr) SymbolicString() string {
 }
 
 type LD_A_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x7f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_A) String() string {
@@ -3140,22 +3713,26 @@ func (o *LD_A_A) SymbolicString() string {
 }
 
 type LD_a16Deref_SP struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_a16Deref_SP) Execute(v *vm.VM) {
 }
 
 func (o *LD_a16Deref_SP) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_a16Deref_SP) String() string {
@@ -3166,22 +3743,26 @@ func (o *LD_a16Deref_SP) SymbolicString() string {
 }
 
 type ADD_A_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_A_B) Execute(v *vm.VM) {
 }
 
 func (o *ADD_A_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x80)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x80)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_A_B) String() string {
@@ -3192,22 +3773,26 @@ func (o *ADD_A_B) SymbolicString() string {
 }
 
 type ADD_A_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_A_C) Execute(v *vm.VM) {
 }
 
 func (o *ADD_A_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x81)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x81)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_A_C) String() string {
@@ -3218,22 +3803,26 @@ func (o *ADD_A_C) SymbolicString() string {
 }
 
 type ADD_A_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_A_D) Execute(v *vm.VM) {
 }
 
 func (o *ADD_A_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x82)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x82)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_A_D) String() string {
@@ -3244,22 +3833,26 @@ func (o *ADD_A_D) SymbolicString() string {
 }
 
 type ADD_A_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_A_E) Execute(v *vm.VM) {
 }
 
 func (o *ADD_A_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x83)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x83)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_A_E) String() string {
@@ -3270,22 +3863,26 @@ func (o *ADD_A_E) SymbolicString() string {
 }
 
 type ADD_A_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_A_H) Execute(v *vm.VM) {
 }
 
 func (o *ADD_A_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x84)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x84)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_A_H) String() string {
@@ -3296,22 +3893,26 @@ func (o *ADD_A_H) SymbolicString() string {
 }
 
 type ADD_A_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_A_L) Execute(v *vm.VM) {
 }
 
 func (o *ADD_A_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x85)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x85)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_A_L) String() string {
@@ -3322,22 +3923,26 @@ func (o *ADD_A_L) SymbolicString() string {
 }
 
 type ADD_A_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_A_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *ADD_A_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x86)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x86)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_A_HLPtr) String() string {
@@ -3348,22 +3953,26 @@ func (o *ADD_A_HLPtr) SymbolicString() string {
 }
 
 type ADD_A_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_A_A) Execute(v *vm.VM) {
 }
 
 func (o *ADD_A_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x87)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x87)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_A_A) String() string {
@@ -3374,22 +3983,26 @@ func (o *ADD_A_A) SymbolicString() string {
 }
 
 type ADC_A_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADC_A_B) Execute(v *vm.VM) {
 }
 
 func (o *ADC_A_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x88)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x88)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADC_A_B) String() string {
@@ -3400,22 +4013,26 @@ func (o *ADC_A_B) SymbolicString() string {
 }
 
 type ADC_A_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADC_A_C) Execute(v *vm.VM) {
 }
 
 func (o *ADC_A_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x89)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x89)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADC_A_C) String() string {
@@ -3426,22 +4043,26 @@ func (o *ADC_A_C) SymbolicString() string {
 }
 
 type ADC_A_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADC_A_D) Execute(v *vm.VM) {
 }
 
 func (o *ADC_A_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x8a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADC_A_D) String() string {
@@ -3452,22 +4073,26 @@ func (o *ADC_A_D) SymbolicString() string {
 }
 
 type ADC_A_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADC_A_E) Execute(v *vm.VM) {
 }
 
 func (o *ADC_A_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x8b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADC_A_E) String() string {
@@ -3478,22 +4103,26 @@ func (o *ADC_A_E) SymbolicString() string {
 }
 
 type ADC_A_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADC_A_H) Execute(v *vm.VM) {
 }
 
 func (o *ADC_A_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x8c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADC_A_H) String() string {
@@ -3504,22 +4133,26 @@ func (o *ADC_A_H) SymbolicString() string {
 }
 
 type ADC_A_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADC_A_L) Execute(v *vm.VM) {
 }
 
 func (o *ADC_A_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x8d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADC_A_L) String() string {
@@ -3530,22 +4163,26 @@ func (o *ADC_A_L) SymbolicString() string {
 }
 
 type ADC_A_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADC_A_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *ADC_A_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x8e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADC_A_HLPtr) String() string {
@@ -3556,22 +4193,26 @@ func (o *ADC_A_HLPtr) SymbolicString() string {
 }
 
 type ADC_A_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADC_A_A) Execute(v *vm.VM) {
 }
 
 func (o *ADC_A_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x8f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADC_A_A) String() string {
@@ -3582,22 +4223,26 @@ func (o *ADC_A_A) SymbolicString() string {
 }
 
 type ADD_HL_BC struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_HL_BC) Execute(v *vm.VM) {
 }
 
 func (o *ADD_HL_BC) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_HL_BC) String() string {
@@ -3608,230 +4253,266 @@ func (o *ADD_HL_BC) SymbolicString() string {
 }
 
 type SUB_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SUB_B) Execute(v *vm.VM) {
 }
 
 func (o *SUB_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x90)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x90)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SUB_B) String() string {
-	return "SUB " + o.operand1 + "," + o.operand2
+	return "SUB " + o.operand1
 }
 func (o *SUB_B) SymbolicString() string {
 	return "SUB B"
 }
 
 type SUB_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SUB_C) Execute(v *vm.VM) {
 }
 
 func (o *SUB_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x91)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x91)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SUB_C) String() string {
-	return "SUB " + o.operand1 + "," + o.operand2
+	return "SUB " + o.operand1
 }
 func (o *SUB_C) SymbolicString() string {
 	return "SUB C"
 }
 
 type SUB_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SUB_D) Execute(v *vm.VM) {
 }
 
 func (o *SUB_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x92)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x92)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SUB_D) String() string {
-	return "SUB " + o.operand1 + "," + o.operand2
+	return "SUB " + o.operand1
 }
 func (o *SUB_D) SymbolicString() string {
 	return "SUB D"
 }
 
 type SUB_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SUB_E) Execute(v *vm.VM) {
 }
 
 func (o *SUB_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x93)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x93)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SUB_E) String() string {
-	return "SUB " + o.operand1 + "," + o.operand2
+	return "SUB " + o.operand1
 }
 func (o *SUB_E) SymbolicString() string {
 	return "SUB E"
 }
 
 type SUB_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SUB_H) Execute(v *vm.VM) {
 }
 
 func (o *SUB_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x94)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x94)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SUB_H) String() string {
-	return "SUB " + o.operand1 + "," + o.operand2
+	return "SUB " + o.operand1
 }
 func (o *SUB_H) SymbolicString() string {
 	return "SUB H"
 }
 
 type SUB_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SUB_L) Execute(v *vm.VM) {
 }
 
 func (o *SUB_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x95)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x95)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SUB_L) String() string {
-	return "SUB " + o.operand1 + "," + o.operand2
+	return "SUB " + o.operand1
 }
 func (o *SUB_L) SymbolicString() string {
 	return "SUB L"
 }
 
 type SUB_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SUB_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SUB_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x96)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x96)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SUB_HLPtr) String() string {
-	return "SUB " + o.operand1 + "," + o.operand2
+	return "SUB " + o.operand1
 }
 func (o *SUB_HLPtr) SymbolicString() string {
 	return "SUB (HL)"
 }
 
 type SUB_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SUB_A) Execute(v *vm.VM) {
 }
 
 func (o *SUB_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x97)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x97)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SUB_A) String() string {
-	return "SUB " + o.operand1 + "," + o.operand2
+	return "SUB " + o.operand1
 }
 func (o *SUB_A) SymbolicString() string {
 	return "SUB A"
 }
 
 type SBC_A_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SBC_A_B) Execute(v *vm.VM) {
 }
 
 func (o *SBC_A_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x98)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x98)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SBC_A_B) String() string {
@@ -3842,22 +4523,26 @@ func (o *SBC_A_B) SymbolicString() string {
 }
 
 type SBC_A_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SBC_A_C) Execute(v *vm.VM) {
 }
 
 func (o *SBC_A_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x99)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x99)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SBC_A_C) String() string {
@@ -3868,22 +4553,26 @@ func (o *SBC_A_C) SymbolicString() string {
 }
 
 type SBC_A_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SBC_A_D) Execute(v *vm.VM) {
 }
 
 func (o *SBC_A_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x9a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SBC_A_D) String() string {
@@ -3894,22 +4583,26 @@ func (o *SBC_A_D) SymbolicString() string {
 }
 
 type SBC_A_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SBC_A_E) Execute(v *vm.VM) {
 }
 
 func (o *SBC_A_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x9b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SBC_A_E) String() string {
@@ -3920,22 +4613,26 @@ func (o *SBC_A_E) SymbolicString() string {
 }
 
 type SBC_A_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SBC_A_H) Execute(v *vm.VM) {
 }
 
 func (o *SBC_A_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x9c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SBC_A_H) String() string {
@@ -3946,22 +4643,26 @@ func (o *SBC_A_H) SymbolicString() string {
 }
 
 type SBC_A_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SBC_A_L) Execute(v *vm.VM) {
 }
 
 func (o *SBC_A_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x9d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SBC_A_L) String() string {
@@ -3972,22 +4673,26 @@ func (o *SBC_A_L) SymbolicString() string {
 }
 
 type SBC_A_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SBC_A_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SBC_A_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x9e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SBC_A_HLPtr) String() string {
@@ -3998,22 +4703,26 @@ func (o *SBC_A_HLPtr) SymbolicString() string {
 }
 
 type SBC_A_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SBC_A_A) Execute(v *vm.VM) {
 }
 
 func (o *SBC_A_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0x9f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SBC_A_A) String() string {
@@ -4024,22 +4733,26 @@ func (o *SBC_A_A) SymbolicString() string {
 }
 
 type LD_A_BCDeref struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_BCDeref) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_BCDeref) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xa)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_BCDeref) String() string {
@@ -4050,958 +4763,1113 @@ func (o *LD_A_BCDeref) SymbolicString() string {
 }
 
 type AND_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *AND_B) Execute(v *vm.VM) {
 }
 
 func (o *AND_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xa0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *AND_B) String() string {
-	return "AND " + o.operand1 + "," + o.operand2
+	return "AND " + o.operand1
 }
 func (o *AND_B) SymbolicString() string {
 	return "AND B"
 }
 
 type AND_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *AND_C) Execute(v *vm.VM) {
 }
 
 func (o *AND_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xa1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *AND_C) String() string {
-	return "AND " + o.operand1 + "," + o.operand2
+	return "AND " + o.operand1
 }
 func (o *AND_C) SymbolicString() string {
 	return "AND C"
 }
 
 type AND_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *AND_D) Execute(v *vm.VM) {
 }
 
 func (o *AND_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa2)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xa2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *AND_D) String() string {
-	return "AND " + o.operand1 + "," + o.operand2
+	return "AND " + o.operand1
 }
 func (o *AND_D) SymbolicString() string {
 	return "AND D"
 }
 
 type AND_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *AND_E) Execute(v *vm.VM) {
 }
 
 func (o *AND_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa3)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xa3)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *AND_E) String() string {
-	return "AND " + o.operand1 + "," + o.operand2
+	return "AND " + o.operand1
 }
 func (o *AND_E) SymbolicString() string {
 	return "AND E"
 }
 
 type AND_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *AND_H) Execute(v *vm.VM) {
 }
 
 func (o *AND_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa4)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xa4)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *AND_H) String() string {
-	return "AND " + o.operand1 + "," + o.operand2
+	return "AND " + o.operand1
 }
 func (o *AND_H) SymbolicString() string {
 	return "AND H"
 }
 
 type AND_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *AND_L) Execute(v *vm.VM) {
 }
 
 func (o *AND_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xa5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *AND_L) String() string {
-	return "AND " + o.operand1 + "," + o.operand2
+	return "AND " + o.operand1
 }
 func (o *AND_L) SymbolicString() string {
 	return "AND L"
 }
 
 type AND_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *AND_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *AND_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa6)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xa6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *AND_HLPtr) String() string {
-	return "AND " + o.operand1 + "," + o.operand2
+	return "AND " + o.operand1
 }
 func (o *AND_HLPtr) SymbolicString() string {
 	return "AND (HL)"
 }
 
 type AND_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *AND_A) Execute(v *vm.VM) {
 }
 
 func (o *AND_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xa7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *AND_A) String() string {
-	return "AND " + o.operand1 + "," + o.operand2
+	return "AND " + o.operand1
 }
 func (o *AND_A) SymbolicString() string {
 	return "AND A"
 }
 
 type XOR_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *XOR_B) Execute(v *vm.VM) {
 }
 
 func (o *XOR_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xa8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *XOR_B) String() string {
-	return "XOR " + o.operand1 + "," + o.operand2
+	return "XOR " + o.operand1
 }
 func (o *XOR_B) SymbolicString() string {
 	return "XOR B"
 }
 
 type XOR_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *XOR_C) Execute(v *vm.VM) {
 }
 
 func (o *XOR_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xa9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *XOR_C) String() string {
-	return "XOR " + o.operand1 + "," + o.operand2
+	return "XOR " + o.operand1
 }
 func (o *XOR_C) SymbolicString() string {
 	return "XOR C"
 }
 
 type XOR_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *XOR_D) Execute(v *vm.VM) {
 }
 
 func (o *XOR_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xaa)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xaa)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *XOR_D) String() string {
-	return "XOR " + o.operand1 + "," + o.operand2
+	return "XOR " + o.operand1
 }
 func (o *XOR_D) SymbolicString() string {
 	return "XOR D"
 }
 
 type XOR_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *XOR_E) Execute(v *vm.VM) {
 }
 
 func (o *XOR_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xab)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xab)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *XOR_E) String() string {
-	return "XOR " + o.operand1 + "," + o.operand2
+	return "XOR " + o.operand1
 }
 func (o *XOR_E) SymbolicString() string {
 	return "XOR E"
 }
 
 type XOR_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *XOR_H) Execute(v *vm.VM) {
 }
 
 func (o *XOR_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xac)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xac)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *XOR_H) String() string {
-	return "XOR " + o.operand1 + "," + o.operand2
+	return "XOR " + o.operand1
 }
 func (o *XOR_H) SymbolicString() string {
 	return "XOR H"
 }
 
 type XOR_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *XOR_L) Execute(v *vm.VM) {
 }
 
 func (o *XOR_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xad)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xad)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *XOR_L) String() string {
-	return "XOR " + o.operand1 + "," + o.operand2
+	return "XOR " + o.operand1
 }
 func (o *XOR_L) SymbolicString() string {
 	return "XOR L"
 }
 
 type XOR_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *XOR_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *XOR_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xae)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xae)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *XOR_HLPtr) String() string {
-	return "XOR " + o.operand1 + "," + o.operand2
+	return "XOR " + o.operand1
 }
 func (o *XOR_HLPtr) SymbolicString() string {
 	return "XOR (HL)"
 }
 
 type XOR_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *XOR_A) Execute(v *vm.VM) {
 }
 
 func (o *XOR_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xaf)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xaf)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *XOR_A) String() string {
-	return "XOR " + o.operand1 + "," + o.operand2
+	return "XOR " + o.operand1
 }
 func (o *XOR_A) SymbolicString() string {
 	return "XOR A"
 }
 
 type DEC_BC struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DEC_BC) Execute(v *vm.VM) {
 }
 
 func (o *DEC_BC) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xb)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DEC_BC) String() string {
-	return "DEC " + o.operand1 + "," + o.operand2
+	return "DEC " + o.operand1
 }
 func (o *DEC_BC) SymbolicString() string {
 	return "DEC BC"
 }
 
 type OR_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *OR_B) Execute(v *vm.VM) {
 }
 
 func (o *OR_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xb0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *OR_B) String() string {
-	return "OR " + o.operand1 + "," + o.operand2
+	return "OR " + o.operand1
 }
 func (o *OR_B) SymbolicString() string {
 	return "OR B"
 }
 
 type OR_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *OR_C) Execute(v *vm.VM) {
 }
 
 func (o *OR_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xb1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *OR_C) String() string {
-	return "OR " + o.operand1 + "," + o.operand2
+	return "OR " + o.operand1
 }
 func (o *OR_C) SymbolicString() string {
 	return "OR C"
 }
 
 type OR_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *OR_D) Execute(v *vm.VM) {
 }
 
 func (o *OR_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb2)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xb2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *OR_D) String() string {
-	return "OR " + o.operand1 + "," + o.operand2
+	return "OR " + o.operand1
 }
 func (o *OR_D) SymbolicString() string {
 	return "OR D"
 }
 
 type OR_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *OR_E) Execute(v *vm.VM) {
 }
 
 func (o *OR_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb3)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xb3)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *OR_E) String() string {
-	return "OR " + o.operand1 + "," + o.operand2
+	return "OR " + o.operand1
 }
 func (o *OR_E) SymbolicString() string {
 	return "OR E"
 }
 
 type OR_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *OR_H) Execute(v *vm.VM) {
 }
 
 func (o *OR_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb4)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xb4)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *OR_H) String() string {
-	return "OR " + o.operand1 + "," + o.operand2
+	return "OR " + o.operand1
 }
 func (o *OR_H) SymbolicString() string {
 	return "OR H"
 }
 
 type OR_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *OR_L) Execute(v *vm.VM) {
 }
 
 func (o *OR_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xb5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *OR_L) String() string {
-	return "OR " + o.operand1 + "," + o.operand2
+	return "OR " + o.operand1
 }
 func (o *OR_L) SymbolicString() string {
 	return "OR L"
 }
 
 type OR_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *OR_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *OR_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb6)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xb6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *OR_HLPtr) String() string {
-	return "OR " + o.operand1 + "," + o.operand2
+	return "OR " + o.operand1
 }
 func (o *OR_HLPtr) SymbolicString() string {
 	return "OR (HL)"
 }
 
 type OR_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *OR_A) Execute(v *vm.VM) {
 }
 
 func (o *OR_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xb7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *OR_A) String() string {
-	return "OR " + o.operand1 + "," + o.operand2
+	return "OR " + o.operand1
 }
 func (o *OR_A) SymbolicString() string {
 	return "OR A"
 }
 
 type CP_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CP_B) Execute(v *vm.VM) {
 }
 
 func (o *CP_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xb8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *CP_B) String() string {
-	return "CP " + o.operand1 + "," + o.operand2
+	return "CP " + o.operand1
 }
 func (o *CP_B) SymbolicString() string {
 	return "CP B"
 }
 
 type CP_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CP_C) Execute(v *vm.VM) {
 }
 
 func (o *CP_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xb9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *CP_C) String() string {
-	return "CP " + o.operand1 + "," + o.operand2
+	return "CP " + o.operand1
 }
 func (o *CP_C) SymbolicString() string {
 	return "CP C"
 }
 
 type CP_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CP_D) Execute(v *vm.VM) {
 }
 
 func (o *CP_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xba)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xba)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *CP_D) String() string {
-	return "CP " + o.operand1 + "," + o.operand2
+	return "CP " + o.operand1
 }
 func (o *CP_D) SymbolicString() string {
 	return "CP D"
 }
 
 type CP_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CP_E) Execute(v *vm.VM) {
 }
 
 func (o *CP_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xbb)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xbb)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *CP_E) String() string {
-	return "CP " + o.operand1 + "," + o.operand2
+	return "CP " + o.operand1
 }
 func (o *CP_E) SymbolicString() string {
 	return "CP E"
 }
 
 type CP_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CP_H) Execute(v *vm.VM) {
 }
 
 func (o *CP_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xbc)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xbc)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *CP_H) String() string {
-	return "CP " + o.operand1 + "," + o.operand2
+	return "CP " + o.operand1
 }
 func (o *CP_H) SymbolicString() string {
 	return "CP H"
 }
 
 type CP_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CP_L) Execute(v *vm.VM) {
 }
 
 func (o *CP_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xbd)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xbd)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *CP_L) String() string {
-	return "CP " + o.operand1 + "," + o.operand2
+	return "CP " + o.operand1
 }
 func (o *CP_L) SymbolicString() string {
 	return "CP L"
 }
 
 type CP_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CP_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *CP_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xbe)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xbe)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *CP_HLPtr) String() string {
-	return "CP " + o.operand1 + "," + o.operand2
+	return "CP " + o.operand1
 }
 func (o *CP_HLPtr) SymbolicString() string {
 	return "CP (HL)"
 }
 
 type CP_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CP_A) Execute(v *vm.VM) {
 }
 
 func (o *CP_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xbf)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xbf)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *CP_A) String() string {
-	return "CP " + o.operand1 + "," + o.operand2
+	return "CP " + o.operand1
 }
 func (o *CP_A) SymbolicString() string {
 	return "CP A"
 }
 
 type INC_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *INC_C) Execute(v *vm.VM) {
 }
 
 func (o *INC_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xc)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *INC_C) String() string {
-	return "INC " + o.operand1 + "," + o.operand2
+	return "INC " + o.operand1
 }
 func (o *INC_C) SymbolicString() string {
 	return "INC C"
 }
 
 type RET_NZ struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RET_NZ) Execute(v *vm.VM) {
 }
 
 func (o *RET_NZ) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xc0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RET_NZ) String() string {
-	return "RET " + o.operand1 + "," + o.operand2
+	return "RET " + o.operand1
 }
 func (o *RET_NZ) SymbolicString() string {
 	return "RET NZ"
 }
 
 type POP_BC struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *POP_BC) Execute(v *vm.VM) {
 }
 
 func (o *POP_BC) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xc1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *POP_BC) String() string {
-	return "POP " + o.operand1 + "," + o.operand2
+	return "POP " + o.operand1
 }
 func (o *POP_BC) SymbolicString() string {
 	return "POP BC"
 }
 
 type JP_NZ_a16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *JP_NZ_a16) Execute(v *vm.VM) {
 }
 
 func (o *JP_NZ_a16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc2)
+	var b []byte
+
+	b = append(b, 0xc2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *JP_NZ_a16) String() string {
@@ -5012,48 +5880,70 @@ func (o *JP_NZ_a16) SymbolicString() string {
 }
 
 type JP_a16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *JP_a16) Execute(v *vm.VM) {
 }
 
 func (o *JP_a16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc3)
+	var b []byte
+
+	b = append(b, 0xc3)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand1, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *JP_a16) String() string {
-	return "JP " + o.operand1 + "," + o.operand2
+	return "JP " + o.operand1
 }
 func (o *JP_a16) SymbolicString() string {
 	return "JP o.operand1"
 }
 
 type CALL_NZ_a16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CALL_NZ_a16) Execute(v *vm.VM) {
 }
 
 func (o *CALL_NZ_a16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc4)
+	var b []byte
+
+	b = append(b, 0xc4)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *CALL_NZ_a16) String() string {
@@ -5064,48 +5954,63 @@ func (o *CALL_NZ_a16) SymbolicString() string {
 }
 
 type PUSH_BC struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *PUSH_BC) Execute(v *vm.VM) {
 }
 
 func (o *PUSH_BC) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xc5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *PUSH_BC) String() string {
-	return "PUSH " + o.operand1 + "," + o.operand2
+	return "PUSH " + o.operand1
 }
 func (o *PUSH_BC) SymbolicString() string {
 	return "PUSH BC"
 }
 
 type ADD_A_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_A_d8) Execute(v *vm.VM) {
 }
 
 func (o *ADD_A_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc6)
+	var b []byte
+
+	b = append(b, 0xc6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *ADD_A_d8) String() string {
@@ -5116,100 +6021,123 @@ func (o *ADD_A_d8) SymbolicString() string {
 }
 
 type RST_00H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RST_00H) Execute(v *vm.VM) {
 }
 
 func (o *RST_00H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xc7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RST_00H) String() string {
-	return "RST " + o.operand1 + "," + o.operand2
+	return "RST " + o.operand1
 }
 func (o *RST_00H) SymbolicString() string {
 	return "RST 00H"
 }
 
 type RET_Z struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RET_Z) Execute(v *vm.VM) {
 }
 
 func (o *RET_Z) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xc8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RET_Z) String() string {
-	return "RET " + o.operand1 + "," + o.operand2
+	return "RET " + o.operand1
 }
 func (o *RET_Z) SymbolicString() string {
 	return "RET Z"
 }
 
 type RET struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RET) Execute(v *vm.VM) {
 }
 
 func (o *RET) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xc9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RET) String() string {
-	return "RET " + o.operand1 + "," + o.operand2
+	return "RET " + o.operand1
 }
 func (o *RET) SymbolicString() string {
 	return "RET"
 }
 
 type JP_Z_a16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *JP_Z_a16) Execute(v *vm.VM) {
 }
 
 func (o *JP_Z_a16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xca)
+	var b []byte
+
+	b = append(b, 0xca)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *JP_Z_a16) String() string {
@@ -5220,48 +6148,63 @@ func (o *JP_Z_a16) SymbolicString() string {
 }
 
 type PREFIX_CB struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *PREFIX_CB) Execute(v *vm.VM) {
 }
 
 func (o *PREFIX_CB) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xcb)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xcb)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *PREFIX_CB) String() string {
-	return "PREFIX " + o.operand1 + "," + o.operand2
+	return "PREFIX " + o.operand1
 }
 func (o *PREFIX_CB) SymbolicString() string {
 	return "PREFIX CB"
 }
 
 type CALL_Z_a16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CALL_Z_a16) Execute(v *vm.VM) {
 }
 
 func (o *CALL_Z_a16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xcc)
+	var b []byte
+
+	b = append(b, 0xcc)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *CALL_Z_a16) String() string {
@@ -5272,48 +6215,70 @@ func (o *CALL_Z_a16) SymbolicString() string {
 }
 
 type CALL_a16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CALL_a16) Execute(v *vm.VM) {
 }
 
 func (o *CALL_a16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xcd)
+	var b []byte
+
+	b = append(b, 0xcd)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand1, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *CALL_a16) String() string {
-	return "CALL " + o.operand1 + "," + o.operand2
+	return "CALL " + o.operand1
 }
 func (o *CALL_a16) SymbolicString() string {
 	return "CALL o.operand1"
 }
 
 type ADC_A_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADC_A_d8) Execute(v *vm.VM) {
 }
 
 func (o *ADC_A_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xce)
+	var b []byte
+
+	b = append(b, 0xce)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *ADC_A_d8) String() string {
@@ -5324,126 +6289,153 @@ func (o *ADC_A_d8) SymbolicString() string {
 }
 
 type RST_08H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RST_08H) Execute(v *vm.VM) {
 }
 
 func (o *RST_08H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xcf)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xcf)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RST_08H) String() string {
-	return "RST " + o.operand1 + "," + o.operand2
+	return "RST " + o.operand1
 }
 func (o *RST_08H) SymbolicString() string {
 	return "RST 08H"
 }
 
 type DEC_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DEC_C) Execute(v *vm.VM) {
 }
 
 func (o *DEC_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xd)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DEC_C) String() string {
-	return "DEC " + o.operand1 + "," + o.operand2
+	return "DEC " + o.operand1
 }
 func (o *DEC_C) SymbolicString() string {
 	return "DEC C"
 }
 
 type RET_NC struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RET_NC) Execute(v *vm.VM) {
 }
 
 func (o *RET_NC) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xd0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RET_NC) String() string {
-	return "RET " + o.operand1 + "," + o.operand2
+	return "RET " + o.operand1
 }
 func (o *RET_NC) SymbolicString() string {
 	return "RET NC"
 }
 
 type POP_DE struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *POP_DE) Execute(v *vm.VM) {
 }
 
 func (o *POP_DE) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xd1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *POP_DE) String() string {
-	return "POP " + o.operand1 + "," + o.operand2
+	return "POP " + o.operand1
 }
 func (o *POP_DE) SymbolicString() string {
 	return "POP DE"
 }
 
 type JP_NC_a16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *JP_NC_a16) Execute(v *vm.VM) {
 }
 
 func (o *JP_NC_a16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd2)
+	var b []byte
+
+	b = append(b, 0xd2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *JP_NC_a16) String() string {
@@ -5454,22 +6446,33 @@ func (o *JP_NC_a16) SymbolicString() string {
 }
 
 type CALL_NC_a16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CALL_NC_a16) Execute(v *vm.VM) {
 }
 
 func (o *CALL_NC_a16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd4)
+	var b []byte
+
+	b = append(b, 0xd4)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *CALL_NC_a16) String() string {
@@ -5480,152 +6483,190 @@ func (o *CALL_NC_a16) SymbolicString() string {
 }
 
 type PUSH_DE struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *PUSH_DE) Execute(v *vm.VM) {
 }
 
 func (o *PUSH_DE) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xd5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *PUSH_DE) String() string {
-	return "PUSH " + o.operand1 + "," + o.operand2
+	return "PUSH " + o.operand1
 }
 func (o *PUSH_DE) SymbolicString() string {
 	return "PUSH DE"
 }
 
 type SUB_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SUB_d8) Execute(v *vm.VM) {
 }
 
 func (o *SUB_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd6)
+	var b []byte
+
+	b = append(b, 0xd6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand1, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *SUB_d8) String() string {
-	return "SUB " + o.operand1 + "," + o.operand2
+	return "SUB " + o.operand1
 }
 func (o *SUB_d8) SymbolicString() string {
 	return "SUB d8"
 }
 
 type RST_10H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RST_10H) Execute(v *vm.VM) {
 }
 
 func (o *RST_10H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xd7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RST_10H) String() string {
-	return "RST " + o.operand1 + "," + o.operand2
+	return "RST " + o.operand1
 }
 func (o *RST_10H) SymbolicString() string {
 	return "RST 10H"
 }
 
 type RET_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RET_C) Execute(v *vm.VM) {
 }
 
 func (o *RET_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xd8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RET_C) String() string {
-	return "RET " + o.operand1 + "," + o.operand2
+	return "RET " + o.operand1
 }
 func (o *RET_C) SymbolicString() string {
 	return "RET C"
 }
 
 type RETI struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RETI) Execute(v *vm.VM) {
 }
 
 func (o *RETI) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xd9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RETI) String() string {
-	return "RETI " + o.operand1 + "," + o.operand2
+	return "RETI " + o.operand1
 }
 func (o *RETI) SymbolicString() string {
 	return "RETI"
 }
 
 type JP_C_a16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *JP_C_a16) Execute(v *vm.VM) {
 }
 
 func (o *JP_C_a16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xda)
+	var b []byte
+
+	b = append(b, 0xda)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *JP_C_a16) String() string {
@@ -5636,22 +6677,33 @@ func (o *JP_C_a16) SymbolicString() string {
 }
 
 type CALL_C_a16 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CALL_C_a16) Execute(v *vm.VM) {
 }
 
 func (o *CALL_C_a16) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xdc)
+	var b []byte
+
+	b = append(b, 0xdc)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *CALL_C_a16) String() string {
@@ -5662,22 +6714,33 @@ func (o *CALL_C_a16) SymbolicString() string {
 }
 
 type SBC_A_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SBC_A_d8) Execute(v *vm.VM) {
 }
 
 func (o *SBC_A_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xde)
+	var b []byte
+
+	b = append(b, 0xde)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *SBC_A_d8) String() string {
@@ -5688,48 +6751,63 @@ func (o *SBC_A_d8) SymbolicString() string {
 }
 
 type RST_18H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RST_18H) Execute(v *vm.VM) {
 }
 
 func (o *RST_18H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xdf)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xdf)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RST_18H) String() string {
-	return "RST " + o.operand1 + "," + o.operand2
+	return "RST " + o.operand1
 }
 func (o *RST_18H) SymbolicString() string {
 	return "RST 18H"
 }
 
 type LD_C_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_C_d8) Execute(v *vm.VM) {
 }
 
 func (o *LD_C_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe)
+	var b []byte
+
+	b = append(b, 0xe)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand2, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *LD_C_d8) String() string {
@@ -5740,22 +6818,26 @@ func (o *LD_C_d8) SymbolicString() string {
 }
 
 type LDH_a8Deref_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LDH_a8Deref_A) Execute(v *vm.VM) {
 }
 
 func (o *LDH_a8Deref_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xe0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LDH_a8Deref_A) String() string {
@@ -5766,48 +6848,56 @@ func (o *LDH_a8Deref_A) SymbolicString() string {
 }
 
 type POP_HL struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *POP_HL) Execute(v *vm.VM) {
 }
 
 func (o *POP_HL) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xe1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *POP_HL) String() string {
-	return "POP " + o.operand1 + "," + o.operand2
+	return "POP " + o.operand1
 }
 func (o *POP_HL) SymbolicString() string {
 	return "POP HL"
 }
 
 type LD_CDeref_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_CDeref_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_CDeref_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe2)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xe2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_CDeref_A) String() string {
@@ -5818,100 +6908,123 @@ func (o *LD_CDeref_A) SymbolicString() string {
 }
 
 type PUSH_HL struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *PUSH_HL) Execute(v *vm.VM) {
 }
 
 func (o *PUSH_HL) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xe5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *PUSH_HL) String() string {
-	return "PUSH " + o.operand1 + "," + o.operand2
+	return "PUSH " + o.operand1
 }
 func (o *PUSH_HL) SymbolicString() string {
 	return "PUSH HL"
 }
 
 type AND_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *AND_d8) Execute(v *vm.VM) {
 }
 
 func (o *AND_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe6)
+	var b []byte
+
+	b = append(b, 0xe6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand1, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *AND_d8) String() string {
-	return "AND " + o.operand1 + "," + o.operand2
+	return "AND " + o.operand1
 }
 func (o *AND_d8) SymbolicString() string {
 	return "AND d8"
 }
 
 type RST_20H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RST_20H) Execute(v *vm.VM) {
 }
 
 func (o *RST_20H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xe7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RST_20H) String() string {
-	return "RST " + o.operand1 + "," + o.operand2
+	return "RST " + o.operand1
 }
 func (o *RST_20H) SymbolicString() string {
 	return "RST 20H"
 }
 
 type ADD_SP_r8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *ADD_SP_r8) Execute(v *vm.VM) {
 }
 
 func (o *ADD_SP_r8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xe8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *ADD_SP_r8) String() string {
@@ -5922,48 +7035,56 @@ func (o *ADD_SP_r8) SymbolicString() string {
 }
 
 type JP_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *JP_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *JP_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xe9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *JP_HLPtr) String() string {
-	return "JP " + o.operand1 + "," + o.operand2
+	return "JP " + o.operand1
 }
 func (o *JP_HLPtr) SymbolicString() string {
 	return "JP (HL)"
 }
 
 type LD_a16Deref_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_a16Deref_A) Execute(v *vm.VM) {
 }
 
 func (o *LD_a16Deref_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xea)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xea)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_a16Deref_A) String() string {
@@ -5974,100 +7095,123 @@ func (o *LD_a16Deref_A) SymbolicString() string {
 }
 
 type XOR_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *XOR_d8) Execute(v *vm.VM) {
 }
 
 func (o *XOR_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xee)
+	var b []byte
+
+	b = append(b, 0xee)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand1, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *XOR_d8) String() string {
-	return "XOR " + o.operand1 + "," + o.operand2
+	return "XOR " + o.operand1
 }
 func (o *XOR_d8) SymbolicString() string {
 	return "XOR d8"
 }
 
 type RST_28H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RST_28H) Execute(v *vm.VM) {
 }
 
 func (o *RST_28H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xef)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xef)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RST_28H) String() string {
-	return "RST " + o.operand1 + "," + o.operand2
+	return "RST " + o.operand1
 }
 func (o *RST_28H) SymbolicString() string {
 	return "RST 28H"
 }
 
 type RRCA struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RRCA) Execute(v *vm.VM) {
 }
 
 func (o *RRCA) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xf)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RRCA) String() string {
-	return "RRCA " + o.operand1 + "," + o.operand2
+	return "RRCA " + o.operand1
 }
 func (o *RRCA) SymbolicString() string {
 	return "RRCA"
 }
 
 type LDH_A_a8Deref struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LDH_A_a8Deref) Execute(v *vm.VM) {
 }
 
 func (o *LDH_A_a8Deref) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xf0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LDH_A_a8Deref) String() string {
@@ -6078,48 +7222,56 @@ func (o *LDH_A_a8Deref) SymbolicString() string {
 }
 
 type POP_AF struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *POP_AF) Execute(v *vm.VM) {
 }
 
 func (o *POP_AF) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xf1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *POP_AF) String() string {
-	return "POP " + o.operand1 + "," + o.operand2
+	return "POP " + o.operand1
 }
 func (o *POP_AF) SymbolicString() string {
 	return "POP AF"
 }
 
 type LD_A_CDeref struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_CDeref) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_CDeref) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf2)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xf2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_CDeref) String() string {
@@ -6130,126 +7282,153 @@ func (o *LD_A_CDeref) SymbolicString() string {
 }
 
 type DI struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *DI) Execute(v *vm.VM) {
 }
 
 func (o *DI) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf3)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xf3)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *DI) String() string {
-	return "DI " + o.operand1 + "," + o.operand2
+	return "DI " + o.operand1
 }
 func (o *DI) SymbolicString() string {
 	return "DI"
 }
 
 type PUSH_AF struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *PUSH_AF) Execute(v *vm.VM) {
 }
 
 func (o *PUSH_AF) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xf5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *PUSH_AF) String() string {
-	return "PUSH " + o.operand1 + "," + o.operand2
+	return "PUSH " + o.operand1
 }
 func (o *PUSH_AF) SymbolicString() string {
 	return "PUSH AF"
 }
 
 type OR_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *OR_d8) Execute(v *vm.VM) {
 }
 
 func (o *OR_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf6)
+	var b []byte
+
+	b = append(b, 0xf6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand1, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *OR_d8) String() string {
-	return "OR " + o.operand1 + "," + o.operand2
+	return "OR " + o.operand1
 }
 func (o *OR_d8) SymbolicString() string {
 	return "OR d8"
 }
 
 type RST_30H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RST_30H) Execute(v *vm.VM) {
 }
 
 func (o *RST_30H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xf7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RST_30H) String() string {
-	return "RST " + o.operand1 + "," + o.operand2
+	return "RST " + o.operand1
 }
 func (o *RST_30H) SymbolicString() string {
 	return "RST 30H"
 }
 
 type LD_HL_SP_plus_r8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_HL_SP_plus_r8) Execute(v *vm.VM) {
 }
 
 func (o *LD_HL_SP_plus_r8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xf8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_HL_SP_plus_r8) String() string {
@@ -6260,22 +7439,26 @@ func (o *LD_HL_SP_plus_r8) SymbolicString() string {
 }
 
 type LD_SP_HL struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_SP_HL) Execute(v *vm.VM) {
 }
 
 func (o *LD_SP_HL) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xf9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_SP_HL) String() string {
@@ -6286,22 +7469,26 @@ func (o *LD_SP_HL) SymbolicString() string {
 }
 
 type LD_A_a16Deref struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *LD_A_a16Deref) Execute(v *vm.VM) {
 }
 
 func (o *LD_A_a16Deref) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xfa)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xfa)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *LD_A_a16Deref) String() string {
@@ -6312,1478 +7499,1821 @@ func (o *LD_A_a16Deref) SymbolicString() string {
 }
 
 type EI struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *EI) Execute(v *vm.VM) {
 }
 
 func (o *EI) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xfb)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xfb)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *EI) String() string {
-	return "EI " + o.operand1 + "," + o.operand2
+	return "EI " + o.operand1
 }
 func (o *EI) SymbolicString() string {
 	return "EI"
 }
 
 type CP_d8 struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *CP_d8) Execute(v *vm.VM) {
 }
 
 func (o *CP_d8) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xfe)
+	var b []byte
+
+	b = append(b, 0xfe)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	v, err = strconv.ParseInt(o.operand1, 16, 16)
 	if err != nil {
 		return 0, err
 	}
-	written += n
-	return n, nil
+
+	b = append(b, byte(v))
+
+	return w.Write(b)
 }
 
 func (o *CP_d8) String() string {
-	return "CP " + o.operand1 + "," + o.operand2
+	return "CP " + o.operand1
 }
 func (o *CP_d8) SymbolicString() string {
 	return "CP d8"
 }
 
 type RST_38H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RST_38H) Execute(v *vm.VM) {
 }
 
 func (o *RST_38H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xff)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xff)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RST_38H) String() string {
-	return "RST " + o.operand1 + "," + o.operand2
+	return "RST " + o.operand1
 }
 func (o *RST_38H) SymbolicString() string {
 	return "RST 38H"
 }
 
 type RLC_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RLC_B) Execute(v *vm.VM) {
 }
 
 func (o *RLC_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RLC_B) String() string {
-	return "RLC " + o.operand1 + "," + o.operand2
+	return "RLC " + o.operand1
 }
 func (o *RLC_B) SymbolicString() string {
 	return "RLC B"
 }
 
 type RLC_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RLC_C) Execute(v *vm.VM) {
 }
 
 func (o *RLC_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RLC_C) String() string {
-	return "RLC " + o.operand1 + "," + o.operand2
+	return "RLC " + o.operand1
 }
 func (o *RLC_C) SymbolicString() string {
 	return "RLC C"
 }
 
 type RL_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RL_B) Execute(v *vm.VM) {
 }
 
 func (o *RL_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x10)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x10)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RL_B) String() string {
-	return "RL " + o.operand1 + "," + o.operand2
+	return "RL " + o.operand1
 }
 func (o *RL_B) SymbolicString() string {
 	return "RL B"
 }
 
 type RL_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RL_C) Execute(v *vm.VM) {
 }
 
 func (o *RL_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x11)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x11)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RL_C) String() string {
-	return "RL " + o.operand1 + "," + o.operand2
+	return "RL " + o.operand1
 }
 func (o *RL_C) SymbolicString() string {
 	return "RL C"
 }
 
 type RL_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RL_D) Execute(v *vm.VM) {
 }
 
 func (o *RL_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x12)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x12)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RL_D) String() string {
-	return "RL " + o.operand1 + "," + o.operand2
+	return "RL " + o.operand1
 }
 func (o *RL_D) SymbolicString() string {
 	return "RL D"
 }
 
 type RL_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RL_E) Execute(v *vm.VM) {
 }
 
 func (o *RL_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x13)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x13)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RL_E) String() string {
-	return "RL " + o.operand1 + "," + o.operand2
+	return "RL " + o.operand1
 }
 func (o *RL_E) SymbolicString() string {
 	return "RL E"
 }
 
 type RL_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RL_H) Execute(v *vm.VM) {
 }
 
 func (o *RL_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x14)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x14)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RL_H) String() string {
-	return "RL " + o.operand1 + "," + o.operand2
+	return "RL " + o.operand1
 }
 func (o *RL_H) SymbolicString() string {
 	return "RL H"
 }
 
 type RL_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RL_L) Execute(v *vm.VM) {
 }
 
 func (o *RL_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x15)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x15)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RL_L) String() string {
-	return "RL " + o.operand1 + "," + o.operand2
+	return "RL " + o.operand1
 }
 func (o *RL_L) SymbolicString() string {
 	return "RL L"
 }
 
 type RL_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RL_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *RL_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x16)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x16)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RL_HLPtr) String() string {
-	return "RL " + o.operand1 + "," + o.operand2
+	return "RL " + o.operand1
 }
 func (o *RL_HLPtr) SymbolicString() string {
 	return "RL (HL)"
 }
 
 type RL_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RL_A) Execute(v *vm.VM) {
 }
 
 func (o *RL_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x17)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x17)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RL_A) String() string {
-	return "RL " + o.operand1 + "," + o.operand2
+	return "RL " + o.operand1
 }
 func (o *RL_A) SymbolicString() string {
 	return "RL A"
 }
 
 type RR_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RR_B) Execute(v *vm.VM) {
 }
 
 func (o *RR_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x18)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x18)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RR_B) String() string {
-	return "RR " + o.operand1 + "," + o.operand2
+	return "RR " + o.operand1
 }
 func (o *RR_B) SymbolicString() string {
 	return "RR B"
 }
 
 type RR_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RR_C) Execute(v *vm.VM) {
 }
 
 func (o *RR_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x19)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x19)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RR_C) String() string {
-	return "RR " + o.operand1 + "," + o.operand2
+	return "RR " + o.operand1
 }
 func (o *RR_C) SymbolicString() string {
 	return "RR C"
 }
 
 type RR_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RR_D) Execute(v *vm.VM) {
 }
 
 func (o *RR_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x1a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RR_D) String() string {
-	return "RR " + o.operand1 + "," + o.operand2
+	return "RR " + o.operand1
 }
 func (o *RR_D) SymbolicString() string {
 	return "RR D"
 }
 
 type RR_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RR_E) Execute(v *vm.VM) {
 }
 
 func (o *RR_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x1b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RR_E) String() string {
-	return "RR " + o.operand1 + "," + o.operand2
+	return "RR " + o.operand1
 }
 func (o *RR_E) SymbolicString() string {
 	return "RR E"
 }
 
 type RR_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RR_H) Execute(v *vm.VM) {
 }
 
 func (o *RR_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x1c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RR_H) String() string {
-	return "RR " + o.operand1 + "," + o.operand2
+	return "RR " + o.operand1
 }
 func (o *RR_H) SymbolicString() string {
 	return "RR H"
 }
 
 type RR_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RR_L) Execute(v *vm.VM) {
 }
 
 func (o *RR_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x1d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RR_L) String() string {
-	return "RR " + o.operand1 + "," + o.operand2
+	return "RR " + o.operand1
 }
 func (o *RR_L) SymbolicString() string {
 	return "RR L"
 }
 
 type RR_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RR_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *RR_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x1e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RR_HLPtr) String() string {
-	return "RR " + o.operand1 + "," + o.operand2
+	return "RR " + o.operand1
 }
 func (o *RR_HLPtr) SymbolicString() string {
 	return "RR (HL)"
 }
 
 type RR_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RR_A) Execute(v *vm.VM) {
 }
 
 func (o *RR_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x1f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x1f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RR_A) String() string {
-	return "RR " + o.operand1 + "," + o.operand2
+	return "RR " + o.operand1
 }
 func (o *RR_A) SymbolicString() string {
 	return "RR A"
 }
 
 type RLC_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RLC_D) Execute(v *vm.VM) {
 }
 
 func (o *RLC_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RLC_D) String() string {
-	return "RLC " + o.operand1 + "," + o.operand2
+	return "RLC " + o.operand1
 }
 func (o *RLC_D) SymbolicString() string {
 	return "RLC D"
 }
 
 type SLA_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SLA_B) Execute(v *vm.VM) {
 }
 
 func (o *SLA_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x20)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x20)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SLA_B) String() string {
-	return "SLA " + o.operand1 + "," + o.operand2
+	return "SLA " + o.operand1
 }
 func (o *SLA_B) SymbolicString() string {
 	return "SLA B"
 }
 
 type SLA_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SLA_C) Execute(v *vm.VM) {
 }
 
 func (o *SLA_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x21)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x21)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SLA_C) String() string {
-	return "SLA " + o.operand1 + "," + o.operand2
+	return "SLA " + o.operand1
 }
 func (o *SLA_C) SymbolicString() string {
 	return "SLA C"
 }
 
 type SLA_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SLA_D) Execute(v *vm.VM) {
 }
 
 func (o *SLA_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x22)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x22)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SLA_D) String() string {
-	return "SLA " + o.operand1 + "," + o.operand2
+	return "SLA " + o.operand1
 }
 func (o *SLA_D) SymbolicString() string {
 	return "SLA D"
 }
 
 type SLA_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SLA_E) Execute(v *vm.VM) {
 }
 
 func (o *SLA_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x23)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x23)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SLA_E) String() string {
-	return "SLA " + o.operand1 + "," + o.operand2
+	return "SLA " + o.operand1
 }
 func (o *SLA_E) SymbolicString() string {
 	return "SLA E"
 }
 
 type SLA_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SLA_H) Execute(v *vm.VM) {
 }
 
 func (o *SLA_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x24)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x24)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SLA_H) String() string {
-	return "SLA " + o.operand1 + "," + o.operand2
+	return "SLA " + o.operand1
 }
 func (o *SLA_H) SymbolicString() string {
 	return "SLA H"
 }
 
 type SLA_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SLA_L) Execute(v *vm.VM) {
 }
 
 func (o *SLA_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x25)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x25)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SLA_L) String() string {
-	return "SLA " + o.operand1 + "," + o.operand2
+	return "SLA " + o.operand1
 }
 func (o *SLA_L) SymbolicString() string {
 	return "SLA L"
 }
 
 type SLA_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SLA_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SLA_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x26)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x26)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SLA_HLPtr) String() string {
-	return "SLA " + o.operand1 + "," + o.operand2
+	return "SLA " + o.operand1
 }
 func (o *SLA_HLPtr) SymbolicString() string {
 	return "SLA (HL)"
 }
 
 type SLA_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SLA_A) Execute(v *vm.VM) {
 }
 
 func (o *SLA_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x27)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x27)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SLA_A) String() string {
-	return "SLA " + o.operand1 + "," + o.operand2
+	return "SLA " + o.operand1
 }
 func (o *SLA_A) SymbolicString() string {
 	return "SLA A"
 }
 
 type SRA_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRA_B) Execute(v *vm.VM) {
 }
 
 func (o *SRA_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x28)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x28)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRA_B) String() string {
-	return "SRA " + o.operand1 + "," + o.operand2
+	return "SRA " + o.operand1
 }
 func (o *SRA_B) SymbolicString() string {
 	return "SRA B"
 }
 
 type SRA_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRA_C) Execute(v *vm.VM) {
 }
 
 func (o *SRA_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x29)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x29)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRA_C) String() string {
-	return "SRA " + o.operand1 + "," + o.operand2
+	return "SRA " + o.operand1
 }
 func (o *SRA_C) SymbolicString() string {
 	return "SRA C"
 }
 
 type SRA_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRA_D) Execute(v *vm.VM) {
 }
 
 func (o *SRA_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x2a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRA_D) String() string {
-	return "SRA " + o.operand1 + "," + o.operand2
+	return "SRA " + o.operand1
 }
 func (o *SRA_D) SymbolicString() string {
 	return "SRA D"
 }
 
 type SRA_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRA_E) Execute(v *vm.VM) {
 }
 
 func (o *SRA_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x2b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRA_E) String() string {
-	return "SRA " + o.operand1 + "," + o.operand2
+	return "SRA " + o.operand1
 }
 func (o *SRA_E) SymbolicString() string {
 	return "SRA E"
 }
 
 type SRA_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRA_H) Execute(v *vm.VM) {
 }
 
 func (o *SRA_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x2c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRA_H) String() string {
-	return "SRA " + o.operand1 + "," + o.operand2
+	return "SRA " + o.operand1
 }
 func (o *SRA_H) SymbolicString() string {
 	return "SRA H"
 }
 
 type SRA_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRA_L) Execute(v *vm.VM) {
 }
 
 func (o *SRA_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x2d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRA_L) String() string {
-	return "SRA " + o.operand1 + "," + o.operand2
+	return "SRA " + o.operand1
 }
 func (o *SRA_L) SymbolicString() string {
 	return "SRA L"
 }
 
 type SRA_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRA_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SRA_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x2e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRA_HLPtr) String() string {
-	return "SRA " + o.operand1 + "," + o.operand2
+	return "SRA " + o.operand1
 }
 func (o *SRA_HLPtr) SymbolicString() string {
 	return "SRA (HL)"
 }
 
 type SRA_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRA_A) Execute(v *vm.VM) {
 }
 
 func (o *SRA_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x2f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x2f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRA_A) String() string {
-	return "SRA " + o.operand1 + "," + o.operand2
+	return "SRA " + o.operand1
 }
 func (o *SRA_A) SymbolicString() string {
 	return "SRA A"
 }
 
 type RLC_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RLC_E) Execute(v *vm.VM) {
 }
 
 func (o *RLC_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x3)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RLC_E) String() string {
-	return "RLC " + o.operand1 + "," + o.operand2
+	return "RLC " + o.operand1
 }
 func (o *RLC_E) SymbolicString() string {
 	return "RLC E"
 }
 
 type SWAP_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SWAP_B) Execute(v *vm.VM) {
 }
 
 func (o *SWAP_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x30)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x30)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SWAP_B) String() string {
-	return "SWAP " + o.operand1 + "," + o.operand2
+	return "SWAP " + o.operand1
 }
 func (o *SWAP_B) SymbolicString() string {
 	return "SWAP B"
 }
 
 type SWAP_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SWAP_C) Execute(v *vm.VM) {
 }
 
 func (o *SWAP_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x31)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x31)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SWAP_C) String() string {
-	return "SWAP " + o.operand1 + "," + o.operand2
+	return "SWAP " + o.operand1
 }
 func (o *SWAP_C) SymbolicString() string {
 	return "SWAP C"
 }
 
 type SWAP_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SWAP_D) Execute(v *vm.VM) {
 }
 
 func (o *SWAP_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x32)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x32)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SWAP_D) String() string {
-	return "SWAP " + o.operand1 + "," + o.operand2
+	return "SWAP " + o.operand1
 }
 func (o *SWAP_D) SymbolicString() string {
 	return "SWAP D"
 }
 
 type SWAP_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SWAP_E) Execute(v *vm.VM) {
 }
 
 func (o *SWAP_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x33)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x33)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SWAP_E) String() string {
-	return "SWAP " + o.operand1 + "," + o.operand2
+	return "SWAP " + o.operand1
 }
 func (o *SWAP_E) SymbolicString() string {
 	return "SWAP E"
 }
 
 type SWAP_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SWAP_H) Execute(v *vm.VM) {
 }
 
 func (o *SWAP_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x34)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x34)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SWAP_H) String() string {
-	return "SWAP " + o.operand1 + "," + o.operand2
+	return "SWAP " + o.operand1
 }
 func (o *SWAP_H) SymbolicString() string {
 	return "SWAP H"
 }
 
 type SWAP_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SWAP_L) Execute(v *vm.VM) {
 }
 
 func (o *SWAP_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x35)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x35)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SWAP_L) String() string {
-	return "SWAP " + o.operand1 + "," + o.operand2
+	return "SWAP " + o.operand1
 }
 func (o *SWAP_L) SymbolicString() string {
 	return "SWAP L"
 }
 
 type SWAP_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SWAP_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SWAP_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x36)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x36)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SWAP_HLPtr) String() string {
-	return "SWAP " + o.operand1 + "," + o.operand2
+	return "SWAP " + o.operand1
 }
 func (o *SWAP_HLPtr) SymbolicString() string {
 	return "SWAP (HL)"
 }
 
 type SWAP_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SWAP_A) Execute(v *vm.VM) {
 }
 
 func (o *SWAP_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x37)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x37)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SWAP_A) String() string {
-	return "SWAP " + o.operand1 + "," + o.operand2
+	return "SWAP " + o.operand1
 }
 func (o *SWAP_A) SymbolicString() string {
 	return "SWAP A"
 }
 
 type SRL_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRL_B) Execute(v *vm.VM) {
 }
 
 func (o *SRL_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x38)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x38)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRL_B) String() string {
-	return "SRL " + o.operand1 + "," + o.operand2
+	return "SRL " + o.operand1
 }
 func (o *SRL_B) SymbolicString() string {
 	return "SRL B"
 }
 
 type SRL_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRL_C) Execute(v *vm.VM) {
 }
 
 func (o *SRL_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x39)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x39)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRL_C) String() string {
-	return "SRL " + o.operand1 + "," + o.operand2
+	return "SRL " + o.operand1
 }
 func (o *SRL_C) SymbolicString() string {
 	return "SRL C"
 }
 
 type SRL_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRL_D) Execute(v *vm.VM) {
 }
 
 func (o *SRL_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x3a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRL_D) String() string {
-	return "SRL " + o.operand1 + "," + o.operand2
+	return "SRL " + o.operand1
 }
 func (o *SRL_D) SymbolicString() string {
 	return "SRL D"
 }
 
 type SRL_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRL_E) Execute(v *vm.VM) {
 }
 
 func (o *SRL_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x3b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRL_E) String() string {
-	return "SRL " + o.operand1 + "," + o.operand2
+	return "SRL " + o.operand1
 }
 func (o *SRL_E) SymbolicString() string {
 	return "SRL E"
 }
 
 type SRL_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRL_H) Execute(v *vm.VM) {
 }
 
 func (o *SRL_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x3c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRL_H) String() string {
-	return "SRL " + o.operand1 + "," + o.operand2
+	return "SRL " + o.operand1
 }
 func (o *SRL_H) SymbolicString() string {
 	return "SRL H"
 }
 
 type SRL_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRL_L) Execute(v *vm.VM) {
 }
 
 func (o *SRL_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x3d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRL_L) String() string {
-	return "SRL " + o.operand1 + "," + o.operand2
+	return "SRL " + o.operand1
 }
 func (o *SRL_L) SymbolicString() string {
 	return "SRL L"
 }
 
 type SRL_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRL_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SRL_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x3e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRL_HLPtr) String() string {
-	return "SRL " + o.operand1 + "," + o.operand2
+	return "SRL " + o.operand1
 }
 func (o *SRL_HLPtr) SymbolicString() string {
 	return "SRL (HL)"
 }
 
 type SRL_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SRL_A) Execute(v *vm.VM) {
 }
 
 func (o *SRL_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x3f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x3f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SRL_A) String() string {
-	return "SRL " + o.operand1 + "," + o.operand2
+	return "SRL " + o.operand1
 }
 func (o *SRL_A) SymbolicString() string {
 	return "SRL A"
 }
 
 type RLC_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RLC_H) Execute(v *vm.VM) {
 }
 
 func (o *RLC_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x4)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RLC_H) String() string {
-	return "RLC " + o.operand1 + "," + o.operand2
+	return "RLC " + o.operand1
 }
 func (o *RLC_H) SymbolicString() string {
 	return "RLC H"
 }
 
 type BIT_0_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_0_B) Execute(v *vm.VM) {
 }
 
 func (o *BIT_0_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x40)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x40)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_0_B) String() string {
@@ -7794,22 +9324,28 @@ func (o *BIT_0_B) SymbolicString() string {
 }
 
 type BIT_0_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_0_C) Execute(v *vm.VM) {
 }
 
 func (o *BIT_0_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x41)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x41)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_0_C) String() string {
@@ -7820,22 +9356,28 @@ func (o *BIT_0_C) SymbolicString() string {
 }
 
 type BIT_0_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_0_D) Execute(v *vm.VM) {
 }
 
 func (o *BIT_0_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x42)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x42)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_0_D) String() string {
@@ -7846,22 +9388,28 @@ func (o *BIT_0_D) SymbolicString() string {
 }
 
 type BIT_0_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_0_E) Execute(v *vm.VM) {
 }
 
 func (o *BIT_0_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x43)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x43)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_0_E) String() string {
@@ -7872,22 +9420,28 @@ func (o *BIT_0_E) SymbolicString() string {
 }
 
 type BIT_0_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_0_H) Execute(v *vm.VM) {
 }
 
 func (o *BIT_0_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x44)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x44)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_0_H) String() string {
@@ -7898,22 +9452,28 @@ func (o *BIT_0_H) SymbolicString() string {
 }
 
 type BIT_0_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_0_L) Execute(v *vm.VM) {
 }
 
 func (o *BIT_0_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x45)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x45)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_0_L) String() string {
@@ -7924,22 +9484,28 @@ func (o *BIT_0_L) SymbolicString() string {
 }
 
 type BIT_0_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_0_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *BIT_0_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x46)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x46)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_0_HLPtr) String() string {
@@ -7950,22 +9516,28 @@ func (o *BIT_0_HLPtr) SymbolicString() string {
 }
 
 type BIT_0_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_0_A) Execute(v *vm.VM) {
 }
 
 func (o *BIT_0_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x47)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x47)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_0_A) String() string {
@@ -7976,22 +9548,28 @@ func (o *BIT_0_A) SymbolicString() string {
 }
 
 type BIT_1_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_1_B) Execute(v *vm.VM) {
 }
 
 func (o *BIT_1_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x48)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x48)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_1_B) String() string {
@@ -8002,22 +9580,28 @@ func (o *BIT_1_B) SymbolicString() string {
 }
 
 type BIT_1_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_1_C) Execute(v *vm.VM) {
 }
 
 func (o *BIT_1_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x49)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x49)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_1_C) String() string {
@@ -8028,22 +9612,28 @@ func (o *BIT_1_C) SymbolicString() string {
 }
 
 type BIT_1_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_1_D) Execute(v *vm.VM) {
 }
 
 func (o *BIT_1_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x4a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_1_D) String() string {
@@ -8054,22 +9644,28 @@ func (o *BIT_1_D) SymbolicString() string {
 }
 
 type BIT_1_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_1_E) Execute(v *vm.VM) {
 }
 
 func (o *BIT_1_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x4b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_1_E) String() string {
@@ -8080,22 +9676,28 @@ func (o *BIT_1_E) SymbolicString() string {
 }
 
 type BIT_1_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_1_H) Execute(v *vm.VM) {
 }
 
 func (o *BIT_1_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x4c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_1_H) String() string {
@@ -8106,22 +9708,28 @@ func (o *BIT_1_H) SymbolicString() string {
 }
 
 type BIT_1_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_1_L) Execute(v *vm.VM) {
 }
 
 func (o *BIT_1_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x4d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_1_L) String() string {
@@ -8132,22 +9740,28 @@ func (o *BIT_1_L) SymbolicString() string {
 }
 
 type BIT_1_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_1_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *BIT_1_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x4e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_1_HLPtr) String() string {
@@ -8158,22 +9772,28 @@ func (o *BIT_1_HLPtr) SymbolicString() string {
 }
 
 type BIT_1_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_1_A) Execute(v *vm.VM) {
 }
 
 func (o *BIT_1_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x4f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x4f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_1_A) String() string {
@@ -8184,48 +9804,60 @@ func (o *BIT_1_A) SymbolicString() string {
 }
 
 type RLC_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RLC_L) Execute(v *vm.VM) {
 }
 
 func (o *RLC_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RLC_L) String() string {
-	return "RLC " + o.operand1 + "," + o.operand2
+	return "RLC " + o.operand1
 }
 func (o *RLC_L) SymbolicString() string {
 	return "RLC L"
 }
 
 type BIT_2_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_2_B) Execute(v *vm.VM) {
 }
 
 func (o *BIT_2_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x50)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x50)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_2_B) String() string {
@@ -8236,22 +9868,28 @@ func (o *BIT_2_B) SymbolicString() string {
 }
 
 type BIT_2_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_2_C) Execute(v *vm.VM) {
 }
 
 func (o *BIT_2_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x51)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x51)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_2_C) String() string {
@@ -8262,22 +9900,28 @@ func (o *BIT_2_C) SymbolicString() string {
 }
 
 type BIT_2_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_2_D) Execute(v *vm.VM) {
 }
 
 func (o *BIT_2_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x52)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x52)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_2_D) String() string {
@@ -8288,22 +9932,28 @@ func (o *BIT_2_D) SymbolicString() string {
 }
 
 type BIT_2_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_2_E) Execute(v *vm.VM) {
 }
 
 func (o *BIT_2_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x53)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x53)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_2_E) String() string {
@@ -8314,22 +9964,28 @@ func (o *BIT_2_E) SymbolicString() string {
 }
 
 type BIT_2_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_2_H) Execute(v *vm.VM) {
 }
 
 func (o *BIT_2_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x54)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x54)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_2_H) String() string {
@@ -8340,22 +9996,28 @@ func (o *BIT_2_H) SymbolicString() string {
 }
 
 type BIT_2_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_2_L) Execute(v *vm.VM) {
 }
 
 func (o *BIT_2_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x55)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x55)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_2_L) String() string {
@@ -8366,22 +10028,28 @@ func (o *BIT_2_L) SymbolicString() string {
 }
 
 type BIT_2_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_2_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *BIT_2_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x56)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x56)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_2_HLPtr) String() string {
@@ -8392,22 +10060,28 @@ func (o *BIT_2_HLPtr) SymbolicString() string {
 }
 
 type BIT_2_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_2_A) Execute(v *vm.VM) {
 }
 
 func (o *BIT_2_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x57)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x57)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_2_A) String() string {
@@ -8418,22 +10092,28 @@ func (o *BIT_2_A) SymbolicString() string {
 }
 
 type BIT_3_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_3_B) Execute(v *vm.VM) {
 }
 
 func (o *BIT_3_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x58)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x58)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_3_B) String() string {
@@ -8444,22 +10124,28 @@ func (o *BIT_3_B) SymbolicString() string {
 }
 
 type BIT_3_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_3_C) Execute(v *vm.VM) {
 }
 
 func (o *BIT_3_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x59)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x59)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_3_C) String() string {
@@ -8470,22 +10156,28 @@ func (o *BIT_3_C) SymbolicString() string {
 }
 
 type BIT_3_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_3_D) Execute(v *vm.VM) {
 }
 
 func (o *BIT_3_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x5a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_3_D) String() string {
@@ -8496,22 +10188,28 @@ func (o *BIT_3_D) SymbolicString() string {
 }
 
 type BIT_3_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_3_E) Execute(v *vm.VM) {
 }
 
 func (o *BIT_3_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x5b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_3_E) String() string {
@@ -8522,22 +10220,28 @@ func (o *BIT_3_E) SymbolicString() string {
 }
 
 type BIT_3_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_3_H) Execute(v *vm.VM) {
 }
 
 func (o *BIT_3_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x5c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_3_H) String() string {
@@ -8548,22 +10252,28 @@ func (o *BIT_3_H) SymbolicString() string {
 }
 
 type BIT_3_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_3_L) Execute(v *vm.VM) {
 }
 
 func (o *BIT_3_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x5d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_3_L) String() string {
@@ -8574,22 +10284,28 @@ func (o *BIT_3_L) SymbolicString() string {
 }
 
 type BIT_3_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_3_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *BIT_3_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x5e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_3_HLPtr) String() string {
@@ -8600,22 +10316,28 @@ func (o *BIT_3_HLPtr) SymbolicString() string {
 }
 
 type BIT_3_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_3_A) Execute(v *vm.VM) {
 }
 
 func (o *BIT_3_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x5f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x5f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_3_A) String() string {
@@ -8626,48 +10348,60 @@ func (o *BIT_3_A) SymbolicString() string {
 }
 
 type RLC_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RLC_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *RLC_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RLC_HLPtr) String() string {
-	return "RLC " + o.operand1 + "," + o.operand2
+	return "RLC " + o.operand1
 }
 func (o *RLC_HLPtr) SymbolicString() string {
 	return "RLC (HL)"
 }
 
 type BIT_4_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_4_B) Execute(v *vm.VM) {
 }
 
 func (o *BIT_4_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x60)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x60)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_4_B) String() string {
@@ -8678,22 +10412,28 @@ func (o *BIT_4_B) SymbolicString() string {
 }
 
 type BIT_4_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_4_C) Execute(v *vm.VM) {
 }
 
 func (o *BIT_4_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x61)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x61)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_4_C) String() string {
@@ -8704,22 +10444,28 @@ func (o *BIT_4_C) SymbolicString() string {
 }
 
 type BIT_4_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_4_D) Execute(v *vm.VM) {
 }
 
 func (o *BIT_4_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x62)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x62)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_4_D) String() string {
@@ -8730,22 +10476,28 @@ func (o *BIT_4_D) SymbolicString() string {
 }
 
 type BIT_4_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_4_E) Execute(v *vm.VM) {
 }
 
 func (o *BIT_4_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x63)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x63)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_4_E) String() string {
@@ -8756,22 +10508,28 @@ func (o *BIT_4_E) SymbolicString() string {
 }
 
 type BIT_4_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_4_H) Execute(v *vm.VM) {
 }
 
 func (o *BIT_4_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x64)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x64)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_4_H) String() string {
@@ -8782,22 +10540,28 @@ func (o *BIT_4_H) SymbolicString() string {
 }
 
 type BIT_4_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_4_L) Execute(v *vm.VM) {
 }
 
 func (o *BIT_4_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x65)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x65)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_4_L) String() string {
@@ -8808,22 +10572,28 @@ func (o *BIT_4_L) SymbolicString() string {
 }
 
 type BIT_4_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_4_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *BIT_4_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x66)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x66)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_4_HLPtr) String() string {
@@ -8834,22 +10604,28 @@ func (o *BIT_4_HLPtr) SymbolicString() string {
 }
 
 type BIT_4_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_4_A) Execute(v *vm.VM) {
 }
 
 func (o *BIT_4_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x67)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x67)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_4_A) String() string {
@@ -8860,22 +10636,28 @@ func (o *BIT_4_A) SymbolicString() string {
 }
 
 type BIT_5_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_5_B) Execute(v *vm.VM) {
 }
 
 func (o *BIT_5_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x68)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x68)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_5_B) String() string {
@@ -8886,22 +10668,28 @@ func (o *BIT_5_B) SymbolicString() string {
 }
 
 type BIT_5_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_5_C) Execute(v *vm.VM) {
 }
 
 func (o *BIT_5_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x69)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x69)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_5_C) String() string {
@@ -8912,22 +10700,28 @@ func (o *BIT_5_C) SymbolicString() string {
 }
 
 type BIT_5_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_5_D) Execute(v *vm.VM) {
 }
 
 func (o *BIT_5_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x6a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_5_D) String() string {
@@ -8938,22 +10732,28 @@ func (o *BIT_5_D) SymbolicString() string {
 }
 
 type BIT_5_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_5_E) Execute(v *vm.VM) {
 }
 
 func (o *BIT_5_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x6b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_5_E) String() string {
@@ -8964,22 +10764,28 @@ func (o *BIT_5_E) SymbolicString() string {
 }
 
 type BIT_5_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_5_H) Execute(v *vm.VM) {
 }
 
 func (o *BIT_5_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x6c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_5_H) String() string {
@@ -8990,22 +10796,28 @@ func (o *BIT_5_H) SymbolicString() string {
 }
 
 type BIT_5_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_5_L) Execute(v *vm.VM) {
 }
 
 func (o *BIT_5_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x6d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_5_L) String() string {
@@ -9016,22 +10828,28 @@ func (o *BIT_5_L) SymbolicString() string {
 }
 
 type BIT_5_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_5_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *BIT_5_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x6e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_5_HLPtr) String() string {
@@ -9042,22 +10860,28 @@ func (o *BIT_5_HLPtr) SymbolicString() string {
 }
 
 type BIT_5_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_5_A) Execute(v *vm.VM) {
 }
 
 func (o *BIT_5_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x6f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x6f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_5_A) String() string {
@@ -9068,48 +10892,60 @@ func (o *BIT_5_A) SymbolicString() string {
 }
 
 type RLC_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RLC_A) Execute(v *vm.VM) {
 }
 
 func (o *RLC_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RLC_A) String() string {
-	return "RLC " + o.operand1 + "," + o.operand2
+	return "RLC " + o.operand1
 }
 func (o *RLC_A) SymbolicString() string {
 	return "RLC A"
 }
 
 type BIT_6_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_6_B) Execute(v *vm.VM) {
 }
 
 func (o *BIT_6_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x70)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x70)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_6_B) String() string {
@@ -9120,22 +10956,28 @@ func (o *BIT_6_B) SymbolicString() string {
 }
 
 type BIT_6_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_6_C) Execute(v *vm.VM) {
 }
 
 func (o *BIT_6_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x71)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x71)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_6_C) String() string {
@@ -9146,22 +10988,28 @@ func (o *BIT_6_C) SymbolicString() string {
 }
 
 type BIT_6_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_6_D) Execute(v *vm.VM) {
 }
 
 func (o *BIT_6_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x72)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x72)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_6_D) String() string {
@@ -9172,22 +11020,28 @@ func (o *BIT_6_D) SymbolicString() string {
 }
 
 type BIT_6_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_6_E) Execute(v *vm.VM) {
 }
 
 func (o *BIT_6_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x73)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x73)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_6_E) String() string {
@@ -9198,22 +11052,28 @@ func (o *BIT_6_E) SymbolicString() string {
 }
 
 type BIT_6_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_6_H) Execute(v *vm.VM) {
 }
 
 func (o *BIT_6_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x74)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x74)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_6_H) String() string {
@@ -9224,22 +11084,28 @@ func (o *BIT_6_H) SymbolicString() string {
 }
 
 type BIT_6_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_6_L) Execute(v *vm.VM) {
 }
 
 func (o *BIT_6_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x75)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x75)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_6_L) String() string {
@@ -9250,22 +11116,28 @@ func (o *BIT_6_L) SymbolicString() string {
 }
 
 type BIT_6_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_6_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *BIT_6_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x76)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x76)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_6_HLPtr) String() string {
@@ -9276,22 +11148,28 @@ func (o *BIT_6_HLPtr) SymbolicString() string {
 }
 
 type BIT_6_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_6_A) Execute(v *vm.VM) {
 }
 
 func (o *BIT_6_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x77)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x77)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_6_A) String() string {
@@ -9302,22 +11180,28 @@ func (o *BIT_6_A) SymbolicString() string {
 }
 
 type BIT_7_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_7_B) Execute(v *vm.VM) {
 }
 
 func (o *BIT_7_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x78)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x78)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_7_B) String() string {
@@ -9328,22 +11212,28 @@ func (o *BIT_7_B) SymbolicString() string {
 }
 
 type BIT_7_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_7_C) Execute(v *vm.VM) {
 }
 
 func (o *BIT_7_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x79)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x79)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_7_C) String() string {
@@ -9354,22 +11244,28 @@ func (o *BIT_7_C) SymbolicString() string {
 }
 
 type BIT_7_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_7_D) Execute(v *vm.VM) {
 }
 
 func (o *BIT_7_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x7a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_7_D) String() string {
@@ -9380,22 +11276,28 @@ func (o *BIT_7_D) SymbolicString() string {
 }
 
 type BIT_7_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_7_E) Execute(v *vm.VM) {
 }
 
 func (o *BIT_7_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x7b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_7_E) String() string {
@@ -9406,22 +11308,28 @@ func (o *BIT_7_E) SymbolicString() string {
 }
 
 type BIT_7_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_7_H) Execute(v *vm.VM) {
 }
 
 func (o *BIT_7_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x7c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_7_H) String() string {
@@ -9432,22 +11340,28 @@ func (o *BIT_7_H) SymbolicString() string {
 }
 
 type BIT_7_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_7_L) Execute(v *vm.VM) {
 }
 
 func (o *BIT_7_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x7d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_7_L) String() string {
@@ -9458,22 +11372,28 @@ func (o *BIT_7_L) SymbolicString() string {
 }
 
 type BIT_7_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_7_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *BIT_7_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x7e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_7_HLPtr) String() string {
@@ -9484,22 +11404,28 @@ func (o *BIT_7_HLPtr) SymbolicString() string {
 }
 
 type BIT_7_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *BIT_7_A) Execute(v *vm.VM) {
 }
 
 func (o *BIT_7_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x7f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x7f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *BIT_7_A) String() string {
@@ -9510,48 +11436,60 @@ func (o *BIT_7_A) SymbolicString() string {
 }
 
 type RRC_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RRC_B) Execute(v *vm.VM) {
 }
 
 func (o *RRC_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RRC_B) String() string {
-	return "RRC " + o.operand1 + "," + o.operand2
+	return "RRC " + o.operand1
 }
 func (o *RRC_B) SymbolicString() string {
 	return "RRC B"
 }
 
 type RES_0_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_0_B) Execute(v *vm.VM) {
 }
 
 func (o *RES_0_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x80)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x80)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_0_B) String() string {
@@ -9562,22 +11500,28 @@ func (o *RES_0_B) SymbolicString() string {
 }
 
 type RES_0_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_0_C) Execute(v *vm.VM) {
 }
 
 func (o *RES_0_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x81)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x81)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_0_C) String() string {
@@ -9588,22 +11532,28 @@ func (o *RES_0_C) SymbolicString() string {
 }
 
 type RES_0_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_0_D) Execute(v *vm.VM) {
 }
 
 func (o *RES_0_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x82)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x82)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_0_D) String() string {
@@ -9614,22 +11564,28 @@ func (o *RES_0_D) SymbolicString() string {
 }
 
 type RES_0_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_0_E) Execute(v *vm.VM) {
 }
 
 func (o *RES_0_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x83)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x83)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_0_E) String() string {
@@ -9640,22 +11596,28 @@ func (o *RES_0_E) SymbolicString() string {
 }
 
 type RES_0_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_0_H) Execute(v *vm.VM) {
 }
 
 func (o *RES_0_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x84)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x84)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_0_H) String() string {
@@ -9666,22 +11628,28 @@ func (o *RES_0_H) SymbolicString() string {
 }
 
 type RES_0_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_0_L) Execute(v *vm.VM) {
 }
 
 func (o *RES_0_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x85)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x85)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_0_L) String() string {
@@ -9692,22 +11660,28 @@ func (o *RES_0_L) SymbolicString() string {
 }
 
 type RES_0_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_0_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *RES_0_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x86)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x86)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_0_HLPtr) String() string {
@@ -9718,22 +11692,28 @@ func (o *RES_0_HLPtr) SymbolicString() string {
 }
 
 type RES_0_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_0_A) Execute(v *vm.VM) {
 }
 
 func (o *RES_0_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x87)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x87)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_0_A) String() string {
@@ -9744,22 +11724,28 @@ func (o *RES_0_A) SymbolicString() string {
 }
 
 type RES_1_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_1_B) Execute(v *vm.VM) {
 }
 
 func (o *RES_1_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x88)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x88)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_1_B) String() string {
@@ -9770,22 +11756,28 @@ func (o *RES_1_B) SymbolicString() string {
 }
 
 type RES_1_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_1_C) Execute(v *vm.VM) {
 }
 
 func (o *RES_1_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x89)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x89)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_1_C) String() string {
@@ -9796,22 +11788,28 @@ func (o *RES_1_C) SymbolicString() string {
 }
 
 type RES_1_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_1_D) Execute(v *vm.VM) {
 }
 
 func (o *RES_1_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x8a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_1_D) String() string {
@@ -9822,22 +11820,28 @@ func (o *RES_1_D) SymbolicString() string {
 }
 
 type RES_1_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_1_E) Execute(v *vm.VM) {
 }
 
 func (o *RES_1_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x8b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_1_E) String() string {
@@ -9848,22 +11852,28 @@ func (o *RES_1_E) SymbolicString() string {
 }
 
 type RES_1_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_1_H) Execute(v *vm.VM) {
 }
 
 func (o *RES_1_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x8c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_1_H) String() string {
@@ -9874,22 +11884,28 @@ func (o *RES_1_H) SymbolicString() string {
 }
 
 type RES_1_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_1_L) Execute(v *vm.VM) {
 }
 
 func (o *RES_1_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x8d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_1_L) String() string {
@@ -9900,22 +11916,28 @@ func (o *RES_1_L) SymbolicString() string {
 }
 
 type RES_1_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_1_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *RES_1_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x8e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_1_HLPtr) String() string {
@@ -9926,22 +11948,28 @@ func (o *RES_1_HLPtr) SymbolicString() string {
 }
 
 type RES_1_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_1_A) Execute(v *vm.VM) {
 }
 
 func (o *RES_1_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x8f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x8f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_1_A) String() string {
@@ -9952,48 +11980,60 @@ func (o *RES_1_A) SymbolicString() string {
 }
 
 type RRC_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RRC_C) Execute(v *vm.VM) {
 }
 
 func (o *RRC_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RRC_C) String() string {
-	return "RRC " + o.operand1 + "," + o.operand2
+	return "RRC " + o.operand1
 }
 func (o *RRC_C) SymbolicString() string {
 	return "RRC C"
 }
 
 type RES_2_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_2_B) Execute(v *vm.VM) {
 }
 
 func (o *RES_2_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x90)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x90)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_2_B) String() string {
@@ -10004,22 +12044,28 @@ func (o *RES_2_B) SymbolicString() string {
 }
 
 type RES_2_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_2_C) Execute(v *vm.VM) {
 }
 
 func (o *RES_2_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x91)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x91)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_2_C) String() string {
@@ -10030,22 +12076,28 @@ func (o *RES_2_C) SymbolicString() string {
 }
 
 type RES_2_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_2_D) Execute(v *vm.VM) {
 }
 
 func (o *RES_2_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x92)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x92)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_2_D) String() string {
@@ -10056,22 +12108,28 @@ func (o *RES_2_D) SymbolicString() string {
 }
 
 type RES_2_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_2_E) Execute(v *vm.VM) {
 }
 
 func (o *RES_2_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x93)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x93)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_2_E) String() string {
@@ -10082,22 +12140,28 @@ func (o *RES_2_E) SymbolicString() string {
 }
 
 type RES_2_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_2_H) Execute(v *vm.VM) {
 }
 
 func (o *RES_2_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x94)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x94)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_2_H) String() string {
@@ -10108,22 +12172,28 @@ func (o *RES_2_H) SymbolicString() string {
 }
 
 type RES_2_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_2_L) Execute(v *vm.VM) {
 }
 
 func (o *RES_2_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x95)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x95)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_2_L) String() string {
@@ -10134,22 +12204,28 @@ func (o *RES_2_L) SymbolicString() string {
 }
 
 type RES_2_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_2_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *RES_2_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x96)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x96)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_2_HLPtr) String() string {
@@ -10160,22 +12236,28 @@ func (o *RES_2_HLPtr) SymbolicString() string {
 }
 
 type RES_2_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_2_A) Execute(v *vm.VM) {
 }
 
 func (o *RES_2_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x97)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x97)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_2_A) String() string {
@@ -10186,22 +12268,28 @@ func (o *RES_2_A) SymbolicString() string {
 }
 
 type RES_3_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_3_B) Execute(v *vm.VM) {
 }
 
 func (o *RES_3_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x98)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x98)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_3_B) String() string {
@@ -10212,22 +12300,28 @@ func (o *RES_3_B) SymbolicString() string {
 }
 
 type RES_3_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_3_C) Execute(v *vm.VM) {
 }
 
 func (o *RES_3_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x99)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x99)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_3_C) String() string {
@@ -10238,22 +12332,28 @@ func (o *RES_3_C) SymbolicString() string {
 }
 
 type RES_3_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_3_D) Execute(v *vm.VM) {
 }
 
 func (o *RES_3_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9a)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x9a)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_3_D) String() string {
@@ -10264,22 +12364,28 @@ func (o *RES_3_D) SymbolicString() string {
 }
 
 type RES_3_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_3_E) Execute(v *vm.VM) {
 }
 
 func (o *RES_3_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9b)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x9b)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_3_E) String() string {
@@ -10290,22 +12396,28 @@ func (o *RES_3_E) SymbolicString() string {
 }
 
 type RES_3_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_3_H) Execute(v *vm.VM) {
 }
 
 func (o *RES_3_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9c)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x9c)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_3_H) String() string {
@@ -10316,22 +12428,28 @@ func (o *RES_3_H) SymbolicString() string {
 }
 
 type RES_3_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_3_L) Execute(v *vm.VM) {
 }
 
 func (o *RES_3_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9d)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x9d)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_3_L) String() string {
@@ -10342,22 +12460,28 @@ func (o *RES_3_L) SymbolicString() string {
 }
 
 type RES_3_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_3_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *RES_3_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9e)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x9e)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_3_HLPtr) String() string {
@@ -10368,22 +12492,28 @@ func (o *RES_3_HLPtr) SymbolicString() string {
 }
 
 type RES_3_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_3_A) Execute(v *vm.VM) {
 }
 
 func (o *RES_3_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0x9f)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0x9f)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_3_A) String() string {
@@ -10394,48 +12524,60 @@ func (o *RES_3_A) SymbolicString() string {
 }
 
 type RRC_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RRC_D) Execute(v *vm.VM) {
 }
 
 func (o *RRC_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xa)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RRC_D) String() string {
-	return "RRC " + o.operand1 + "," + o.operand2
+	return "RRC " + o.operand1
 }
 func (o *RRC_D) SymbolicString() string {
 	return "RRC D"
 }
 
 type RES_4_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_4_B) Execute(v *vm.VM) {
 }
 
 func (o *RES_4_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xa0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_4_B) String() string {
@@ -10446,22 +12588,28 @@ func (o *RES_4_B) SymbolicString() string {
 }
 
 type RES_4_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_4_C) Execute(v *vm.VM) {
 }
 
 func (o *RES_4_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xa1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_4_C) String() string {
@@ -10472,22 +12620,28 @@ func (o *RES_4_C) SymbolicString() string {
 }
 
 type RES_4_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_4_D) Execute(v *vm.VM) {
 }
 
 func (o *RES_4_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa2)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xa2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_4_D) String() string {
@@ -10498,22 +12652,28 @@ func (o *RES_4_D) SymbolicString() string {
 }
 
 type RES_4_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_4_E) Execute(v *vm.VM) {
 }
 
 func (o *RES_4_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa3)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xa3)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_4_E) String() string {
@@ -10524,22 +12684,28 @@ func (o *RES_4_E) SymbolicString() string {
 }
 
 type RES_4_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_4_H) Execute(v *vm.VM) {
 }
 
 func (o *RES_4_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa4)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xa4)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_4_H) String() string {
@@ -10550,22 +12716,28 @@ func (o *RES_4_H) SymbolicString() string {
 }
 
 type RES_4_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_4_L) Execute(v *vm.VM) {
 }
 
 func (o *RES_4_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xa5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_4_L) String() string {
@@ -10576,22 +12748,28 @@ func (o *RES_4_L) SymbolicString() string {
 }
 
 type RES_4_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_4_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *RES_4_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa6)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xa6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_4_HLPtr) String() string {
@@ -10602,22 +12780,28 @@ func (o *RES_4_HLPtr) SymbolicString() string {
 }
 
 type RES_4_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_4_A) Execute(v *vm.VM) {
 }
 
 func (o *RES_4_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xa7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_4_A) String() string {
@@ -10628,22 +12812,28 @@ func (o *RES_4_A) SymbolicString() string {
 }
 
 type RES_5_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_5_B) Execute(v *vm.VM) {
 }
 
 func (o *RES_5_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xa8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_5_B) String() string {
@@ -10654,22 +12844,28 @@ func (o *RES_5_B) SymbolicString() string {
 }
 
 type RES_5_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_5_C) Execute(v *vm.VM) {
 }
 
 func (o *RES_5_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xa9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xa9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_5_C) String() string {
@@ -10680,22 +12876,28 @@ func (o *RES_5_C) SymbolicString() string {
 }
 
 type RES_5_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_5_D) Execute(v *vm.VM) {
 }
 
 func (o *RES_5_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xaa)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xaa)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_5_D) String() string {
@@ -10706,22 +12908,28 @@ func (o *RES_5_D) SymbolicString() string {
 }
 
 type RES_5_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_5_E) Execute(v *vm.VM) {
 }
 
 func (o *RES_5_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xab)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xab)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_5_E) String() string {
@@ -10732,22 +12940,28 @@ func (o *RES_5_E) SymbolicString() string {
 }
 
 type RES_5_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_5_H) Execute(v *vm.VM) {
 }
 
 func (o *RES_5_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xac)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xac)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_5_H) String() string {
@@ -10758,22 +12972,28 @@ func (o *RES_5_H) SymbolicString() string {
 }
 
 type RES_5_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_5_L) Execute(v *vm.VM) {
 }
 
 func (o *RES_5_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xad)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xad)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_5_L) String() string {
@@ -10784,22 +13004,28 @@ func (o *RES_5_L) SymbolicString() string {
 }
 
 type RES_5_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_5_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *RES_5_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xae)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xae)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_5_HLPtr) String() string {
@@ -10810,22 +13036,28 @@ func (o *RES_5_HLPtr) SymbolicString() string {
 }
 
 type RES_5_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_5_A) Execute(v *vm.VM) {
 }
 
 func (o *RES_5_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xaf)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xaf)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_5_A) String() string {
@@ -10836,48 +13068,60 @@ func (o *RES_5_A) SymbolicString() string {
 }
 
 type RRC_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RRC_E) Execute(v *vm.VM) {
 }
 
 func (o *RRC_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xb)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RRC_E) String() string {
-	return "RRC " + o.operand1 + "," + o.operand2
+	return "RRC " + o.operand1
 }
 func (o *RRC_E) SymbolicString() string {
 	return "RRC E"
 }
 
 type RES_6_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_6_B) Execute(v *vm.VM) {
 }
 
 func (o *RES_6_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xb0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_6_B) String() string {
@@ -10888,22 +13132,28 @@ func (o *RES_6_B) SymbolicString() string {
 }
 
 type RES_6_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_6_C) Execute(v *vm.VM) {
 }
 
 func (o *RES_6_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xb1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_6_C) String() string {
@@ -10914,22 +13164,28 @@ func (o *RES_6_C) SymbolicString() string {
 }
 
 type RES_6_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_6_D) Execute(v *vm.VM) {
 }
 
 func (o *RES_6_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb2)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xb2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_6_D) String() string {
@@ -10940,22 +13196,28 @@ func (o *RES_6_D) SymbolicString() string {
 }
 
 type RES_6_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_6_E) Execute(v *vm.VM) {
 }
 
 func (o *RES_6_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb3)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xb3)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_6_E) String() string {
@@ -10966,22 +13228,28 @@ func (o *RES_6_E) SymbolicString() string {
 }
 
 type RES_6_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_6_H) Execute(v *vm.VM) {
 }
 
 func (o *RES_6_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb4)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xb4)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_6_H) String() string {
@@ -10992,22 +13260,28 @@ func (o *RES_6_H) SymbolicString() string {
 }
 
 type RES_6_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_6_L) Execute(v *vm.VM) {
 }
 
 func (o *RES_6_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xb5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_6_L) String() string {
@@ -11018,22 +13292,28 @@ func (o *RES_6_L) SymbolicString() string {
 }
 
 type RES_6_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_6_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *RES_6_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb6)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xb6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_6_HLPtr) String() string {
@@ -11044,22 +13324,28 @@ func (o *RES_6_HLPtr) SymbolicString() string {
 }
 
 type RES_6_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_6_A) Execute(v *vm.VM) {
 }
 
 func (o *RES_6_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xb7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_6_A) String() string {
@@ -11070,22 +13356,28 @@ func (o *RES_6_A) SymbolicString() string {
 }
 
 type RES_7_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_7_B) Execute(v *vm.VM) {
 }
 
 func (o *RES_7_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xb8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_7_B) String() string {
@@ -11096,22 +13388,28 @@ func (o *RES_7_B) SymbolicString() string {
 }
 
 type RES_7_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_7_C) Execute(v *vm.VM) {
 }
 
 func (o *RES_7_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xb9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xb9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_7_C) String() string {
@@ -11122,22 +13420,28 @@ func (o *RES_7_C) SymbolicString() string {
 }
 
 type RES_7_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_7_D) Execute(v *vm.VM) {
 }
 
 func (o *RES_7_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xba)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xba)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_7_D) String() string {
@@ -11148,22 +13452,28 @@ func (o *RES_7_D) SymbolicString() string {
 }
 
 type RES_7_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_7_E) Execute(v *vm.VM) {
 }
 
 func (o *RES_7_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xbb)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xbb)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_7_E) String() string {
@@ -11174,22 +13484,28 @@ func (o *RES_7_E) SymbolicString() string {
 }
 
 type RES_7_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_7_H) Execute(v *vm.VM) {
 }
 
 func (o *RES_7_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xbc)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xbc)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_7_H) String() string {
@@ -11200,22 +13516,28 @@ func (o *RES_7_H) SymbolicString() string {
 }
 
 type RES_7_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_7_L) Execute(v *vm.VM) {
 }
 
 func (o *RES_7_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xbd)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xbd)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_7_L) String() string {
@@ -11226,22 +13548,28 @@ func (o *RES_7_L) SymbolicString() string {
 }
 
 type RES_7_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_7_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *RES_7_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xbe)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xbe)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_7_HLPtr) String() string {
@@ -11252,22 +13580,28 @@ func (o *RES_7_HLPtr) SymbolicString() string {
 }
 
 type RES_7_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RES_7_A) Execute(v *vm.VM) {
 }
 
 func (o *RES_7_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xbf)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xbf)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RES_7_A) String() string {
@@ -11278,48 +13612,60 @@ func (o *RES_7_A) SymbolicString() string {
 }
 
 type RRC_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RRC_H) Execute(v *vm.VM) {
 }
 
 func (o *RRC_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xc)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RRC_H) String() string {
-	return "RRC " + o.operand1 + "," + o.operand2
+	return "RRC " + o.operand1
 }
 func (o *RRC_H) SymbolicString() string {
 	return "RRC H"
 }
 
 type SET_0_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_0_B) Execute(v *vm.VM) {
 }
 
 func (o *SET_0_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xc0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_0_B) String() string {
@@ -11330,22 +13676,28 @@ func (o *SET_0_B) SymbolicString() string {
 }
 
 type SET_0_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_0_C) Execute(v *vm.VM) {
 }
 
 func (o *SET_0_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xc1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_0_C) String() string {
@@ -11356,22 +13708,28 @@ func (o *SET_0_C) SymbolicString() string {
 }
 
 type SET_0_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_0_D) Execute(v *vm.VM) {
 }
 
 func (o *SET_0_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc2)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xc2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_0_D) String() string {
@@ -11382,22 +13740,28 @@ func (o *SET_0_D) SymbolicString() string {
 }
 
 type SET_0_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_0_E) Execute(v *vm.VM) {
 }
 
 func (o *SET_0_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc3)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xc3)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_0_E) String() string {
@@ -11408,22 +13772,28 @@ func (o *SET_0_E) SymbolicString() string {
 }
 
 type SET_0_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_0_H) Execute(v *vm.VM) {
 }
 
 func (o *SET_0_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc4)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xc4)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_0_H) String() string {
@@ -11434,22 +13804,28 @@ func (o *SET_0_H) SymbolicString() string {
 }
 
 type SET_0_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_0_L) Execute(v *vm.VM) {
 }
 
 func (o *SET_0_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xc5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_0_L) String() string {
@@ -11460,22 +13836,28 @@ func (o *SET_0_L) SymbolicString() string {
 }
 
 type SET_0_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_0_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SET_0_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc6)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xc6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_0_HLPtr) String() string {
@@ -11486,22 +13868,28 @@ func (o *SET_0_HLPtr) SymbolicString() string {
 }
 
 type SET_0_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_0_A) Execute(v *vm.VM) {
 }
 
 func (o *SET_0_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xc7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_0_A) String() string {
@@ -11512,22 +13900,28 @@ func (o *SET_0_A) SymbolicString() string {
 }
 
 type SET_1_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_1_B) Execute(v *vm.VM) {
 }
 
 func (o *SET_1_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xc8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_1_B) String() string {
@@ -11538,22 +13932,28 @@ func (o *SET_1_B) SymbolicString() string {
 }
 
 type SET_1_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_1_C) Execute(v *vm.VM) {
 }
 
 func (o *SET_1_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xc9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xc9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_1_C) String() string {
@@ -11564,22 +13964,28 @@ func (o *SET_1_C) SymbolicString() string {
 }
 
 type SET_1_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_1_D) Execute(v *vm.VM) {
 }
 
 func (o *SET_1_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xca)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xca)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_1_D) String() string {
@@ -11590,22 +13996,28 @@ func (o *SET_1_D) SymbolicString() string {
 }
 
 type SET_1_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_1_E) Execute(v *vm.VM) {
 }
 
 func (o *SET_1_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xcb)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xcb)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_1_E) String() string {
@@ -11616,22 +14028,28 @@ func (o *SET_1_E) SymbolicString() string {
 }
 
 type SET_1_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_1_H) Execute(v *vm.VM) {
 }
 
 func (o *SET_1_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xcc)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xcc)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_1_H) String() string {
@@ -11642,22 +14060,28 @@ func (o *SET_1_H) SymbolicString() string {
 }
 
 type SET_1_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_1_L) Execute(v *vm.VM) {
 }
 
 func (o *SET_1_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xcd)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xcd)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_1_L) String() string {
@@ -11668,22 +14092,28 @@ func (o *SET_1_L) SymbolicString() string {
 }
 
 type SET_1_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_1_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SET_1_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xce)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xce)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_1_HLPtr) String() string {
@@ -11694,22 +14124,28 @@ func (o *SET_1_HLPtr) SymbolicString() string {
 }
 
 type SET_1_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_1_A) Execute(v *vm.VM) {
 }
 
 func (o *SET_1_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xcf)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xcf)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_1_A) String() string {
@@ -11720,48 +14156,60 @@ func (o *SET_1_A) SymbolicString() string {
 }
 
 type RRC_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RRC_L) Execute(v *vm.VM) {
 }
 
 func (o *RRC_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xd)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RRC_L) String() string {
-	return "RRC " + o.operand1 + "," + o.operand2
+	return "RRC " + o.operand1
 }
 func (o *RRC_L) SymbolicString() string {
 	return "RRC L"
 }
 
 type SET_2_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_2_B) Execute(v *vm.VM) {
 }
 
 func (o *SET_2_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xd0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_2_B) String() string {
@@ -11772,22 +14220,28 @@ func (o *SET_2_B) SymbolicString() string {
 }
 
 type SET_2_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_2_C) Execute(v *vm.VM) {
 }
 
 func (o *SET_2_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xd1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_2_C) String() string {
@@ -11798,22 +14252,28 @@ func (o *SET_2_C) SymbolicString() string {
 }
 
 type SET_2_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_2_D) Execute(v *vm.VM) {
 }
 
 func (o *SET_2_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd2)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xd2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_2_D) String() string {
@@ -11824,22 +14284,28 @@ func (o *SET_2_D) SymbolicString() string {
 }
 
 type SET_2_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_2_E) Execute(v *vm.VM) {
 }
 
 func (o *SET_2_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd3)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xd3)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_2_E) String() string {
@@ -11850,22 +14316,28 @@ func (o *SET_2_E) SymbolicString() string {
 }
 
 type SET_2_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_2_H) Execute(v *vm.VM) {
 }
 
 func (o *SET_2_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd4)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xd4)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_2_H) String() string {
@@ -11876,22 +14348,28 @@ func (o *SET_2_H) SymbolicString() string {
 }
 
 type SET_2_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_2_L) Execute(v *vm.VM) {
 }
 
 func (o *SET_2_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xd5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_2_L) String() string {
@@ -11902,22 +14380,28 @@ func (o *SET_2_L) SymbolicString() string {
 }
 
 type SET_2_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_2_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SET_2_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd6)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xd6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_2_HLPtr) String() string {
@@ -11928,22 +14412,28 @@ func (o *SET_2_HLPtr) SymbolicString() string {
 }
 
 type SET_2_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_2_A) Execute(v *vm.VM) {
 }
 
 func (o *SET_2_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xd7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_2_A) String() string {
@@ -11954,22 +14444,28 @@ func (o *SET_2_A) SymbolicString() string {
 }
 
 type SET_3_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_3_B) Execute(v *vm.VM) {
 }
 
 func (o *SET_3_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xd8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_3_B) String() string {
@@ -11980,22 +14476,28 @@ func (o *SET_3_B) SymbolicString() string {
 }
 
 type SET_3_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_3_C) Execute(v *vm.VM) {
 }
 
 func (o *SET_3_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xd9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xd9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_3_C) String() string {
@@ -12006,22 +14508,28 @@ func (o *SET_3_C) SymbolicString() string {
 }
 
 type SET_3_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_3_D) Execute(v *vm.VM) {
 }
 
 func (o *SET_3_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xda)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xda)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_3_D) String() string {
@@ -12032,22 +14540,28 @@ func (o *SET_3_D) SymbolicString() string {
 }
 
 type SET_3_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_3_E) Execute(v *vm.VM) {
 }
 
 func (o *SET_3_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xdb)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xdb)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_3_E) String() string {
@@ -12058,22 +14572,28 @@ func (o *SET_3_E) SymbolicString() string {
 }
 
 type SET_3_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_3_H) Execute(v *vm.VM) {
 }
 
 func (o *SET_3_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xdc)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xdc)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_3_H) String() string {
@@ -12084,22 +14604,28 @@ func (o *SET_3_H) SymbolicString() string {
 }
 
 type SET_3_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_3_L) Execute(v *vm.VM) {
 }
 
 func (o *SET_3_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xdd)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xdd)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_3_L) String() string {
@@ -12110,22 +14636,28 @@ func (o *SET_3_L) SymbolicString() string {
 }
 
 type SET_3_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_3_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SET_3_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xde)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xde)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_3_HLPtr) String() string {
@@ -12136,22 +14668,28 @@ func (o *SET_3_HLPtr) SymbolicString() string {
 }
 
 type SET_3_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_3_A) Execute(v *vm.VM) {
 }
 
 func (o *SET_3_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xdf)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xdf)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_3_A) String() string {
@@ -12162,48 +14700,60 @@ func (o *SET_3_A) SymbolicString() string {
 }
 
 type RRC_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RRC_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *RRC_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xe)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RRC_HLPtr) String() string {
-	return "RRC " + o.operand1 + "," + o.operand2
+	return "RRC " + o.operand1
 }
 func (o *RRC_HLPtr) SymbolicString() string {
 	return "RRC (HL)"
 }
 
 type SET_4_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_4_B) Execute(v *vm.VM) {
 }
 
 func (o *SET_4_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xe0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_4_B) String() string {
@@ -12214,22 +14764,28 @@ func (o *SET_4_B) SymbolicString() string {
 }
 
 type SET_4_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_4_C) Execute(v *vm.VM) {
 }
 
 func (o *SET_4_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xe1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_4_C) String() string {
@@ -12240,22 +14796,28 @@ func (o *SET_4_C) SymbolicString() string {
 }
 
 type SET_4_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_4_D) Execute(v *vm.VM) {
 }
 
 func (o *SET_4_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe2)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xe2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_4_D) String() string {
@@ -12266,22 +14828,28 @@ func (o *SET_4_D) SymbolicString() string {
 }
 
 type SET_4_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_4_E) Execute(v *vm.VM) {
 }
 
 func (o *SET_4_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe3)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xe3)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_4_E) String() string {
@@ -12292,22 +14860,28 @@ func (o *SET_4_E) SymbolicString() string {
 }
 
 type SET_4_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_4_H) Execute(v *vm.VM) {
 }
 
 func (o *SET_4_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe4)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xe4)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_4_H) String() string {
@@ -12318,22 +14892,28 @@ func (o *SET_4_H) SymbolicString() string {
 }
 
 type SET_4_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_4_L) Execute(v *vm.VM) {
 }
 
 func (o *SET_4_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xe5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_4_L) String() string {
@@ -12344,22 +14924,28 @@ func (o *SET_4_L) SymbolicString() string {
 }
 
 type SET_4_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_4_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SET_4_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe6)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xe6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_4_HLPtr) String() string {
@@ -12370,22 +14956,28 @@ func (o *SET_4_HLPtr) SymbolicString() string {
 }
 
 type SET_4_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_4_A) Execute(v *vm.VM) {
 }
 
 func (o *SET_4_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xe7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_4_A) String() string {
@@ -12396,22 +14988,28 @@ func (o *SET_4_A) SymbolicString() string {
 }
 
 type SET_5_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_5_B) Execute(v *vm.VM) {
 }
 
 func (o *SET_5_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xe8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_5_B) String() string {
@@ -12422,22 +15020,28 @@ func (o *SET_5_B) SymbolicString() string {
 }
 
 type SET_5_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_5_C) Execute(v *vm.VM) {
 }
 
 func (o *SET_5_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xe9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xe9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_5_C) String() string {
@@ -12448,22 +15052,28 @@ func (o *SET_5_C) SymbolicString() string {
 }
 
 type SET_5_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_5_D) Execute(v *vm.VM) {
 }
 
 func (o *SET_5_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xea)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xea)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_5_D) String() string {
@@ -12474,22 +15084,28 @@ func (o *SET_5_D) SymbolicString() string {
 }
 
 type SET_5_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_5_E) Execute(v *vm.VM) {
 }
 
 func (o *SET_5_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xeb)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xeb)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_5_E) String() string {
@@ -12500,22 +15116,28 @@ func (o *SET_5_E) SymbolicString() string {
 }
 
 type SET_5_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_5_H) Execute(v *vm.VM) {
 }
 
 func (o *SET_5_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xec)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xec)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_5_H) String() string {
@@ -12526,22 +15148,28 @@ func (o *SET_5_H) SymbolicString() string {
 }
 
 type SET_5_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_5_L) Execute(v *vm.VM) {
 }
 
 func (o *SET_5_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xed)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xed)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_5_L) String() string {
@@ -12552,22 +15180,28 @@ func (o *SET_5_L) SymbolicString() string {
 }
 
 type SET_5_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_5_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SET_5_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xee)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xee)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_5_HLPtr) String() string {
@@ -12578,22 +15212,28 @@ func (o *SET_5_HLPtr) SymbolicString() string {
 }
 
 type SET_5_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_5_A) Execute(v *vm.VM) {
 }
 
 func (o *SET_5_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xef)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xef)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_5_A) String() string {
@@ -12604,48 +15244,60 @@ func (o *SET_5_A) SymbolicString() string {
 }
 
 type RRC_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *RRC_A) Execute(v *vm.VM) {
 }
 
 func (o *RRC_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xf)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *RRC_A) String() string {
-	return "RRC " + o.operand1 + "," + o.operand2
+	return "RRC " + o.operand1
 }
 func (o *RRC_A) SymbolicString() string {
 	return "RRC A"
 }
 
 type SET_6_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_6_B) Execute(v *vm.VM) {
 }
 
 func (o *SET_6_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf0)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xf0)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_6_B) String() string {
@@ -12656,22 +15308,28 @@ func (o *SET_6_B) SymbolicString() string {
 }
 
 type SET_6_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_6_C) Execute(v *vm.VM) {
 }
 
 func (o *SET_6_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf1)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xf1)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_6_C) String() string {
@@ -12682,22 +15340,28 @@ func (o *SET_6_C) SymbolicString() string {
 }
 
 type SET_6_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_6_D) Execute(v *vm.VM) {
 }
 
 func (o *SET_6_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf2)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xf2)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_6_D) String() string {
@@ -12708,22 +15372,28 @@ func (o *SET_6_D) SymbolicString() string {
 }
 
 type SET_6_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_6_E) Execute(v *vm.VM) {
 }
 
 func (o *SET_6_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf3)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xf3)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_6_E) String() string {
@@ -12734,22 +15404,28 @@ func (o *SET_6_E) SymbolicString() string {
 }
 
 type SET_6_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_6_H) Execute(v *vm.VM) {
 }
 
 func (o *SET_6_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf4)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xf4)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_6_H) String() string {
@@ -12760,22 +15436,28 @@ func (o *SET_6_H) SymbolicString() string {
 }
 
 type SET_6_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_6_L) Execute(v *vm.VM) {
 }
 
 func (o *SET_6_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf5)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xf5)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_6_L) String() string {
@@ -12786,22 +15468,28 @@ func (o *SET_6_L) SymbolicString() string {
 }
 
 type SET_6_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_6_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SET_6_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf6)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xf6)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_6_HLPtr) String() string {
@@ -12812,22 +15500,28 @@ func (o *SET_6_HLPtr) SymbolicString() string {
 }
 
 type SET_6_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_6_A) Execute(v *vm.VM) {
 }
 
 func (o *SET_6_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf7)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xf7)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_6_A) String() string {
@@ -12838,22 +15532,28 @@ func (o *SET_6_A) SymbolicString() string {
 }
 
 type SET_7_B struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_7_B) Execute(v *vm.VM) {
 }
 
 func (o *SET_7_B) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf8)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xf8)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_7_B) String() string {
@@ -12864,22 +15564,28 @@ func (o *SET_7_B) SymbolicString() string {
 }
 
 type SET_7_C struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_7_C) Execute(v *vm.VM) {
 }
 
 func (o *SET_7_C) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xf9)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xf9)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_7_C) String() string {
@@ -12890,22 +15596,28 @@ func (o *SET_7_C) SymbolicString() string {
 }
 
 type SET_7_D struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_7_D) Execute(v *vm.VM) {
 }
 
 func (o *SET_7_D) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xfa)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xfa)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_7_D) String() string {
@@ -12916,22 +15628,28 @@ func (o *SET_7_D) SymbolicString() string {
 }
 
 type SET_7_E struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_7_E) Execute(v *vm.VM) {
 }
 
 func (o *SET_7_E) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xfb)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xfb)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_7_E) String() string {
@@ -12942,22 +15660,28 @@ func (o *SET_7_E) SymbolicString() string {
 }
 
 type SET_7_H struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_7_H) Execute(v *vm.VM) {
 }
 
 func (o *SET_7_H) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xfc)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xfc)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_7_H) String() string {
@@ -12968,22 +15692,28 @@ func (o *SET_7_H) SymbolicString() string {
 }
 
 type SET_7_L struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_7_L) Execute(v *vm.VM) {
 }
 
 func (o *SET_7_L) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xfd)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xfd)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_7_L) String() string {
@@ -12994,22 +15724,28 @@ func (o *SET_7_L) SymbolicString() string {
 }
 
 type SET_7_HLPtr struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_7_HLPtr) Execute(v *vm.VM) {
 }
 
 func (o *SET_7_HLPtr) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xfe)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xfe)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_7_HLPtr) String() string {
@@ -13020,22 +15756,28 @@ func (o *SET_7_HLPtr) SymbolicString() string {
 }
 
 type SET_7_A struct {
-	addr     string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr         string // 0x50
+	operand1     string // literal, or reg name, or (HL)...
+	operand2     string // same
+	isCbPrefixed bool
 }
 
 func (o *SET_7_A) Execute(v *vm.VM) {
 }
 
 func (o *SET_7_A) Write(w io.Writer) (int, error) {
-	var written int
-	n, err := fmt.Fprintf(w, "%c", 0xff)
-	if err != nil {
-		return 0, err
-	}
-	written += n
-	return n, nil
+	var b []byte
+
+	b = append(b, 0xCB)
+
+	b = append(b, 0xff)
+
+	var v int64
+	var err error
+	_ = v
+	_ = err
+
+	return w.Write(b)
 }
 
 func (o *SET_7_A) String() string {
@@ -13049,6 +15791,7 @@ func (o *SET_7_A) SymbolicString() string {
 // and reading a single instruction off it. If there is no more data
 // returns undelying io.Reader's EOF error type.
 func ReadOpCode(data io.Reader) (OpCode, error) {
+
 	d := make([]byte, 1)
 	_, err := data.Read(d)
 	if err != nil {
@@ -15482,15 +18225,7 @@ func ReadOpCode(data io.Reader) (OpCode, error) {
 		return o, nil
 
 	case 0xcb: // 0xcb - PREFIX
-		o := &PREFIX_CB{}
-
-		var s string
-		s = "CB"
-		o.operand1 = s
-		s = ""
-		o.operand2 = s
-
-		return o, nil
+		return readCBPrefixedOpcode(data)
 
 	case 0xcc: // 0xcc - CALL
 		o := &CALL_Z_a16{}
@@ -16054,4 +18789,2996 @@ func ReadOpCode(data io.Reader) (OpCode, error) {
 	default:
 		return nil, fmt.Errorf("the proposed opcode (dec %d, hex %x) doesn't exist: %v", d[0], d[0], ErrNoOpCode)
 	}
+
+}
+
+func readCBPrefixedOpcode(data io.Reader) (OpCode, error) {
+
+	d := make([]byte, 1)
+	_, err := data.Read(d)
+	if err != nil {
+		return nil, err
+	}
+	switch d[0] {
+
+	case 0x0: // 0x0 - RLC
+		o := &RLC_B{}
+
+		var s string
+		s = "B"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x1: // 0x1 - RLC
+		o := &RLC_C{}
+
+		var s string
+		s = "C"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x10: // 0x10 - RL
+		o := &RL_B{}
+
+		var s string
+		s = "B"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x11: // 0x11 - RL
+		o := &RL_C{}
+
+		var s string
+		s = "C"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x12: // 0x12 - RL
+		o := &RL_D{}
+
+		var s string
+		s = "D"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x13: // 0x13 - RL
+		o := &RL_E{}
+
+		var s string
+		s = "E"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x14: // 0x14 - RL
+		o := &RL_H{}
+
+		var s string
+		s = "H"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x15: // 0x15 - RL
+		o := &RL_L{}
+
+		var s string
+		s = "L"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x16: // 0x16 - RL
+		o := &RL_HLPtr{}
+
+		var s string
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x17: // 0x17 - RL
+		o := &RL_A{}
+
+		var s string
+		s = "A"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x18: // 0x18 - RR
+		o := &RR_B{}
+
+		var s string
+		s = "B"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x19: // 0x19 - RR
+		o := &RR_C{}
+
+		var s string
+		s = "C"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x1a: // 0x1a - RR
+		o := &RR_D{}
+
+		var s string
+		s = "D"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x1b: // 0x1b - RR
+		o := &RR_E{}
+
+		var s string
+		s = "E"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x1c: // 0x1c - RR
+		o := &RR_H{}
+
+		var s string
+		s = "H"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x1d: // 0x1d - RR
+		o := &RR_L{}
+
+		var s string
+		s = "L"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x1e: // 0x1e - RR
+		o := &RR_HLPtr{}
+
+		var s string
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x1f: // 0x1f - RR
+		o := &RR_A{}
+
+		var s string
+		s = "A"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x2: // 0x2 - RLC
+		o := &RLC_D{}
+
+		var s string
+		s = "D"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x20: // 0x20 - SLA
+		o := &SLA_B{}
+
+		var s string
+		s = "B"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x21: // 0x21 - SLA
+		o := &SLA_C{}
+
+		var s string
+		s = "C"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x22: // 0x22 - SLA
+		o := &SLA_D{}
+
+		var s string
+		s = "D"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x23: // 0x23 - SLA
+		o := &SLA_E{}
+
+		var s string
+		s = "E"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x24: // 0x24 - SLA
+		o := &SLA_H{}
+
+		var s string
+		s = "H"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x25: // 0x25 - SLA
+		o := &SLA_L{}
+
+		var s string
+		s = "L"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x26: // 0x26 - SLA
+		o := &SLA_HLPtr{}
+
+		var s string
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x27: // 0x27 - SLA
+		o := &SLA_A{}
+
+		var s string
+		s = "A"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x28: // 0x28 - SRA
+		o := &SRA_B{}
+
+		var s string
+		s = "B"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x29: // 0x29 - SRA
+		o := &SRA_C{}
+
+		var s string
+		s = "C"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x2a: // 0x2a - SRA
+		o := &SRA_D{}
+
+		var s string
+		s = "D"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x2b: // 0x2b - SRA
+		o := &SRA_E{}
+
+		var s string
+		s = "E"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x2c: // 0x2c - SRA
+		o := &SRA_H{}
+
+		var s string
+		s = "H"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x2d: // 0x2d - SRA
+		o := &SRA_L{}
+
+		var s string
+		s = "L"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x2e: // 0x2e - SRA
+		o := &SRA_HLPtr{}
+
+		var s string
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x2f: // 0x2f - SRA
+		o := &SRA_A{}
+
+		var s string
+		s = "A"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x3: // 0x3 - RLC
+		o := &RLC_E{}
+
+		var s string
+		s = "E"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x30: // 0x30 - SWAP
+		o := &SWAP_B{}
+
+		var s string
+		s = "B"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x31: // 0x31 - SWAP
+		o := &SWAP_C{}
+
+		var s string
+		s = "C"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x32: // 0x32 - SWAP
+		o := &SWAP_D{}
+
+		var s string
+		s = "D"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x33: // 0x33 - SWAP
+		o := &SWAP_E{}
+
+		var s string
+		s = "E"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x34: // 0x34 - SWAP
+		o := &SWAP_H{}
+
+		var s string
+		s = "H"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x35: // 0x35 - SWAP
+		o := &SWAP_L{}
+
+		var s string
+		s = "L"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x36: // 0x36 - SWAP
+		o := &SWAP_HLPtr{}
+
+		var s string
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x37: // 0x37 - SWAP
+		o := &SWAP_A{}
+
+		var s string
+		s = "A"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x38: // 0x38 - SRL
+		o := &SRL_B{}
+
+		var s string
+		s = "B"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x39: // 0x39 - SRL
+		o := &SRL_C{}
+
+		var s string
+		s = "C"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x3a: // 0x3a - SRL
+		o := &SRL_D{}
+
+		var s string
+		s = "D"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x3b: // 0x3b - SRL
+		o := &SRL_E{}
+
+		var s string
+		s = "E"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x3c: // 0x3c - SRL
+		o := &SRL_H{}
+
+		var s string
+		s = "H"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x3d: // 0x3d - SRL
+		o := &SRL_L{}
+
+		var s string
+		s = "L"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x3e: // 0x3e - SRL
+		o := &SRL_HLPtr{}
+
+		var s string
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x3f: // 0x3f - SRL
+		o := &SRL_A{}
+
+		var s string
+		s = "A"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x4: // 0x4 - RLC
+		o := &RLC_H{}
+
+		var s string
+		s = "H"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x40: // 0x40 - BIT
+		o := &BIT_0_B{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x41: // 0x41 - BIT
+		o := &BIT_0_C{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x42: // 0x42 - BIT
+		o := &BIT_0_D{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x43: // 0x43 - BIT
+		o := &BIT_0_E{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x44: // 0x44 - BIT
+		o := &BIT_0_H{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x45: // 0x45 - BIT
+		o := &BIT_0_L{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x46: // 0x46 - BIT
+		o := &BIT_0_HLPtr{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x47: // 0x47 - BIT
+		o := &BIT_0_A{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x48: // 0x48 - BIT
+		o := &BIT_1_B{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x49: // 0x49 - BIT
+		o := &BIT_1_C{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x4a: // 0x4a - BIT
+		o := &BIT_1_D{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x4b: // 0x4b - BIT
+		o := &BIT_1_E{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x4c: // 0x4c - BIT
+		o := &BIT_1_H{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x4d: // 0x4d - BIT
+		o := &BIT_1_L{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x4e: // 0x4e - BIT
+		o := &BIT_1_HLPtr{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x4f: // 0x4f - BIT
+		o := &BIT_1_A{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x5: // 0x5 - RLC
+		o := &RLC_L{}
+
+		var s string
+		s = "L"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x50: // 0x50 - BIT
+		o := &BIT_2_B{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x51: // 0x51 - BIT
+		o := &BIT_2_C{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x52: // 0x52 - BIT
+		o := &BIT_2_D{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x53: // 0x53 - BIT
+		o := &BIT_2_E{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x54: // 0x54 - BIT
+		o := &BIT_2_H{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x55: // 0x55 - BIT
+		o := &BIT_2_L{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x56: // 0x56 - BIT
+		o := &BIT_2_HLPtr{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x57: // 0x57 - BIT
+		o := &BIT_2_A{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x58: // 0x58 - BIT
+		o := &BIT_3_B{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x59: // 0x59 - BIT
+		o := &BIT_3_C{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x5a: // 0x5a - BIT
+		o := &BIT_3_D{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x5b: // 0x5b - BIT
+		o := &BIT_3_E{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x5c: // 0x5c - BIT
+		o := &BIT_3_H{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x5d: // 0x5d - BIT
+		o := &BIT_3_L{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x5e: // 0x5e - BIT
+		o := &BIT_3_HLPtr{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x5f: // 0x5f - BIT
+		o := &BIT_3_A{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x6: // 0x6 - RLC
+		o := &RLC_HLPtr{}
+
+		var s string
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x60: // 0x60 - BIT
+		o := &BIT_4_B{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x61: // 0x61 - BIT
+		o := &BIT_4_C{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x62: // 0x62 - BIT
+		o := &BIT_4_D{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x63: // 0x63 - BIT
+		o := &BIT_4_E{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x64: // 0x64 - BIT
+		o := &BIT_4_H{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x65: // 0x65 - BIT
+		o := &BIT_4_L{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x66: // 0x66 - BIT
+		o := &BIT_4_HLPtr{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x67: // 0x67 - BIT
+		o := &BIT_4_A{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x68: // 0x68 - BIT
+		o := &BIT_5_B{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x69: // 0x69 - BIT
+		o := &BIT_5_C{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x6a: // 0x6a - BIT
+		o := &BIT_5_D{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x6b: // 0x6b - BIT
+		o := &BIT_5_E{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x6c: // 0x6c - BIT
+		o := &BIT_5_H{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x6d: // 0x6d - BIT
+		o := &BIT_5_L{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x6e: // 0x6e - BIT
+		o := &BIT_5_HLPtr{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x6f: // 0x6f - BIT
+		o := &BIT_5_A{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x7: // 0x7 - RLC
+		o := &RLC_A{}
+
+		var s string
+		s = "A"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x70: // 0x70 - BIT
+		o := &BIT_6_B{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x71: // 0x71 - BIT
+		o := &BIT_6_C{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x72: // 0x72 - BIT
+		o := &BIT_6_D{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x73: // 0x73 - BIT
+		o := &BIT_6_E{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x74: // 0x74 - BIT
+		o := &BIT_6_H{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x75: // 0x75 - BIT
+		o := &BIT_6_L{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x76: // 0x76 - BIT
+		o := &BIT_6_HLPtr{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x77: // 0x77 - BIT
+		o := &BIT_6_A{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x78: // 0x78 - BIT
+		o := &BIT_7_B{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x79: // 0x79 - BIT
+		o := &BIT_7_C{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x7a: // 0x7a - BIT
+		o := &BIT_7_D{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x7b: // 0x7b - BIT
+		o := &BIT_7_E{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x7c: // 0x7c - BIT
+		o := &BIT_7_H{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x7d: // 0x7d - BIT
+		o := &BIT_7_L{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x7e: // 0x7e - BIT
+		o := &BIT_7_HLPtr{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x7f: // 0x7f - BIT
+		o := &BIT_7_A{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x8: // 0x8 - RRC
+		o := &RRC_B{}
+
+		var s string
+		s = "B"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x80: // 0x80 - RES
+		o := &RES_0_B{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x81: // 0x81 - RES
+		o := &RES_0_C{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x82: // 0x82 - RES
+		o := &RES_0_D{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x83: // 0x83 - RES
+		o := &RES_0_E{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x84: // 0x84 - RES
+		o := &RES_0_H{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x85: // 0x85 - RES
+		o := &RES_0_L{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x86: // 0x86 - RES
+		o := &RES_0_HLPtr{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x87: // 0x87 - RES
+		o := &RES_0_A{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x88: // 0x88 - RES
+		o := &RES_1_B{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x89: // 0x89 - RES
+		o := &RES_1_C{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x8a: // 0x8a - RES
+		o := &RES_1_D{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x8b: // 0x8b - RES
+		o := &RES_1_E{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x8c: // 0x8c - RES
+		o := &RES_1_H{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x8d: // 0x8d - RES
+		o := &RES_1_L{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x8e: // 0x8e - RES
+		o := &RES_1_HLPtr{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x8f: // 0x8f - RES
+		o := &RES_1_A{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x9: // 0x9 - RRC
+		o := &RRC_C{}
+
+		var s string
+		s = "C"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x90: // 0x90 - RES
+		o := &RES_2_B{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x91: // 0x91 - RES
+		o := &RES_2_C{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x92: // 0x92 - RES
+		o := &RES_2_D{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x93: // 0x93 - RES
+		o := &RES_2_E{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x94: // 0x94 - RES
+		o := &RES_2_H{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x95: // 0x95 - RES
+		o := &RES_2_L{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x96: // 0x96 - RES
+		o := &RES_2_HLPtr{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x97: // 0x97 - RES
+		o := &RES_2_A{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x98: // 0x98 - RES
+		o := &RES_3_B{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x99: // 0x99 - RES
+		o := &RES_3_C{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x9a: // 0x9a - RES
+		o := &RES_3_D{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x9b: // 0x9b - RES
+		o := &RES_3_E{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x9c: // 0x9c - RES
+		o := &RES_3_H{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x9d: // 0x9d - RES
+		o := &RES_3_L{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x9e: // 0x9e - RES
+		o := &RES_3_HLPtr{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0x9f: // 0x9f - RES
+		o := &RES_3_A{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xa: // 0xa - RRC
+		o := &RRC_D{}
+
+		var s string
+		s = "D"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xa0: // 0xa0 - RES
+		o := &RES_4_B{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xa1: // 0xa1 - RES
+		o := &RES_4_C{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xa2: // 0xa2 - RES
+		o := &RES_4_D{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xa3: // 0xa3 - RES
+		o := &RES_4_E{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xa4: // 0xa4 - RES
+		o := &RES_4_H{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xa5: // 0xa5 - RES
+		o := &RES_4_L{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xa6: // 0xa6 - RES
+		o := &RES_4_HLPtr{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xa7: // 0xa7 - RES
+		o := &RES_4_A{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xa8: // 0xa8 - RES
+		o := &RES_5_B{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xa9: // 0xa9 - RES
+		o := &RES_5_C{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xaa: // 0xaa - RES
+		o := &RES_5_D{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xab: // 0xab - RES
+		o := &RES_5_E{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xac: // 0xac - RES
+		o := &RES_5_H{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xad: // 0xad - RES
+		o := &RES_5_L{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xae: // 0xae - RES
+		o := &RES_5_HLPtr{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xaf: // 0xaf - RES
+		o := &RES_5_A{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xb: // 0xb - RRC
+		o := &RRC_E{}
+
+		var s string
+		s = "E"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xb0: // 0xb0 - RES
+		o := &RES_6_B{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xb1: // 0xb1 - RES
+		o := &RES_6_C{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xb2: // 0xb2 - RES
+		o := &RES_6_D{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xb3: // 0xb3 - RES
+		o := &RES_6_E{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xb4: // 0xb4 - RES
+		o := &RES_6_H{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xb5: // 0xb5 - RES
+		o := &RES_6_L{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xb6: // 0xb6 - RES
+		o := &RES_6_HLPtr{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xb7: // 0xb7 - RES
+		o := &RES_6_A{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xb8: // 0xb8 - RES
+		o := &RES_7_B{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xb9: // 0xb9 - RES
+		o := &RES_7_C{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xba: // 0xba - RES
+		o := &RES_7_D{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xbb: // 0xbb - RES
+		o := &RES_7_E{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xbc: // 0xbc - RES
+		o := &RES_7_H{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xbd: // 0xbd - RES
+		o := &RES_7_L{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xbe: // 0xbe - RES
+		o := &RES_7_HLPtr{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xbf: // 0xbf - RES
+		o := &RES_7_A{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xc: // 0xc - RRC
+		o := &RRC_H{}
+
+		var s string
+		s = "H"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xc0: // 0xc0 - SET
+		o := &SET_0_B{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xc1: // 0xc1 - SET
+		o := &SET_0_C{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xc2: // 0xc2 - SET
+		o := &SET_0_D{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xc3: // 0xc3 - SET
+		o := &SET_0_E{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xc4: // 0xc4 - SET
+		o := &SET_0_H{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xc5: // 0xc5 - SET
+		o := &SET_0_L{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xc6: // 0xc6 - SET
+		o := &SET_0_HLPtr{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xc7: // 0xc7 - SET
+		o := &SET_0_A{}
+
+		var s string
+		s = "0"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xc8: // 0xc8 - SET
+		o := &SET_1_B{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xc9: // 0xc9 - SET
+		o := &SET_1_C{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xca: // 0xca - SET
+		o := &SET_1_D{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xcb: // 0xcb - SET
+		o := &SET_1_E{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xcc: // 0xcc - SET
+		o := &SET_1_H{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xcd: // 0xcd - SET
+		o := &SET_1_L{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xce: // 0xce - SET
+		o := &SET_1_HLPtr{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xcf: // 0xcf - SET
+		o := &SET_1_A{}
+
+		var s string
+		s = "1"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xd: // 0xd - RRC
+		o := &RRC_L{}
+
+		var s string
+		s = "L"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xd0: // 0xd0 - SET
+		o := &SET_2_B{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xd1: // 0xd1 - SET
+		o := &SET_2_C{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xd2: // 0xd2 - SET
+		o := &SET_2_D{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xd3: // 0xd3 - SET
+		o := &SET_2_E{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xd4: // 0xd4 - SET
+		o := &SET_2_H{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xd5: // 0xd5 - SET
+		o := &SET_2_L{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xd6: // 0xd6 - SET
+		o := &SET_2_HLPtr{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xd7: // 0xd7 - SET
+		o := &SET_2_A{}
+
+		var s string
+		s = "2"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xd8: // 0xd8 - SET
+		o := &SET_3_B{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xd9: // 0xd9 - SET
+		o := &SET_3_C{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xda: // 0xda - SET
+		o := &SET_3_D{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xdb: // 0xdb - SET
+		o := &SET_3_E{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xdc: // 0xdc - SET
+		o := &SET_3_H{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xdd: // 0xdd - SET
+		o := &SET_3_L{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xde: // 0xde - SET
+		o := &SET_3_HLPtr{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xdf: // 0xdf - SET
+		o := &SET_3_A{}
+
+		var s string
+		s = "3"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xe: // 0xe - RRC
+		o := &RRC_HLPtr{}
+
+		var s string
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xe0: // 0xe0 - SET
+		o := &SET_4_B{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xe1: // 0xe1 - SET
+		o := &SET_4_C{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xe2: // 0xe2 - SET
+		o := &SET_4_D{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xe3: // 0xe3 - SET
+		o := &SET_4_E{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xe4: // 0xe4 - SET
+		o := &SET_4_H{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xe5: // 0xe5 - SET
+		o := &SET_4_L{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xe6: // 0xe6 - SET
+		o := &SET_4_HLPtr{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xe7: // 0xe7 - SET
+		o := &SET_4_A{}
+
+		var s string
+		s = "4"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xe8: // 0xe8 - SET
+		o := &SET_5_B{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xe9: // 0xe9 - SET
+		o := &SET_5_C{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xea: // 0xea - SET
+		o := &SET_5_D{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xeb: // 0xeb - SET
+		o := &SET_5_E{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xec: // 0xec - SET
+		o := &SET_5_H{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xed: // 0xed - SET
+		o := &SET_5_L{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xee: // 0xee - SET
+		o := &SET_5_HLPtr{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xef: // 0xef - SET
+		o := &SET_5_A{}
+
+		var s string
+		s = "5"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xf: // 0xf - RRC
+		o := &RRC_A{}
+
+		var s string
+		s = "A"
+		o.operand1 = s
+		s = ""
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xf0: // 0xf0 - SET
+		o := &SET_6_B{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xf1: // 0xf1 - SET
+		o := &SET_6_C{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xf2: // 0xf2 - SET
+		o := &SET_6_D{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xf3: // 0xf3 - SET
+		o := &SET_6_E{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xf4: // 0xf4 - SET
+		o := &SET_6_H{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xf5: // 0xf5 - SET
+		o := &SET_6_L{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xf6: // 0xf6 - SET
+		o := &SET_6_HLPtr{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xf7: // 0xf7 - SET
+		o := &SET_6_A{}
+
+		var s string
+		s = "6"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xf8: // 0xf8 - SET
+		o := &SET_7_B{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "B"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xf9: // 0xf9 - SET
+		o := &SET_7_C{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "C"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xfa: // 0xfa - SET
+		o := &SET_7_D{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "D"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xfb: // 0xfb - SET
+		o := &SET_7_E{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "E"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xfc: // 0xfc - SET
+		o := &SET_7_H{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "H"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xfd: // 0xfd - SET
+		o := &SET_7_L{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "L"
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xfe: // 0xfe - SET
+		o := &SET_7_HLPtr{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+
+		s, err = readBytesAsString(data, 2)
+		if err != nil {
+			return nil, fmt.Errorf("useful error message: %v", err)
+		}
+
+		o.operand2 = s
+
+		return o, nil
+
+	case 0xff: // 0xff - SET
+		o := &SET_7_A{}
+
+		var s string
+		s = "7"
+		o.operand1 = s
+		s = "A"
+		o.operand2 = s
+
+		return o, nil
+
+	default:
+		return nil, fmt.Errorf("the proposed opcode (dec %d, hex %x) doesn't exist: %v", d[0], d[0], ErrNoOpCode)
+	}
+
 }

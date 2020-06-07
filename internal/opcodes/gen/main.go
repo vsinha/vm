@@ -165,6 +165,10 @@ func main() {
 	cleanMnemonics(opcodes.Unprefixed)
 	cleanMnemonics(opcodes.CBPrefixed)
 
+	for _, val := range opcodes.CBPrefixed {
+		val.CBPrefixed = true
+	}
+
 	outFile, err := os.Create("../opcodes_generated.go")
 	if err != nil {
 		fmt.Println(err)

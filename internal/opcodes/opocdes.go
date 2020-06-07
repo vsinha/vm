@@ -17,3 +17,14 @@ func readBytesAsString(r io.Reader, n int) (string, error) {
 
 	return s, nil
 }
+
+func printLiteral(rawOperand string) bool {
+	if rawOperand == "a8" ||
+		rawOperand == "d8" ||
+		rawOperand == "a16" ||
+		rawOperand == "d16" {
+		return true
+	} else {
+		return false
+	}
+}
