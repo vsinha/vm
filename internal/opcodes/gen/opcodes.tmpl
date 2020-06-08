@@ -1,13 +1,11 @@
 package opcodes
 
 import (
+	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
-	"unicode/utf8"
 	"strconv"
-
-	"github.com/vsinha/vm/internal/vm"
 )
 
 // ErrNoOpCode is a little alias for the error message returned below
@@ -17,44 +15,48 @@ var ErrNoOpCode = errors.New("no opcode with that address exists")
 // so we have to think about how to disambiguate them or if we even want to
 type Op int
 
-type OpCode interface {
-	Execute(*vm.VM) 
-	String() string
-	Write(io.Writer) (int, error)
-}
-
-// Fake converting UTF-8 internal string representation to standard
-// ASCII bytes for serial connections.
-func StringToAsciiBytes(s string) []byte {
-	t := make([]byte, utf8.RuneCountInString(s))
-	i := 0
-	for _, r := range s {
-		t[i] = byte(r)
-		i++
-	}
-	return t
-}
-
-{{define "printOperand"}}
-	v, err = strconv.ParseInt(o.operand{{.}}, 16, 16)
+{{define "write8BitOperand"}}
+	v, err = strconv.ParseInt(o.operand{{.}}, /*base*/16, /*bitsize*/16)
 	if err != nil {
-		return 0, err
+		return written, err
 	}
 
-	b = append(b, byte(v))
+	err = binary.Write(w, endianness, int8(v))
+	if err != nil {
+		return written, err
+	}
+	written += 1
 {{end}}
-{{define "handlePrintOperand1"}}
-	{{ if eq .RawOperand1 "a8" }} {{ template "printOperand" 1 }}
-	{{ else if eq .RawOperand1 "d8" }} {{ template "printOperand" 1 }}
-	{{ else if eq .RawOperand1 "a16" }} {{ template "printOperand" 1 }}
-	{{ else if eq .RawOperand1 "d16" }} {{ template "printOperand" 1 }}
+{{define "write16BitOperand"}}
+	v, err = strconv.ParseInt(o.operand{{.}}, /*base*/16, /*bitsize*/32)
+	if err != nil {
+		return written, err
+	}
+	
+	err = binary.Write(w, endianness, int16(v))
+	if err != nil {
+		return written, err
+	}
+	written += 2
+{{end}}
+
+{{define "handleWriteByteOperand1"}}
+	{{ if eq .RawOperand1 "a8" }} {{ template "write8BitOperand" 1 }}
+	{{ else if eq .RawOperand1 "(a8)" }} {{ template "write8BitOperand" 1 }}
+	{{ else if eq .RawOperand1 "d8" }} {{ template "write8BitOperand" 1 }}
+	{{ else if eq .RawOperand1 "a16" }} {{ template "write16BitOperand" 1 }}
+	{{ else if eq .RawOperand1 "(a16)" }} {{ template "write16BitOperand" 1 }}
+	{{ else if eq .RawOperand1 "d16" }} {{ template "write16BitOperand" 1 }}
 	{{- end }}
 {{end}}
-{{define "handlePrintOperand2"}}
-	{{ if eq .RawOperand2 "a8" }} {{ template "printOperand" 2 }}
-	{{ else if eq .RawOperand2 "d8" }} {{ template "printOperand" 2 }}
-	{{ else if eq .RawOperand2 "a16" }} {{ template "printOperand" 2 }}
-	{{ else if eq .RawOperand2 "d16" }} {{ template "printOperand" 2 }}
+{{define "handleWriteByteOperand2"}}
+	{{ if eq .RawOperand2 "a8" }} {{ template "write8BitOperand" 2 }}
+	{{ else if eq .RawOperand2 "(a8)" }} {{ template "write8BitOperand" 2 }}
+	{{ else if eq .RawOperand2 "d8" }} {{ template "write8BitOperand" 2 }}
+	{{ else if eq .RawOperand2 "a16" }} {{ template "write16BitOperand" 2 }}
+	{{ else if eq .RawOperand2 "(a16)" }} {{ template "write16BitOperand" 2 }}
+	{{ else if eq .RawOperand2 "d16" }} {{ template "write16BitOperand" 2 }}
+	{{ else if eq .RawOperand2 "SP+r8" }} {{ template "write8BitOperand" 2 }}
 	{{- end }}
 {{end}}
 
@@ -67,30 +69,40 @@ type {{.ExtendedMnemonic}} struct {
 	isCbPrefixed bool
 }
 
-func (o *{{.ExtendedMnemonic}}) Execute(v *vm.VM) {
+{{ if ne .Addr "0x80" }}
+{{ if ne .Addr "0x76" }}
+func (o *{{.ExtendedMnemonic}}) Execute(v vm) error {
+	return nil
 }
+{{end}}
+{{end}}
 
 func (o *{{.ExtendedMnemonic}}) Write(w io.Writer) (int, error) {
 	var b []byte
 
-	{{ if .CBPrefixed }} 
-		b = append(b, 0xCB)
-	{{end}}
-
 	b = append(b, {{.Addr}})
 
 	var v int64
-	var err error
-	_ = v
-	_ = err
-	{{template "handlePrintOperand1" . }}
-	{{template "handlePrintOperand2" . }}
+	_ = v // suppress unused variable warning in the case we have no operands 
 
-	return w.Write(b)
+	written, err := w.Write([]byte{ 
+	{{ if .CBPrefixed }} 
+		0xCB,
+	{{end}}
+		{{.Addr}},
+	})
+	if err != nil {
+		return written, err
+	}
+
+	{{template "handleWriteByteOperand1" . }}
+	{{template "handleWriteByteOperand2" . }}
+
+	return written, err
 }
 
 func (o *{{.ExtendedMnemonic}}) String() string {
-	return "{{.Mnemonic}} " + o.operand1 {{if .Operand2}} + "," + o.operand2 {{end}}
+	return "{{.Mnemonic}} " + o.operand1 {{if eq .Operand2 "SP+r8"}} + ", SP+" + o.operand2 {{else if .Operand2}} + ", " + o.operand2 {{end}}
 }
 func (o *{{.ExtendedMnemonic}}) SymbolicString() string {
 	return "{{.Mnemonic}}{{if .Operand1}} {{.Operand1}}{{end}}{{if .Operand2}},{{.Operand2}}{{end}}"
@@ -115,8 +127,11 @@ func (o *{{.ExtendedMnemonic}}) SymbolicString() string {
 {{end}}
 {{define "handleOperand"}}
 	{{ if eq . "a8" }} {{ template "readOneByte" . }}
+	{{ else if eq . "(a8)" }} {{ template "readOneByte" . }}
 	{{ else if eq . "d8" }} {{ template "readOneByte" . }}
+	{{ else if eq . "SP+r8" }} {{ template "readOneByte" . }}
 	{{ else if eq . "a16" }} {{ template "readTwoBytes" . }}
+	{{ else if eq . "(a16)" }} {{ template "readTwoBytes" . }}
 	{{ else if eq . "d16" }} {{ template "readTwoBytes" . }}
 	{{ else if eq . "(HL)" }} {{ template "readTwoBytes" . }}
 	{{ else if eq . "(HL-)" }} {{ template "readTwoBytes" . }}
@@ -126,7 +141,7 @@ func (o *{{.ExtendedMnemonic}}) SymbolicString() string {
 {{end}}
 
 
-{{define "readOpCode"}}
+{{define "readInstruction"}}
 	d := make([]byte, 1)
 	_, err := data.Read(d)
 	if err != nil {
@@ -136,7 +151,7 @@ func (o *{{.ExtendedMnemonic}}) SymbolicString() string {
 	{{ range $key, $value := .}}
 	case {{$value.Addr}}: // {{$value.Addr}} - {{$value.Mnemonic}}
 		{{- if eq $value.Mnemonic "PREFIX"}} 
-			return read{{$value.RawOperand1}}PrefixedOpcode(data)
+			return read{{$value.RawOperand1}}PrefixedInstruction(data)
 		{{- else}}
 			o := &{{$value.ExtendedMnemonic}}{}
 
@@ -158,10 +173,10 @@ func (o *{{.ExtendedMnemonic}}) SymbolicString() string {
 // ReadOpCode returns an executable opcode by taking an io.Reader
 // and reading a single instruction off it. If there is no more data
 // returns undelying io.Reader's EOF error type.
-func ReadOpCode(data io.Reader) (OpCode, error) {
-{{template "readOpCode" .Unprefixed}}
+func ReadInstruction(data io.Reader) (Instruction, error) {
+{{template "readInstruction" .Unprefixed}}
 }
 
-func readCBPrefixedOpcode(data io.Reader) (OpCode, error) {
-{{template "readOpCode" .CBPrefixed}}
+func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
+{{template "readInstruction" .CBPrefixed}}
 }

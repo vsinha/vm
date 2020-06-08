@@ -2,102 +2,34 @@ package vm
 
 import (
 	"fmt"
+	"io"
+
+	"github.com/vsinha/vm/internal/memory"
+	"github.com/vsinha/vm/internal/opcodes"
+	"github.com/vsinha/vm/internal/registers"
 )
-
-// Reg is an enum alias of the named registers
-type Reg uint8
-
-// FlagRegister provides easier encapsulation for the Accumulator and Flag registers
-type FlagRegister uint8
-
-// FlagRegisterFlag does things
-type FlagRegisterFlag uint8
-
-// These are the accessors for the flags in the F flag register
-const (
-	FlagZf FlagRegisterFlag = 1 << 7 // Zero Flag
-	FlagN                   = 1 << 6 // Add/Sub Flag (BCD)
-	FlagH                   = 1 << 5 // Half Carry Flag
-	FlagCy                  = 1 << 4 // Carry Flag
-)
-
-func hasBit(n uint8, pos uint8) bool {
-	val := n & (1 << pos)
-	return (val > 0)
-}
-
-func (af FlagRegister) isFlagSet(which FlagRegisterFlag) bool {
-	return hasBit(uint8(af), uint8(which))
-}
-
-// Registers are the gameboy's registers.
-type Registers struct {
-	a  Reg // Accumulator % & flags
-	b  Reg
-	c  Reg
-	d  Reg
-	e  Reg
-	f  FlagRegister
-	h  Reg
-	l  Reg
-	sp uint16
-	pc uint16
-}
-
-// BC returns the B register cat'd to the C register as an int16.
-func (reg Registers) BC() uint16 {
-	return uint16(reg.b) << 8 & uint16(reg.c)
-}
-
-// SetBC sets the B register and the C register individually as int8.
-func (reg *Registers) SetBC(val uint16) {
-	reg.b = Reg(val >> 8 & 0xFF)
-	reg.c = Reg(val & 0xFF)
-}
-
-// Memory is the initialized starting memory to be passed into the VM
-type Memory []int
-
-/*
-func (m Memory) String() string {
-	b := &strings.Builder{}
-
-	nopCount := 0
-	for i := 0; i < len(m); i++ {
-		o := Op(m[i])
-
-		if o == Nop {
-			nopCount++
-			continue
-		} else if nopCount != 0 {
-			fmt.Fprintf(b, "Found %d nops\n", nopCount)
-		}
-
-		if ex, ok := OpExec[o]; ok {
-			fmt.Fprintf(b, "%v ", ex.Name)
-			for j := 1; j < int(ex.Kind.Size); j++ {
-				fmt.Fprintf(b, "%v ", m[i+j])
-			}
-			i += int(ex.Kind.Size)
-			fmt.Fprintf(b, "\n")
-		}
-	}
-	return b.String()
-}
-*/
 
 // VM is the in-memory virtual machine!
 type VM struct {
-	pc  uint
-	r   Registers
-	mem Memory
+	r   registers.Registers
+	mem memory.Memory
 
 	trace bool
 }
 
+// Reg returns the registers of the vm.
+func (v *VM) Reg() *registers.Registers {
+	return &v.r
+}
+
+// Mem returns the memory of the vm.
+func (v *VM) Mem() memory.Memory {
+	return v.mem
+}
+
 // New creates anew Virtual Machine with the provided memory initialized. The PC
 // will be set to 0 and the VM will be ready to run.
-func New(mem Memory) *VM {
+func New(mem memory.Memory) *VM {
 	return &VM{
 		mem: mem,
 	}
@@ -106,6 +38,47 @@ func New(mem Memory) *VM {
 // Run executes the virtual machine.
 func (v *VM) Run() error {
 	//o := Op(v.mem[v.pc])
+
+	v.r.PC = 0
+
+	count := 1
+	max := 100
+	for {
+		count++
+		if count > max {
+			return fmt.Errorf("Ran %d instructions, bailing", max)
+		}
+		// Instructions are parseable in a direct way where the CPU can run an
+		// opcode and move on to the next. However, there are times when you
+		// will jump not to the beginning of an opcode, but instead to the
+		// argument of an opcode.
+		// For example:
+		// 0x30, 0x01, 0x00, 0x00
+		// This can be interpreted in two ways based on where you start parsing.
+		// If you start parsing at byte 0, this is:
+		// JR NC, 01
+		// NOP
+		// NOP
+		// If you start parsing at byte 1, this is:
+		// LD BC, 0000
+		// There is no guaruntee that we are going to jump to the correct byte
+		// alignment and sometimes this is used as a trick in obfuscated code.
+		i, err := opcodes.ReadInstruction(io.NewSectionReader(v.mem, int64(v.r.PC), 4))
+		if err != nil {
+			return err
+		}
+
+		fmt.Printf("Running PC = %d: %v\n", v.r.PC, i)
+		// execute
+		if err := i.Execute(v); err != nil {
+			return err
+		}
+
+		// increment cycles
+
+		// if cycles > cycles_between_interrupts
+		// then handle interrupts
+	}
 
 	/*
 		for o != Halt {
