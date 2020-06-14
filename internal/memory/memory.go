@@ -4,8 +4,14 @@ package memory
 type Memory []byte
 
 func (m Memory) ReadAt(p []byte, off int64) (n int, err error) {
-	for i := 0; i < len(p); i++ {
+	i := 0
+	// Read up to len(p) bytes (as long as you don't overflow).
+	for ; i < len(p) && int(off)+i < len(m); i++ {
 		p[i] = m[off+int64(i)]
+	}
+	// If you overflow, return the remainder as 0x00.
+	for ; i < len(p); i++ {
+		p[i] = 0x00
 	}
 	return len(p), nil
 }

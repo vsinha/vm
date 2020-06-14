@@ -1,48 +1,5 @@
 package vm_test
 
-import (
-	// 	"fmt"
-	// 	"strings"
-	"testing"
-
-	"github.com/google/go-cmp/cmp"
-	"github.com/vsinha/vm/internal/memory"
-	"github.com/vsinha/vm/internal/registers"
-	"github.com/vsinha/vm/internal/vm"
-)
-
-func TestAdding(t *testing.T) {
-	v := vm.New(memory.Memory{
-		0x80,
-		0x76,
-		0x00,
-		0x00,
-		0x00,
-		0x00,
-		0x00,
-		0x00,
-		0x00,
-		0x00,
-		0x00,
-		0x00,
-		0x00,
-	},
-	)
-
-	err := v.Run()
-	if err.Error() != "HALTED" {
-		t.Errorf("Got non HALTED error: %v", err)
-	}
-
-	want := &registers.Registers{
-		A:  5,
-		PC: 1,
-	}
-	if diff := cmp.Diff(v.Reg(), want); diff != "" {
-		t.Errorf("Register difference (-got,+want): %v", diff)
-	}
-}
-
 // func Example() {
 // 	mem, err := assembler.Assemble([]interface{}{
 // 		vm.Loadi, // r1 = 5

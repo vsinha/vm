@@ -1,4 +1,4 @@
-package opcodes
+package opcodes_test
 
 import (
 	"bytes"
@@ -11,6 +11,10 @@ import (
 	"testing/quick"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/vsinha/vm/internal/memory"
+	"github.com/vsinha/vm/internal/opcodes"
+	"github.com/vsinha/vm/internal/registers"
+	"github.com/vsinha/vm/internal/vm"
 )
 
 func TestParse(t *testing.T) {
@@ -58,12 +62,12 @@ LDH ff, A`},
 			r := bytes.NewBuffer(test.in)
 			var w bytes.Buffer
 			for {
-				o, err := ReadInstruction(r)
+				o, err := opcodes.ReadInstruction(r)
 				if err == io.EOF {
 					break
 				}
 				if err != nil {
-					t.Fatalf("ReadInstruction(%v) error: %v", test.in, err)
+					t.Fatalf("opcodes.ReadInstruction(%v) error: %v", test.in, err)
 				}
 
 				_, err = o.Write(&w)
@@ -91,8 +95,7 @@ type randomInstructions struct {
 
 // Generate implements quick.Generate.
 func (_ randomInstructions) Generate(rand *rand.Rand, size int) reflect.Value {
-
-	var instructions []Instruction
+	var instructions []opcodes.Instruction
 	for j := 0; j < size; j++ {
 		// Make a byte slice of 4 random bytes
 		// 0 - 2^64
@@ -102,7 +105,7 @@ func (_ randomInstructions) Generate(rand *rand.Rand, size int) reflect.Value {
 		}
 
 		// Read 1 opcode off the random bytes
-		i, err := ReadInstruction(bytes.NewBuffer(b))
+		i, err := opcodes.ReadInstruction(bytes.NewBuffer(b))
 		if err != nil {
 			panic(err)
 		}
@@ -136,12 +139,12 @@ func TestRoundTrip(t *testing.T) {
 		r := bytes.NewBuffer(x.Bytes)
 		var w bytes.Buffer
 		for {
-			o, err := ReadInstruction(r)
+			o, err := opcodes.ReadInstruction(r)
 			if err == io.EOF {
 				break
 			}
 			if err != nil {
-				t.Fatalf("ReadInstruction(%v) error: %v", x.Bytes, err)
+				t.Fatalf("opcodes.ReadInstruction(%v) error: %v", x.Bytes, err)
 				return false
 			}
 
@@ -170,5 +173,26 @@ func TestRoundTrip(t *testing.T) {
 
 	if err := quick.Check(f, &config); err != nil {
 		t.Error(err)
+	}
+}
+
+func TestOpcodes(t *testing.T) {
+	v := vm.New(memory.Memory{
+		0xc6, // ADD A,d8
+		0xff, // d8
+		0x76, // Halt
+	})
+
+	err := v.Run()
+	if err == opcodes.ErrHalt {
+		t.Errorf("Got non HALTED error: %v", err)
+	}
+
+	want := &registers.Registers{
+		A:  255,
+		PC: 2,
+	}
+	if diff := cmp.Diff(v.Reg(), want); diff != "" {
+		t.Errorf("Register difference (-got,+want): %v", diff)
 	}
 }

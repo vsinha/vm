@@ -22,10 +22,6 @@ type NOP struct {
 	isCbPrefixed bool
 }
 
-func (o *NOP) Execute(v vm) error {
-	return nil
-}
-
 func (o *NOP) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -45,6 +41,14 @@ func (o *NOP) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *NOP) Length() uint8 {
+	return 1
+}
+
+func (o *NOP) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *NOP) String() string {
 	return "NOP " + o.operand1
 }
@@ -57,10 +61,6 @@ type LD_BC_d16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_BC_d16) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_BC_d16) Write(w io.Writer) (int, error) {
@@ -93,6 +93,14 @@ func (o *LD_BC_d16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_BC_d16) Length() uint8 {
+	return 3
+}
+
+func (o *LD_BC_d16) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *LD_BC_d16) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -105,10 +113,6 @@ type STOP_0 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *STOP_0) Execute(v vm) error {
-	return nil
 }
 
 func (o *STOP_0) Write(w io.Writer) (int, error) {
@@ -130,6 +134,14 @@ func (o *STOP_0) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *STOP_0) Length() uint8 {
+	return 1
+}
+
+func (o *STOP_0) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *STOP_0) String() string {
 	return "STOP " + o.operand1
 }
@@ -142,10 +154,6 @@ type LD_DE_d16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_DE_d16) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_DE_d16) Write(w io.Writer) (int, error) {
@@ -178,6 +186,14 @@ func (o *LD_DE_d16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_DE_d16) Length() uint8 {
+	return 3
+}
+
+func (o *LD_DE_d16) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *LD_DE_d16) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -190,10 +206,6 @@ type LD_DEDeref_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_DEDeref_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_DEDeref_A) Write(w io.Writer) (int, error) {
@@ -215,6 +227,14 @@ func (o *LD_DEDeref_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_DEDeref_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_DEDeref_A) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_DEDeref_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -227,10 +247,6 @@ type INC_DE struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *INC_DE) Execute(v vm) error {
-	return nil
 }
 
 func (o *INC_DE) Write(w io.Writer) (int, error) {
@@ -252,6 +268,14 @@ func (o *INC_DE) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *INC_DE) Length() uint8 {
+	return 1
+}
+
+func (o *INC_DE) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *INC_DE) String() string {
 	return "INC " + o.operand1
 }
@@ -264,10 +288,6 @@ type INC_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *INC_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *INC_D) Write(w io.Writer) (int, error) {
@@ -289,6 +309,14 @@ func (o *INC_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *INC_D) Length() uint8 {
+	return 1
+}
+
+func (o *INC_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *INC_D) String() string {
 	return "INC " + o.operand1
 }
@@ -301,10 +329,6 @@ type DEC_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DEC_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *DEC_D) Write(w io.Writer) (int, error) {
@@ -326,6 +350,14 @@ func (o *DEC_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DEC_D) Length() uint8 {
+	return 1
+}
+
+func (o *DEC_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *DEC_D) String() string {
 	return "DEC " + o.operand1
 }
@@ -338,10 +370,6 @@ type LD_D_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_D_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_D_d8) Write(w io.Writer) (int, error) {
@@ -374,6 +402,14 @@ func (o *LD_D_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_D_d8) Length() uint8 {
+	return 2
+}
+
+func (o *LD_D_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_D_d8) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -386,10 +422,6 @@ type RLA struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RLA) Execute(v vm) error {
-	return nil
 }
 
 func (o *RLA) Write(w io.Writer) (int, error) {
@@ -411,6 +443,14 @@ func (o *RLA) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RLA) Length() uint8 {
+	return 1
+}
+
+func (o *RLA) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *RLA) String() string {
 	return "RLA " + o.operand1
 }
@@ -423,10 +463,6 @@ type JR_r8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *JR_r8) Execute(v vm) error {
-	return nil
 }
 
 func (o *JR_r8) Write(w io.Writer) (int, error) {
@@ -448,6 +484,14 @@ func (o *JR_r8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *JR_r8) Length() uint8 {
+	return 2
+}
+
+func (o *JR_r8) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *JR_r8) String() string {
 	return "JR " + o.operand1
 }
@@ -460,10 +504,6 @@ type ADD_HL_DE struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_HL_DE) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_HL_DE) Write(w io.Writer) (int, error) {
@@ -485,6 +525,14 @@ func (o *ADD_HL_DE) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_HL_DE) Length() uint8 {
+	return 1
+}
+
+func (o *ADD_HL_DE) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *ADD_HL_DE) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -497,10 +545,6 @@ type LD_A_DEDeref struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_DEDeref) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_DEDeref) Write(w io.Writer) (int, error) {
@@ -522,6 +566,14 @@ func (o *LD_A_DEDeref) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_DEDeref) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_DEDeref) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_A_DEDeref) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -534,10 +586,6 @@ type DEC_DE struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DEC_DE) Execute(v vm) error {
-	return nil
 }
 
 func (o *DEC_DE) Write(w io.Writer) (int, error) {
@@ -559,6 +607,14 @@ func (o *DEC_DE) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DEC_DE) Length() uint8 {
+	return 1
+}
+
+func (o *DEC_DE) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *DEC_DE) String() string {
 	return "DEC " + o.operand1
 }
@@ -571,10 +627,6 @@ type INC_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *INC_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *INC_E) Write(w io.Writer) (int, error) {
@@ -596,6 +648,14 @@ func (o *INC_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *INC_E) Length() uint8 {
+	return 1
+}
+
+func (o *INC_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *INC_E) String() string {
 	return "INC " + o.operand1
 }
@@ -608,10 +668,6 @@ type DEC_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DEC_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *DEC_E) Write(w io.Writer) (int, error) {
@@ -633,6 +689,14 @@ func (o *DEC_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DEC_E) Length() uint8 {
+	return 1
+}
+
+func (o *DEC_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *DEC_E) String() string {
 	return "DEC " + o.operand1
 }
@@ -645,10 +709,6 @@ type LD_E_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_E_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_E_d8) Write(w io.Writer) (int, error) {
@@ -681,6 +741,14 @@ func (o *LD_E_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_E_d8) Length() uint8 {
+	return 2
+}
+
+func (o *LD_E_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_E_d8) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -693,10 +761,6 @@ type RRA struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RRA) Execute(v vm) error {
-	return nil
 }
 
 func (o *RRA) Write(w io.Writer) (int, error) {
@@ -718,6 +782,14 @@ func (o *RRA) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RRA) Length() uint8 {
+	return 1
+}
+
+func (o *RRA) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *RRA) String() string {
 	return "RRA " + o.operand1
 }
@@ -730,10 +802,6 @@ type LD_BCDeref_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_BCDeref_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_BCDeref_A) Write(w io.Writer) (int, error) {
@@ -755,6 +823,14 @@ func (o *LD_BCDeref_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_BCDeref_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_BCDeref_A) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_BCDeref_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -767,10 +843,6 @@ type JR_NZ_r8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *JR_NZ_r8) Execute(v vm) error {
-	return nil
 }
 
 func (o *JR_NZ_r8) Write(w io.Writer) (int, error) {
@@ -792,6 +864,14 @@ func (o *JR_NZ_r8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *JR_NZ_r8) Length() uint8 {
+	return 2
+}
+
+func (o *JR_NZ_r8) cycles() []uint8 {
+	return []uint8{12, 8}
+}
+
 func (o *JR_NZ_r8) String() string {
 	return "JR " + o.operand1 + ", " + o.operand2
 }
@@ -804,10 +884,6 @@ type LD_HL_d16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_HL_d16) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_HL_d16) Write(w io.Writer) (int, error) {
@@ -840,6 +916,14 @@ func (o *LD_HL_d16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_HL_d16) Length() uint8 {
+	return 3
+}
+
+func (o *LD_HL_d16) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *LD_HL_d16) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -852,10 +936,6 @@ type LD_HLPtrInc_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_HLPtrInc_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_HLPtrInc_A) Write(w io.Writer) (int, error) {
@@ -877,6 +957,14 @@ func (o *LD_HLPtrInc_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_HLPtrInc_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_HLPtrInc_A) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_HLPtrInc_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -889,10 +977,6 @@ type INC_HL struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *INC_HL) Execute(v vm) error {
-	return nil
 }
 
 func (o *INC_HL) Write(w io.Writer) (int, error) {
@@ -914,6 +998,14 @@ func (o *INC_HL) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *INC_HL) Length() uint8 {
+	return 1
+}
+
+func (o *INC_HL) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *INC_HL) String() string {
 	return "INC " + o.operand1
 }
@@ -926,10 +1018,6 @@ type INC_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *INC_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *INC_H) Write(w io.Writer) (int, error) {
@@ -951,6 +1039,14 @@ func (o *INC_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *INC_H) Length() uint8 {
+	return 1
+}
+
+func (o *INC_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *INC_H) String() string {
 	return "INC " + o.operand1
 }
@@ -963,10 +1059,6 @@ type DEC_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DEC_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *DEC_H) Write(w io.Writer) (int, error) {
@@ -988,6 +1080,14 @@ func (o *DEC_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DEC_H) Length() uint8 {
+	return 1
+}
+
+func (o *DEC_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *DEC_H) String() string {
 	return "DEC " + o.operand1
 }
@@ -1000,10 +1100,6 @@ type LD_H_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_H_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_H_d8) Write(w io.Writer) (int, error) {
@@ -1036,6 +1132,14 @@ func (o *LD_H_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_H_d8) Length() uint8 {
+	return 2
+}
+
+func (o *LD_H_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_H_d8) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -1048,10 +1152,6 @@ type DAA struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DAA) Execute(v vm) error {
-	return nil
 }
 
 func (o *DAA) Write(w io.Writer) (int, error) {
@@ -1073,6 +1173,14 @@ func (o *DAA) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DAA) Length() uint8 {
+	return 1
+}
+
+func (o *DAA) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *DAA) String() string {
 	return "DAA " + o.operand1
 }
@@ -1085,10 +1193,6 @@ type JR_Z_r8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *JR_Z_r8) Execute(v vm) error {
-	return nil
 }
 
 func (o *JR_Z_r8) Write(w io.Writer) (int, error) {
@@ -1110,6 +1214,14 @@ func (o *JR_Z_r8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *JR_Z_r8) Length() uint8 {
+	return 2
+}
+
+func (o *JR_Z_r8) cycles() []uint8 {
+	return []uint8{12, 8}
+}
+
 func (o *JR_Z_r8) String() string {
 	return "JR " + o.operand1 + ", " + o.operand2
 }
@@ -1122,10 +1234,6 @@ type ADD_HL_HL struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_HL_HL) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_HL_HL) Write(w io.Writer) (int, error) {
@@ -1147,6 +1255,14 @@ func (o *ADD_HL_HL) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_HL_HL) Length() uint8 {
+	return 1
+}
+
+func (o *ADD_HL_HL) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *ADD_HL_HL) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -1159,10 +1275,6 @@ type LD_A_HLPtrInc struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_HLPtrInc) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_HLPtrInc) Write(w io.Writer) (int, error) {
@@ -1184,6 +1296,14 @@ func (o *LD_A_HLPtrInc) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_HLPtrInc) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_HLPtrInc) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_A_HLPtrInc) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -1196,10 +1316,6 @@ type DEC_HL struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DEC_HL) Execute(v vm) error {
-	return nil
 }
 
 func (o *DEC_HL) Write(w io.Writer) (int, error) {
@@ -1221,6 +1337,14 @@ func (o *DEC_HL) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DEC_HL) Length() uint8 {
+	return 1
+}
+
+func (o *DEC_HL) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *DEC_HL) String() string {
 	return "DEC " + o.operand1
 }
@@ -1233,10 +1357,6 @@ type INC_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *INC_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *INC_L) Write(w io.Writer) (int, error) {
@@ -1258,6 +1378,14 @@ func (o *INC_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *INC_L) Length() uint8 {
+	return 1
+}
+
+func (o *INC_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *INC_L) String() string {
 	return "INC " + o.operand1
 }
@@ -1270,10 +1398,6 @@ type DEC_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DEC_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *DEC_L) Write(w io.Writer) (int, error) {
@@ -1295,6 +1419,14 @@ func (o *DEC_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DEC_L) Length() uint8 {
+	return 1
+}
+
+func (o *DEC_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *DEC_L) String() string {
 	return "DEC " + o.operand1
 }
@@ -1307,10 +1439,6 @@ type LD_L_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_L_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_L_d8) Write(w io.Writer) (int, error) {
@@ -1343,6 +1471,14 @@ func (o *LD_L_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_L_d8) Length() uint8 {
+	return 2
+}
+
+func (o *LD_L_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_L_d8) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -1355,10 +1491,6 @@ type CPL struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CPL) Execute(v vm) error {
-	return nil
 }
 
 func (o *CPL) Write(w io.Writer) (int, error) {
@@ -1380,6 +1512,14 @@ func (o *CPL) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CPL) Length() uint8 {
+	return 1
+}
+
+func (o *CPL) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *CPL) String() string {
 	return "CPL " + o.operand1
 }
@@ -1392,10 +1532,6 @@ type INC_BC struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *INC_BC) Execute(v vm) error {
-	return nil
 }
 
 func (o *INC_BC) Write(w io.Writer) (int, error) {
@@ -1417,6 +1553,14 @@ func (o *INC_BC) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *INC_BC) Length() uint8 {
+	return 1
+}
+
+func (o *INC_BC) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *INC_BC) String() string {
 	return "INC " + o.operand1
 }
@@ -1429,10 +1573,6 @@ type JR_NC_r8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *JR_NC_r8) Execute(v vm) error {
-	return nil
 }
 
 func (o *JR_NC_r8) Write(w io.Writer) (int, error) {
@@ -1454,6 +1594,14 @@ func (o *JR_NC_r8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *JR_NC_r8) Length() uint8 {
+	return 2
+}
+
+func (o *JR_NC_r8) cycles() []uint8 {
+	return []uint8{12, 8}
+}
+
 func (o *JR_NC_r8) String() string {
 	return "JR " + o.operand1 + ", " + o.operand2
 }
@@ -1466,10 +1614,6 @@ type LD_SP_d16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_SP_d16) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_SP_d16) Write(w io.Writer) (int, error) {
@@ -1502,6 +1646,14 @@ func (o *LD_SP_d16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_SP_d16) Length() uint8 {
+	return 3
+}
+
+func (o *LD_SP_d16) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *LD_SP_d16) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -1514,10 +1666,6 @@ type LD_HLPtrDec_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_HLPtrDec_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_HLPtrDec_A) Write(w io.Writer) (int, error) {
@@ -1539,6 +1687,14 @@ func (o *LD_HLPtrDec_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_HLPtrDec_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_HLPtrDec_A) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_HLPtrDec_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -1551,10 +1707,6 @@ type INC_SP struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *INC_SP) Execute(v vm) error {
-	return nil
 }
 
 func (o *INC_SP) Write(w io.Writer) (int, error) {
@@ -1576,6 +1728,14 @@ func (o *INC_SP) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *INC_SP) Length() uint8 {
+	return 1
+}
+
+func (o *INC_SP) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *INC_SP) String() string {
 	return "INC " + o.operand1
 }
@@ -1588,10 +1748,6 @@ type INC_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *INC_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *INC_HLPtr) Write(w io.Writer) (int, error) {
@@ -1613,6 +1769,14 @@ func (o *INC_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *INC_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *INC_HLPtr) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *INC_HLPtr) String() string {
 	return "INC " + o.operand1
 }
@@ -1625,10 +1789,6 @@ type DEC_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DEC_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *DEC_HLPtr) Write(w io.Writer) (int, error) {
@@ -1650,6 +1810,14 @@ func (o *DEC_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DEC_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *DEC_HLPtr) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *DEC_HLPtr) String() string {
 	return "DEC " + o.operand1
 }
@@ -1662,10 +1830,6 @@ type LD_HLPtr_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_HLPtr_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_HLPtr_d8) Write(w io.Writer) (int, error) {
@@ -1698,6 +1862,14 @@ func (o *LD_HLPtr_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_HLPtr_d8) Length() uint8 {
+	return 2
+}
+
+func (o *LD_HLPtr_d8) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *LD_HLPtr_d8) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -1710,10 +1882,6 @@ type SCF struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SCF) Execute(v vm) error {
-	return nil
 }
 
 func (o *SCF) Write(w io.Writer) (int, error) {
@@ -1735,6 +1903,14 @@ func (o *SCF) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SCF) Length() uint8 {
+	return 1
+}
+
+func (o *SCF) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SCF) String() string {
 	return "SCF " + o.operand1
 }
@@ -1747,10 +1923,6 @@ type JR_C_r8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *JR_C_r8) Execute(v vm) error {
-	return nil
 }
 
 func (o *JR_C_r8) Write(w io.Writer) (int, error) {
@@ -1772,6 +1944,14 @@ func (o *JR_C_r8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *JR_C_r8) Length() uint8 {
+	return 2
+}
+
+func (o *JR_C_r8) cycles() []uint8 {
+	return []uint8{12, 8}
+}
+
 func (o *JR_C_r8) String() string {
 	return "JR " + o.operand1 + ", " + o.operand2
 }
@@ -1784,10 +1964,6 @@ type ADD_HL_SP struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_HL_SP) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_HL_SP) Write(w io.Writer) (int, error) {
@@ -1809,6 +1985,14 @@ func (o *ADD_HL_SP) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_HL_SP) Length() uint8 {
+	return 1
+}
+
+func (o *ADD_HL_SP) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *ADD_HL_SP) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -1821,10 +2005,6 @@ type LD_A_HLPtrDec struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_HLPtrDec) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_HLPtrDec) Write(w io.Writer) (int, error) {
@@ -1846,6 +2026,14 @@ func (o *LD_A_HLPtrDec) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_HLPtrDec) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_HLPtrDec) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_A_HLPtrDec) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -1858,10 +2046,6 @@ type DEC_SP struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DEC_SP) Execute(v vm) error {
-	return nil
 }
 
 func (o *DEC_SP) Write(w io.Writer) (int, error) {
@@ -1883,6 +2067,14 @@ func (o *DEC_SP) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DEC_SP) Length() uint8 {
+	return 1
+}
+
+func (o *DEC_SP) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *DEC_SP) String() string {
 	return "DEC " + o.operand1
 }
@@ -1895,10 +2087,6 @@ type INC_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *INC_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *INC_A) Write(w io.Writer) (int, error) {
@@ -1920,6 +2108,14 @@ func (o *INC_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *INC_A) Length() uint8 {
+	return 1
+}
+
+func (o *INC_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *INC_A) String() string {
 	return "INC " + o.operand1
 }
@@ -1932,10 +2128,6 @@ type DEC_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DEC_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *DEC_A) Write(w io.Writer) (int, error) {
@@ -1957,6 +2149,14 @@ func (o *DEC_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DEC_A) Length() uint8 {
+	return 1
+}
+
+func (o *DEC_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *DEC_A) String() string {
 	return "DEC " + o.operand1
 }
@@ -1969,10 +2169,6 @@ type LD_A_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_d8) Write(w io.Writer) (int, error) {
@@ -2005,6 +2201,14 @@ func (o *LD_A_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_d8) Length() uint8 {
+	return 2
+}
+
+func (o *LD_A_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_A_d8) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2017,10 +2221,6 @@ type CCF struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CCF) Execute(v vm) error {
-	return nil
 }
 
 func (o *CCF) Write(w io.Writer) (int, error) {
@@ -2042,6 +2242,14 @@ func (o *CCF) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CCF) Length() uint8 {
+	return 1
+}
+
+func (o *CCF) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *CCF) String() string {
 	return "CCF " + o.operand1
 }
@@ -2054,10 +2262,6 @@ type INC_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *INC_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *INC_B) Write(w io.Writer) (int, error) {
@@ -2079,6 +2283,14 @@ func (o *INC_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *INC_B) Length() uint8 {
+	return 1
+}
+
+func (o *INC_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *INC_B) String() string {
 	return "INC " + o.operand1
 }
@@ -2091,10 +2303,6 @@ type LD_B_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_B_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_B_B) Write(w io.Writer) (int, error) {
@@ -2116,6 +2324,14 @@ func (o *LD_B_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_B_B) Length() uint8 {
+	return 1
+}
+
+func (o *LD_B_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_B_B) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2128,10 +2344,6 @@ type LD_B_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_B_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_B_C) Write(w io.Writer) (int, error) {
@@ -2153,6 +2365,14 @@ func (o *LD_B_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_B_C) Length() uint8 {
+	return 1
+}
+
+func (o *LD_B_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_B_C) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2165,10 +2385,6 @@ type LD_B_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_B_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_B_D) Write(w io.Writer) (int, error) {
@@ -2190,6 +2406,14 @@ func (o *LD_B_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_B_D) Length() uint8 {
+	return 1
+}
+
+func (o *LD_B_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_B_D) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2202,10 +2426,6 @@ type LD_B_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_B_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_B_E) Write(w io.Writer) (int, error) {
@@ -2227,6 +2447,14 @@ func (o *LD_B_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_B_E) Length() uint8 {
+	return 1
+}
+
+func (o *LD_B_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_B_E) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2239,10 +2467,6 @@ type LD_B_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_B_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_B_H) Write(w io.Writer) (int, error) {
@@ -2264,6 +2488,14 @@ func (o *LD_B_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_B_H) Length() uint8 {
+	return 1
+}
+
+func (o *LD_B_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_B_H) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2276,10 +2508,6 @@ type LD_B_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_B_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_B_L) Write(w io.Writer) (int, error) {
@@ -2301,6 +2529,14 @@ func (o *LD_B_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_B_L) Length() uint8 {
+	return 1
+}
+
+func (o *LD_B_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_B_L) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2313,10 +2549,6 @@ type LD_B_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_B_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_B_HLPtr) Write(w io.Writer) (int, error) {
@@ -2338,6 +2570,14 @@ func (o *LD_B_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_B_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *LD_B_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_B_HLPtr) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2350,10 +2590,6 @@ type LD_B_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_B_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_B_A) Write(w io.Writer) (int, error) {
@@ -2375,6 +2611,14 @@ func (o *LD_B_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_B_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_B_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_B_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2387,10 +2631,6 @@ type LD_C_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_C_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_C_B) Write(w io.Writer) (int, error) {
@@ -2412,6 +2652,14 @@ func (o *LD_C_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_C_B) Length() uint8 {
+	return 1
+}
+
+func (o *LD_C_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_C_B) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2424,10 +2672,6 @@ type LD_C_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_C_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_C_C) Write(w io.Writer) (int, error) {
@@ -2449,6 +2693,14 @@ func (o *LD_C_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_C_C) Length() uint8 {
+	return 1
+}
+
+func (o *LD_C_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_C_C) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2461,10 +2713,6 @@ type LD_C_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_C_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_C_D) Write(w io.Writer) (int, error) {
@@ -2486,6 +2734,14 @@ func (o *LD_C_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_C_D) Length() uint8 {
+	return 1
+}
+
+func (o *LD_C_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_C_D) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2498,10 +2754,6 @@ type LD_C_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_C_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_C_E) Write(w io.Writer) (int, error) {
@@ -2523,6 +2775,14 @@ func (o *LD_C_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_C_E) Length() uint8 {
+	return 1
+}
+
+func (o *LD_C_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_C_E) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2535,10 +2795,6 @@ type LD_C_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_C_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_C_H) Write(w io.Writer) (int, error) {
@@ -2560,6 +2816,14 @@ func (o *LD_C_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_C_H) Length() uint8 {
+	return 1
+}
+
+func (o *LD_C_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_C_H) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2572,10 +2836,6 @@ type LD_C_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_C_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_C_L) Write(w io.Writer) (int, error) {
@@ -2597,6 +2857,14 @@ func (o *LD_C_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_C_L) Length() uint8 {
+	return 1
+}
+
+func (o *LD_C_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_C_L) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2609,10 +2877,6 @@ type LD_C_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_C_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_C_HLPtr) Write(w io.Writer) (int, error) {
@@ -2634,6 +2898,14 @@ func (o *LD_C_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_C_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *LD_C_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_C_HLPtr) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2646,10 +2918,6 @@ type LD_C_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_C_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_C_A) Write(w io.Writer) (int, error) {
@@ -2671,6 +2939,14 @@ func (o *LD_C_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_C_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_C_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_C_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2683,10 +2959,6 @@ type DEC_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DEC_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *DEC_B) Write(w io.Writer) (int, error) {
@@ -2708,6 +2980,14 @@ func (o *DEC_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DEC_B) Length() uint8 {
+	return 1
+}
+
+func (o *DEC_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *DEC_B) String() string {
 	return "DEC " + o.operand1
 }
@@ -2720,10 +3000,6 @@ type LD_D_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_D_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_D_B) Write(w io.Writer) (int, error) {
@@ -2745,6 +3021,14 @@ func (o *LD_D_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_D_B) Length() uint8 {
+	return 1
+}
+
+func (o *LD_D_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_D_B) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2757,10 +3041,6 @@ type LD_D_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_D_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_D_C) Write(w io.Writer) (int, error) {
@@ -2782,6 +3062,14 @@ func (o *LD_D_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_D_C) Length() uint8 {
+	return 1
+}
+
+func (o *LD_D_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_D_C) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2794,10 +3082,6 @@ type LD_D_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_D_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_D_D) Write(w io.Writer) (int, error) {
@@ -2819,6 +3103,14 @@ func (o *LD_D_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_D_D) Length() uint8 {
+	return 1
+}
+
+func (o *LD_D_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_D_D) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2831,10 +3123,6 @@ type LD_D_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_D_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_D_E) Write(w io.Writer) (int, error) {
@@ -2856,6 +3144,14 @@ func (o *LD_D_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_D_E) Length() uint8 {
+	return 1
+}
+
+func (o *LD_D_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_D_E) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2868,10 +3164,6 @@ type LD_D_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_D_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_D_H) Write(w io.Writer) (int, error) {
@@ -2893,6 +3185,14 @@ func (o *LD_D_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_D_H) Length() uint8 {
+	return 1
+}
+
+func (o *LD_D_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_D_H) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2905,10 +3205,6 @@ type LD_D_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_D_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_D_L) Write(w io.Writer) (int, error) {
@@ -2930,6 +3226,14 @@ func (o *LD_D_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_D_L) Length() uint8 {
+	return 1
+}
+
+func (o *LD_D_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_D_L) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2942,10 +3246,6 @@ type LD_D_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_D_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_D_HLPtr) Write(w io.Writer) (int, error) {
@@ -2967,6 +3267,14 @@ func (o *LD_D_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_D_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *LD_D_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_D_HLPtr) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -2979,10 +3287,6 @@ type LD_D_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_D_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_D_A) Write(w io.Writer) (int, error) {
@@ -3004,6 +3308,14 @@ func (o *LD_D_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_D_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_D_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_D_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3016,10 +3328,6 @@ type LD_E_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_E_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_E_B) Write(w io.Writer) (int, error) {
@@ -3041,6 +3349,14 @@ func (o *LD_E_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_E_B) Length() uint8 {
+	return 1
+}
+
+func (o *LD_E_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_E_B) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3053,10 +3369,6 @@ type LD_E_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_E_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_E_C) Write(w io.Writer) (int, error) {
@@ -3078,6 +3390,14 @@ func (o *LD_E_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_E_C) Length() uint8 {
+	return 1
+}
+
+func (o *LD_E_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_E_C) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3090,10 +3410,6 @@ type LD_E_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_E_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_E_D) Write(w io.Writer) (int, error) {
@@ -3115,6 +3431,14 @@ func (o *LD_E_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_E_D) Length() uint8 {
+	return 1
+}
+
+func (o *LD_E_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_E_D) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3127,10 +3451,6 @@ type LD_E_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_E_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_E_E) Write(w io.Writer) (int, error) {
@@ -3152,6 +3472,14 @@ func (o *LD_E_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_E_E) Length() uint8 {
+	return 1
+}
+
+func (o *LD_E_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_E_E) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3164,10 +3492,6 @@ type LD_E_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_E_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_E_H) Write(w io.Writer) (int, error) {
@@ -3189,6 +3513,14 @@ func (o *LD_E_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_E_H) Length() uint8 {
+	return 1
+}
+
+func (o *LD_E_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_E_H) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3201,10 +3533,6 @@ type LD_E_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_E_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_E_L) Write(w io.Writer) (int, error) {
@@ -3226,6 +3554,14 @@ func (o *LD_E_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_E_L) Length() uint8 {
+	return 1
+}
+
+func (o *LD_E_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_E_L) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3238,10 +3574,6 @@ type LD_E_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_E_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_E_HLPtr) Write(w io.Writer) (int, error) {
@@ -3263,6 +3595,14 @@ func (o *LD_E_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_E_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *LD_E_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_E_HLPtr) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3275,10 +3615,6 @@ type LD_E_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_E_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_E_A) Write(w io.Writer) (int, error) {
@@ -3300,6 +3636,14 @@ func (o *LD_E_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_E_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_E_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_E_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3312,10 +3656,6 @@ type LD_B_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_B_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_B_d8) Write(w io.Writer) (int, error) {
@@ -3348,6 +3688,14 @@ func (o *LD_B_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_B_d8) Length() uint8 {
+	return 2
+}
+
+func (o *LD_B_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_B_d8) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3360,10 +3708,6 @@ type LD_H_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_H_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_H_B) Write(w io.Writer) (int, error) {
@@ -3385,6 +3729,14 @@ func (o *LD_H_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_H_B) Length() uint8 {
+	return 1
+}
+
+func (o *LD_H_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_H_B) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3397,10 +3749,6 @@ type LD_H_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_H_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_H_C) Write(w io.Writer) (int, error) {
@@ -3422,6 +3770,14 @@ func (o *LD_H_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_H_C) Length() uint8 {
+	return 1
+}
+
+func (o *LD_H_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_H_C) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3434,10 +3790,6 @@ type LD_H_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_H_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_H_D) Write(w io.Writer) (int, error) {
@@ -3459,6 +3811,14 @@ func (o *LD_H_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_H_D) Length() uint8 {
+	return 1
+}
+
+func (o *LD_H_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_H_D) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3471,10 +3831,6 @@ type LD_H_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_H_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_H_E) Write(w io.Writer) (int, error) {
@@ -3496,6 +3852,14 @@ func (o *LD_H_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_H_E) Length() uint8 {
+	return 1
+}
+
+func (o *LD_H_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_H_E) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3508,10 +3872,6 @@ type LD_H_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_H_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_H_H) Write(w io.Writer) (int, error) {
@@ -3533,6 +3893,14 @@ func (o *LD_H_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_H_H) Length() uint8 {
+	return 1
+}
+
+func (o *LD_H_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_H_H) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3545,10 +3913,6 @@ type LD_H_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_H_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_H_L) Write(w io.Writer) (int, error) {
@@ -3570,6 +3934,14 @@ func (o *LD_H_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_H_L) Length() uint8 {
+	return 1
+}
+
+func (o *LD_H_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_H_L) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3582,10 +3954,6 @@ type LD_H_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_H_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_H_HLPtr) Write(w io.Writer) (int, error) {
@@ -3607,6 +3975,14 @@ func (o *LD_H_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_H_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *LD_H_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_H_HLPtr) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3619,10 +3995,6 @@ type LD_H_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_H_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_H_A) Write(w io.Writer) (int, error) {
@@ -3644,6 +4016,14 @@ func (o *LD_H_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_H_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_H_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_H_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3656,10 +4036,6 @@ type LD_L_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_L_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_L_B) Write(w io.Writer) (int, error) {
@@ -3681,6 +4057,14 @@ func (o *LD_L_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_L_B) Length() uint8 {
+	return 1
+}
+
+func (o *LD_L_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_L_B) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3693,10 +4077,6 @@ type LD_L_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_L_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_L_C) Write(w io.Writer) (int, error) {
@@ -3718,6 +4098,14 @@ func (o *LD_L_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_L_C) Length() uint8 {
+	return 1
+}
+
+func (o *LD_L_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_L_C) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3730,10 +4118,6 @@ type LD_L_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_L_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_L_D) Write(w io.Writer) (int, error) {
@@ -3755,6 +4139,14 @@ func (o *LD_L_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_L_D) Length() uint8 {
+	return 1
+}
+
+func (o *LD_L_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_L_D) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3767,10 +4159,6 @@ type LD_L_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_L_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_L_E) Write(w io.Writer) (int, error) {
@@ -3792,6 +4180,14 @@ func (o *LD_L_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_L_E) Length() uint8 {
+	return 1
+}
+
+func (o *LD_L_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_L_E) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3804,10 +4200,6 @@ type LD_L_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_L_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_L_H) Write(w io.Writer) (int, error) {
@@ -3829,6 +4221,14 @@ func (o *LD_L_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_L_H) Length() uint8 {
+	return 1
+}
+
+func (o *LD_L_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_L_H) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3841,10 +4241,6 @@ type LD_L_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_L_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_L_L) Write(w io.Writer) (int, error) {
@@ -3866,6 +4262,14 @@ func (o *LD_L_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_L_L) Length() uint8 {
+	return 1
+}
+
+func (o *LD_L_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_L_L) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3878,10 +4282,6 @@ type LD_L_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_L_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_L_HLPtr) Write(w io.Writer) (int, error) {
@@ -3903,6 +4303,14 @@ func (o *LD_L_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_L_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *LD_L_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_L_HLPtr) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3915,10 +4323,6 @@ type LD_L_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_L_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_L_A) Write(w io.Writer) (int, error) {
@@ -3940,6 +4344,14 @@ func (o *LD_L_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_L_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_L_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_L_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -3952,10 +4364,6 @@ type RLCA struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RLCA) Execute(v vm) error {
-	return nil
 }
 
 func (o *RLCA) Write(w io.Writer) (int, error) {
@@ -3977,6 +4385,14 @@ func (o *RLCA) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RLCA) Length() uint8 {
+	return 1
+}
+
+func (o *RLCA) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *RLCA) String() string {
 	return "RLCA " + o.operand1
 }
@@ -3989,10 +4405,6 @@ type LD_HLPtr_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_HLPtr_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_HLPtr_B) Write(w io.Writer) (int, error) {
@@ -4014,6 +4426,14 @@ func (o *LD_HLPtr_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_HLPtr_B) Length() uint8 {
+	return 1
+}
+
+func (o *LD_HLPtr_B) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_HLPtr_B) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4026,10 +4446,6 @@ type LD_HLPtr_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_HLPtr_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_HLPtr_C) Write(w io.Writer) (int, error) {
@@ -4051,6 +4467,14 @@ func (o *LD_HLPtr_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_HLPtr_C) Length() uint8 {
+	return 1
+}
+
+func (o *LD_HLPtr_C) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_HLPtr_C) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4063,10 +4487,6 @@ type LD_HLPtr_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_HLPtr_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_HLPtr_D) Write(w io.Writer) (int, error) {
@@ -4088,6 +4508,14 @@ func (o *LD_HLPtr_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_HLPtr_D) Length() uint8 {
+	return 1
+}
+
+func (o *LD_HLPtr_D) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_HLPtr_D) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4100,10 +4528,6 @@ type LD_HLPtr_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_HLPtr_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_HLPtr_E) Write(w io.Writer) (int, error) {
@@ -4125,6 +4549,14 @@ func (o *LD_HLPtr_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_HLPtr_E) Length() uint8 {
+	return 1
+}
+
+func (o *LD_HLPtr_E) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_HLPtr_E) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4137,10 +4569,6 @@ type LD_HLPtr_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_HLPtr_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_HLPtr_H) Write(w io.Writer) (int, error) {
@@ -4162,6 +4590,14 @@ func (o *LD_HLPtr_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_HLPtr_H) Length() uint8 {
+	return 1
+}
+
+func (o *LD_HLPtr_H) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_HLPtr_H) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4174,10 +4610,6 @@ type LD_HLPtr_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_HLPtr_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_HLPtr_L) Write(w io.Writer) (int, error) {
@@ -4197,6 +4629,14 @@ func (o *LD_HLPtr_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *LD_HLPtr_L) Length() uint8 {
+	return 1
+}
+
+func (o *LD_HLPtr_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *LD_HLPtr_L) String() string {
@@ -4232,6 +4672,14 @@ func (o *HALT) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *HALT) Length() uint8 {
+	return 1
+}
+
+func (o *HALT) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *HALT) String() string {
 	return "HALT " + o.operand1
 }
@@ -4244,10 +4692,6 @@ type LD_HLPtr_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_HLPtr_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_HLPtr_A) Write(w io.Writer) (int, error) {
@@ -4269,6 +4713,14 @@ func (o *LD_HLPtr_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_HLPtr_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_HLPtr_A) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_HLPtr_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4281,10 +4733,6 @@ type LD_A_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_B) Write(w io.Writer) (int, error) {
@@ -4306,6 +4754,14 @@ func (o *LD_A_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_B) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_A_B) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4318,10 +4774,6 @@ type LD_A_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_C) Write(w io.Writer) (int, error) {
@@ -4343,6 +4795,14 @@ func (o *LD_A_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_C) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_A_C) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4355,10 +4815,6 @@ type LD_A_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_D) Write(w io.Writer) (int, error) {
@@ -4380,6 +4836,14 @@ func (o *LD_A_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_D) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_A_D) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4392,10 +4856,6 @@ type LD_A_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_E) Write(w io.Writer) (int, error) {
@@ -4417,6 +4877,14 @@ func (o *LD_A_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_E) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_A_E) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4429,10 +4897,6 @@ type LD_A_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_H) Write(w io.Writer) (int, error) {
@@ -4454,6 +4918,14 @@ func (o *LD_A_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_H) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_A_H) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4466,10 +4938,6 @@ type LD_A_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_L) Write(w io.Writer) (int, error) {
@@ -4491,6 +4959,14 @@ func (o *LD_A_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_L) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_A_L) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4503,10 +4979,6 @@ type LD_A_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_HLPtr) Write(w io.Writer) (int, error) {
@@ -4528,6 +5000,14 @@ func (o *LD_A_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_A_HLPtr) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4540,10 +5020,6 @@ type LD_A_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_A) Write(w io.Writer) (int, error) {
@@ -4565,6 +5041,14 @@ func (o *LD_A_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *LD_A_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -4577,10 +5061,6 @@ type LD_a16Deref_SP struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_a16Deref_SP) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_a16Deref_SP) Write(w io.Writer) (int, error) {
@@ -4611,6 +5091,14 @@ func (o *LD_a16Deref_SP) Write(w io.Writer) (int, error) {
 	written += 2
 
 	return written, err
+}
+
+func (o *LD_a16Deref_SP) Length() uint8 {
+	return 3
+}
+
+func (o *LD_a16Deref_SP) cycles() []uint8 {
+	return []uint8{20}
 }
 
 func (o *LD_a16Deref_SP) String() string {
@@ -4646,6 +5134,14 @@ func (o *ADD_A_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_A_B) Length() uint8 {
+	return 1
+}
+
+func (o *ADD_A_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADD_A_B) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -4658,10 +5154,6 @@ type ADD_A_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_A_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_A_C) Write(w io.Writer) (int, error) {
@@ -4683,6 +5175,14 @@ func (o *ADD_A_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_A_C) Length() uint8 {
+	return 1
+}
+
+func (o *ADD_A_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADD_A_C) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -4695,10 +5195,6 @@ type ADD_A_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_A_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_A_D) Write(w io.Writer) (int, error) {
@@ -4720,6 +5216,14 @@ func (o *ADD_A_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_A_D) Length() uint8 {
+	return 1
+}
+
+func (o *ADD_A_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADD_A_D) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -4732,10 +5236,6 @@ type ADD_A_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_A_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_A_E) Write(w io.Writer) (int, error) {
@@ -4757,6 +5257,14 @@ func (o *ADD_A_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_A_E) Length() uint8 {
+	return 1
+}
+
+func (o *ADD_A_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADD_A_E) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -4769,10 +5277,6 @@ type ADD_A_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_A_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_A_H) Write(w io.Writer) (int, error) {
@@ -4794,6 +5298,14 @@ func (o *ADD_A_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_A_H) Length() uint8 {
+	return 1
+}
+
+func (o *ADD_A_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADD_A_H) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -4806,10 +5318,6 @@ type ADD_A_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_A_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_A_L) Write(w io.Writer) (int, error) {
@@ -4831,6 +5339,14 @@ func (o *ADD_A_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_A_L) Length() uint8 {
+	return 1
+}
+
+func (o *ADD_A_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADD_A_L) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -4843,10 +5359,6 @@ type ADD_A_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_A_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_A_HLPtr) Write(w io.Writer) (int, error) {
@@ -4868,6 +5380,14 @@ func (o *ADD_A_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_A_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *ADD_A_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *ADD_A_HLPtr) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -4880,10 +5400,6 @@ type ADD_A_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_A_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_A_A) Write(w io.Writer) (int, error) {
@@ -4905,6 +5421,14 @@ func (o *ADD_A_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_A_A) Length() uint8 {
+	return 1
+}
+
+func (o *ADD_A_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADD_A_A) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -4917,10 +5441,6 @@ type ADC_A_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADC_A_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADC_A_B) Write(w io.Writer) (int, error) {
@@ -4942,6 +5462,14 @@ func (o *ADC_A_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADC_A_B) Length() uint8 {
+	return 1
+}
+
+func (o *ADC_A_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADC_A_B) String() string {
 	return "ADC " + o.operand1 + ", " + o.operand2
 }
@@ -4954,10 +5482,6 @@ type ADC_A_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADC_A_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADC_A_C) Write(w io.Writer) (int, error) {
@@ -4979,6 +5503,14 @@ func (o *ADC_A_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADC_A_C) Length() uint8 {
+	return 1
+}
+
+func (o *ADC_A_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADC_A_C) String() string {
 	return "ADC " + o.operand1 + ", " + o.operand2
 }
@@ -4991,10 +5523,6 @@ type ADC_A_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADC_A_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADC_A_D) Write(w io.Writer) (int, error) {
@@ -5016,6 +5544,14 @@ func (o *ADC_A_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADC_A_D) Length() uint8 {
+	return 1
+}
+
+func (o *ADC_A_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADC_A_D) String() string {
 	return "ADC " + o.operand1 + ", " + o.operand2
 }
@@ -5028,10 +5564,6 @@ type ADC_A_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADC_A_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADC_A_E) Write(w io.Writer) (int, error) {
@@ -5053,6 +5585,14 @@ func (o *ADC_A_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADC_A_E) Length() uint8 {
+	return 1
+}
+
+func (o *ADC_A_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADC_A_E) String() string {
 	return "ADC " + o.operand1 + ", " + o.operand2
 }
@@ -5065,10 +5605,6 @@ type ADC_A_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADC_A_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADC_A_H) Write(w io.Writer) (int, error) {
@@ -5090,6 +5626,14 @@ func (o *ADC_A_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADC_A_H) Length() uint8 {
+	return 1
+}
+
+func (o *ADC_A_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADC_A_H) String() string {
 	return "ADC " + o.operand1 + ", " + o.operand2
 }
@@ -5102,10 +5646,6 @@ type ADC_A_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADC_A_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADC_A_L) Write(w io.Writer) (int, error) {
@@ -5127,6 +5667,14 @@ func (o *ADC_A_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADC_A_L) Length() uint8 {
+	return 1
+}
+
+func (o *ADC_A_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADC_A_L) String() string {
 	return "ADC " + o.operand1 + ", " + o.operand2
 }
@@ -5139,10 +5687,6 @@ type ADC_A_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADC_A_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADC_A_HLPtr) Write(w io.Writer) (int, error) {
@@ -5164,6 +5708,14 @@ func (o *ADC_A_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADC_A_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *ADC_A_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *ADC_A_HLPtr) String() string {
 	return "ADC " + o.operand1 + ", " + o.operand2
 }
@@ -5176,10 +5728,6 @@ type ADC_A_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADC_A_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADC_A_A) Write(w io.Writer) (int, error) {
@@ -5201,6 +5749,14 @@ func (o *ADC_A_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADC_A_A) Length() uint8 {
+	return 1
+}
+
+func (o *ADC_A_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *ADC_A_A) String() string {
 	return "ADC " + o.operand1 + ", " + o.operand2
 }
@@ -5213,10 +5769,6 @@ type ADD_HL_BC struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_HL_BC) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_HL_BC) Write(w io.Writer) (int, error) {
@@ -5238,6 +5790,14 @@ func (o *ADD_HL_BC) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_HL_BC) Length() uint8 {
+	return 1
+}
+
+func (o *ADD_HL_BC) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *ADD_HL_BC) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -5250,10 +5810,6 @@ type SUB_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SUB_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *SUB_B) Write(w io.Writer) (int, error) {
@@ -5275,6 +5831,14 @@ func (o *SUB_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SUB_B) Length() uint8 {
+	return 1
+}
+
+func (o *SUB_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SUB_B) String() string {
 	return "SUB " + o.operand1
 }
@@ -5287,10 +5851,6 @@ type SUB_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SUB_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *SUB_C) Write(w io.Writer) (int, error) {
@@ -5312,6 +5872,14 @@ func (o *SUB_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SUB_C) Length() uint8 {
+	return 1
+}
+
+func (o *SUB_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SUB_C) String() string {
 	return "SUB " + o.operand1
 }
@@ -5324,10 +5892,6 @@ type SUB_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SUB_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *SUB_D) Write(w io.Writer) (int, error) {
@@ -5349,6 +5913,14 @@ func (o *SUB_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SUB_D) Length() uint8 {
+	return 1
+}
+
+func (o *SUB_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SUB_D) String() string {
 	return "SUB " + o.operand1
 }
@@ -5361,10 +5933,6 @@ type SUB_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SUB_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *SUB_E) Write(w io.Writer) (int, error) {
@@ -5386,6 +5954,14 @@ func (o *SUB_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SUB_E) Length() uint8 {
+	return 1
+}
+
+func (o *SUB_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SUB_E) String() string {
 	return "SUB " + o.operand1
 }
@@ -5398,10 +5974,6 @@ type SUB_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SUB_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *SUB_H) Write(w io.Writer) (int, error) {
@@ -5423,6 +5995,14 @@ func (o *SUB_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SUB_H) Length() uint8 {
+	return 1
+}
+
+func (o *SUB_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SUB_H) String() string {
 	return "SUB " + o.operand1
 }
@@ -5435,10 +6015,6 @@ type SUB_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SUB_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *SUB_L) Write(w io.Writer) (int, error) {
@@ -5460,6 +6036,14 @@ func (o *SUB_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SUB_L) Length() uint8 {
+	return 1
+}
+
+func (o *SUB_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SUB_L) String() string {
 	return "SUB " + o.operand1
 }
@@ -5472,10 +6056,6 @@ type SUB_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SUB_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *SUB_HLPtr) Write(w io.Writer) (int, error) {
@@ -5497,6 +6077,14 @@ func (o *SUB_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SUB_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *SUB_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *SUB_HLPtr) String() string {
 	return "SUB " + o.operand1
 }
@@ -5509,10 +6097,6 @@ type SUB_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SUB_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *SUB_A) Write(w io.Writer) (int, error) {
@@ -5534,6 +6118,14 @@ func (o *SUB_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SUB_A) Length() uint8 {
+	return 1
+}
+
+func (o *SUB_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SUB_A) String() string {
 	return "SUB " + o.operand1
 }
@@ -5546,10 +6138,6 @@ type SBC_A_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SBC_A_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *SBC_A_B) Write(w io.Writer) (int, error) {
@@ -5571,6 +6159,14 @@ func (o *SBC_A_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SBC_A_B) Length() uint8 {
+	return 1
+}
+
+func (o *SBC_A_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SBC_A_B) String() string {
 	return "SBC " + o.operand1 + ", " + o.operand2
 }
@@ -5583,10 +6179,6 @@ type SBC_A_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SBC_A_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *SBC_A_C) Write(w io.Writer) (int, error) {
@@ -5608,6 +6200,14 @@ func (o *SBC_A_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SBC_A_C) Length() uint8 {
+	return 1
+}
+
+func (o *SBC_A_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SBC_A_C) String() string {
 	return "SBC " + o.operand1 + ", " + o.operand2
 }
@@ -5620,10 +6220,6 @@ type SBC_A_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SBC_A_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *SBC_A_D) Write(w io.Writer) (int, error) {
@@ -5645,6 +6241,14 @@ func (o *SBC_A_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SBC_A_D) Length() uint8 {
+	return 1
+}
+
+func (o *SBC_A_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SBC_A_D) String() string {
 	return "SBC " + o.operand1 + ", " + o.operand2
 }
@@ -5657,10 +6261,6 @@ type SBC_A_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SBC_A_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *SBC_A_E) Write(w io.Writer) (int, error) {
@@ -5682,6 +6282,14 @@ func (o *SBC_A_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SBC_A_E) Length() uint8 {
+	return 1
+}
+
+func (o *SBC_A_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SBC_A_E) String() string {
 	return "SBC " + o.operand1 + ", " + o.operand2
 }
@@ -5694,10 +6302,6 @@ type SBC_A_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SBC_A_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *SBC_A_H) Write(w io.Writer) (int, error) {
@@ -5719,6 +6323,14 @@ func (o *SBC_A_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SBC_A_H) Length() uint8 {
+	return 1
+}
+
+func (o *SBC_A_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SBC_A_H) String() string {
 	return "SBC " + o.operand1 + ", " + o.operand2
 }
@@ -5731,10 +6343,6 @@ type SBC_A_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SBC_A_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *SBC_A_L) Write(w io.Writer) (int, error) {
@@ -5756,6 +6364,14 @@ func (o *SBC_A_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SBC_A_L) Length() uint8 {
+	return 1
+}
+
+func (o *SBC_A_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SBC_A_L) String() string {
 	return "SBC " + o.operand1 + ", " + o.operand2
 }
@@ -5768,10 +6384,6 @@ type SBC_A_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SBC_A_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *SBC_A_HLPtr) Write(w io.Writer) (int, error) {
@@ -5793,6 +6405,14 @@ func (o *SBC_A_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SBC_A_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *SBC_A_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *SBC_A_HLPtr) String() string {
 	return "SBC " + o.operand1 + ", " + o.operand2
 }
@@ -5805,10 +6425,6 @@ type SBC_A_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SBC_A_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *SBC_A_A) Write(w io.Writer) (int, error) {
@@ -5830,6 +6446,14 @@ func (o *SBC_A_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SBC_A_A) Length() uint8 {
+	return 1
+}
+
+func (o *SBC_A_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *SBC_A_A) String() string {
 	return "SBC " + o.operand1 + ", " + o.operand2
 }
@@ -5842,10 +6466,6 @@ type LD_A_BCDeref struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_BCDeref) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_BCDeref) Write(w io.Writer) (int, error) {
@@ -5867,6 +6487,14 @@ func (o *LD_A_BCDeref) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_BCDeref) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_BCDeref) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_A_BCDeref) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -5879,10 +6507,6 @@ type AND_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *AND_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *AND_B) Write(w io.Writer) (int, error) {
@@ -5904,6 +6528,14 @@ func (o *AND_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *AND_B) Length() uint8 {
+	return 1
+}
+
+func (o *AND_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *AND_B) String() string {
 	return "AND " + o.operand1
 }
@@ -5916,10 +6548,6 @@ type AND_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *AND_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *AND_C) Write(w io.Writer) (int, error) {
@@ -5941,6 +6569,14 @@ func (o *AND_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *AND_C) Length() uint8 {
+	return 1
+}
+
+func (o *AND_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *AND_C) String() string {
 	return "AND " + o.operand1
 }
@@ -5953,10 +6589,6 @@ type AND_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *AND_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *AND_D) Write(w io.Writer) (int, error) {
@@ -5978,6 +6610,14 @@ func (o *AND_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *AND_D) Length() uint8 {
+	return 1
+}
+
+func (o *AND_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *AND_D) String() string {
 	return "AND " + o.operand1
 }
@@ -5990,10 +6630,6 @@ type AND_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *AND_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *AND_E) Write(w io.Writer) (int, error) {
@@ -6015,6 +6651,14 @@ func (o *AND_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *AND_E) Length() uint8 {
+	return 1
+}
+
+func (o *AND_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *AND_E) String() string {
 	return "AND " + o.operand1
 }
@@ -6027,10 +6671,6 @@ type AND_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *AND_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *AND_H) Write(w io.Writer) (int, error) {
@@ -6052,6 +6692,14 @@ func (o *AND_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *AND_H) Length() uint8 {
+	return 1
+}
+
+func (o *AND_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *AND_H) String() string {
 	return "AND " + o.operand1
 }
@@ -6064,10 +6712,6 @@ type AND_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *AND_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *AND_L) Write(w io.Writer) (int, error) {
@@ -6089,6 +6733,14 @@ func (o *AND_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *AND_L) Length() uint8 {
+	return 1
+}
+
+func (o *AND_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *AND_L) String() string {
 	return "AND " + o.operand1
 }
@@ -6101,10 +6753,6 @@ type AND_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *AND_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *AND_HLPtr) Write(w io.Writer) (int, error) {
@@ -6126,6 +6774,14 @@ func (o *AND_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *AND_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *AND_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *AND_HLPtr) String() string {
 	return "AND " + o.operand1
 }
@@ -6138,10 +6794,6 @@ type AND_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *AND_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *AND_A) Write(w io.Writer) (int, error) {
@@ -6163,6 +6815,14 @@ func (o *AND_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *AND_A) Length() uint8 {
+	return 1
+}
+
+func (o *AND_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *AND_A) String() string {
 	return "AND " + o.operand1
 }
@@ -6175,10 +6835,6 @@ type XOR_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *XOR_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *XOR_B) Write(w io.Writer) (int, error) {
@@ -6200,6 +6856,14 @@ func (o *XOR_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *XOR_B) Length() uint8 {
+	return 1
+}
+
+func (o *XOR_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *XOR_B) String() string {
 	return "XOR " + o.operand1
 }
@@ -6212,10 +6876,6 @@ type XOR_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *XOR_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *XOR_C) Write(w io.Writer) (int, error) {
@@ -6237,6 +6897,14 @@ func (o *XOR_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *XOR_C) Length() uint8 {
+	return 1
+}
+
+func (o *XOR_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *XOR_C) String() string {
 	return "XOR " + o.operand1
 }
@@ -6249,10 +6917,6 @@ type XOR_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *XOR_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *XOR_D) Write(w io.Writer) (int, error) {
@@ -6274,6 +6938,14 @@ func (o *XOR_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *XOR_D) Length() uint8 {
+	return 1
+}
+
+func (o *XOR_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *XOR_D) String() string {
 	return "XOR " + o.operand1
 }
@@ -6286,10 +6958,6 @@ type XOR_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *XOR_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *XOR_E) Write(w io.Writer) (int, error) {
@@ -6311,6 +6979,14 @@ func (o *XOR_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *XOR_E) Length() uint8 {
+	return 1
+}
+
+func (o *XOR_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *XOR_E) String() string {
 	return "XOR " + o.operand1
 }
@@ -6323,10 +6999,6 @@ type XOR_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *XOR_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *XOR_H) Write(w io.Writer) (int, error) {
@@ -6348,6 +7020,14 @@ func (o *XOR_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *XOR_H) Length() uint8 {
+	return 1
+}
+
+func (o *XOR_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *XOR_H) String() string {
 	return "XOR " + o.operand1
 }
@@ -6360,10 +7040,6 @@ type XOR_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *XOR_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *XOR_L) Write(w io.Writer) (int, error) {
@@ -6385,6 +7061,14 @@ func (o *XOR_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *XOR_L) Length() uint8 {
+	return 1
+}
+
+func (o *XOR_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *XOR_L) String() string {
 	return "XOR " + o.operand1
 }
@@ -6397,10 +7081,6 @@ type XOR_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *XOR_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *XOR_HLPtr) Write(w io.Writer) (int, error) {
@@ -6422,6 +7102,14 @@ func (o *XOR_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *XOR_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *XOR_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *XOR_HLPtr) String() string {
 	return "XOR " + o.operand1
 }
@@ -6434,10 +7122,6 @@ type XOR_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *XOR_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *XOR_A) Write(w io.Writer) (int, error) {
@@ -6459,6 +7143,14 @@ func (o *XOR_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *XOR_A) Length() uint8 {
+	return 1
+}
+
+func (o *XOR_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *XOR_A) String() string {
 	return "XOR " + o.operand1
 }
@@ -6471,10 +7163,6 @@ type DEC_BC struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DEC_BC) Execute(v vm) error {
-	return nil
 }
 
 func (o *DEC_BC) Write(w io.Writer) (int, error) {
@@ -6496,6 +7184,14 @@ func (o *DEC_BC) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DEC_BC) Length() uint8 {
+	return 1
+}
+
+func (o *DEC_BC) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *DEC_BC) String() string {
 	return "DEC " + o.operand1
 }
@@ -6508,10 +7204,6 @@ type OR_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *OR_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *OR_B) Write(w io.Writer) (int, error) {
@@ -6533,6 +7225,14 @@ func (o *OR_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *OR_B) Length() uint8 {
+	return 1
+}
+
+func (o *OR_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *OR_B) String() string {
 	return "OR " + o.operand1
 }
@@ -6545,10 +7245,6 @@ type OR_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *OR_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *OR_C) Write(w io.Writer) (int, error) {
@@ -6570,6 +7266,14 @@ func (o *OR_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *OR_C) Length() uint8 {
+	return 1
+}
+
+func (o *OR_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *OR_C) String() string {
 	return "OR " + o.operand1
 }
@@ -6582,10 +7286,6 @@ type OR_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *OR_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *OR_D) Write(w io.Writer) (int, error) {
@@ -6607,6 +7307,14 @@ func (o *OR_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *OR_D) Length() uint8 {
+	return 1
+}
+
+func (o *OR_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *OR_D) String() string {
 	return "OR " + o.operand1
 }
@@ -6619,10 +7327,6 @@ type OR_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *OR_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *OR_E) Write(w io.Writer) (int, error) {
@@ -6644,6 +7348,14 @@ func (o *OR_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *OR_E) Length() uint8 {
+	return 1
+}
+
+func (o *OR_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *OR_E) String() string {
 	return "OR " + o.operand1
 }
@@ -6656,10 +7368,6 @@ type OR_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *OR_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *OR_H) Write(w io.Writer) (int, error) {
@@ -6681,6 +7389,14 @@ func (o *OR_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *OR_H) Length() uint8 {
+	return 1
+}
+
+func (o *OR_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *OR_H) String() string {
 	return "OR " + o.operand1
 }
@@ -6693,10 +7409,6 @@ type OR_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *OR_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *OR_L) Write(w io.Writer) (int, error) {
@@ -6718,6 +7430,14 @@ func (o *OR_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *OR_L) Length() uint8 {
+	return 1
+}
+
+func (o *OR_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *OR_L) String() string {
 	return "OR " + o.operand1
 }
@@ -6730,10 +7450,6 @@ type OR_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *OR_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *OR_HLPtr) Write(w io.Writer) (int, error) {
@@ -6755,6 +7471,14 @@ func (o *OR_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *OR_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *OR_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *OR_HLPtr) String() string {
 	return "OR " + o.operand1
 }
@@ -6767,10 +7491,6 @@ type OR_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *OR_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *OR_A) Write(w io.Writer) (int, error) {
@@ -6792,6 +7512,14 @@ func (o *OR_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *OR_A) Length() uint8 {
+	return 1
+}
+
+func (o *OR_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *OR_A) String() string {
 	return "OR " + o.operand1
 }
@@ -6804,10 +7532,6 @@ type CP_B struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CP_B) Execute(v vm) error {
-	return nil
 }
 
 func (o *CP_B) Write(w io.Writer) (int, error) {
@@ -6829,6 +7553,14 @@ func (o *CP_B) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CP_B) Length() uint8 {
+	return 1
+}
+
+func (o *CP_B) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *CP_B) String() string {
 	return "CP " + o.operand1
 }
@@ -6841,10 +7573,6 @@ type CP_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CP_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *CP_C) Write(w io.Writer) (int, error) {
@@ -6866,6 +7594,14 @@ func (o *CP_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CP_C) Length() uint8 {
+	return 1
+}
+
+func (o *CP_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *CP_C) String() string {
 	return "CP " + o.operand1
 }
@@ -6878,10 +7614,6 @@ type CP_D struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CP_D) Execute(v vm) error {
-	return nil
 }
 
 func (o *CP_D) Write(w io.Writer) (int, error) {
@@ -6903,6 +7635,14 @@ func (o *CP_D) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CP_D) Length() uint8 {
+	return 1
+}
+
+func (o *CP_D) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *CP_D) String() string {
 	return "CP " + o.operand1
 }
@@ -6915,10 +7655,6 @@ type CP_E struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CP_E) Execute(v vm) error {
-	return nil
 }
 
 func (o *CP_E) Write(w io.Writer) (int, error) {
@@ -6940,6 +7676,14 @@ func (o *CP_E) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CP_E) Length() uint8 {
+	return 1
+}
+
+func (o *CP_E) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *CP_E) String() string {
 	return "CP " + o.operand1
 }
@@ -6952,10 +7696,6 @@ type CP_H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CP_H) Execute(v vm) error {
-	return nil
 }
 
 func (o *CP_H) Write(w io.Writer) (int, error) {
@@ -6977,6 +7717,14 @@ func (o *CP_H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CP_H) Length() uint8 {
+	return 1
+}
+
+func (o *CP_H) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *CP_H) String() string {
 	return "CP " + o.operand1
 }
@@ -6989,10 +7737,6 @@ type CP_L struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CP_L) Execute(v vm) error {
-	return nil
 }
 
 func (o *CP_L) Write(w io.Writer) (int, error) {
@@ -7014,6 +7758,14 @@ func (o *CP_L) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CP_L) Length() uint8 {
+	return 1
+}
+
+func (o *CP_L) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *CP_L) String() string {
 	return "CP " + o.operand1
 }
@@ -7026,10 +7778,6 @@ type CP_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CP_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *CP_HLPtr) Write(w io.Writer) (int, error) {
@@ -7051,6 +7799,14 @@ func (o *CP_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CP_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *CP_HLPtr) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *CP_HLPtr) String() string {
 	return "CP " + o.operand1
 }
@@ -7063,10 +7819,6 @@ type CP_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CP_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *CP_A) Write(w io.Writer) (int, error) {
@@ -7088,6 +7840,14 @@ func (o *CP_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CP_A) Length() uint8 {
+	return 1
+}
+
+func (o *CP_A) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *CP_A) String() string {
 	return "CP " + o.operand1
 }
@@ -7100,10 +7860,6 @@ type INC_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *INC_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *INC_C) Write(w io.Writer) (int, error) {
@@ -7125,6 +7881,14 @@ func (o *INC_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *INC_C) Length() uint8 {
+	return 1
+}
+
+func (o *INC_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *INC_C) String() string {
 	return "INC " + o.operand1
 }
@@ -7137,10 +7901,6 @@ type RET_NZ struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RET_NZ) Execute(v vm) error {
-	return nil
 }
 
 func (o *RET_NZ) Write(w io.Writer) (int, error) {
@@ -7162,6 +7922,14 @@ func (o *RET_NZ) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RET_NZ) Length() uint8 {
+	return 1
+}
+
+func (o *RET_NZ) cycles() []uint8 {
+	return []uint8{20, 8}
+}
+
 func (o *RET_NZ) String() string {
 	return "RET " + o.operand1
 }
@@ -7174,10 +7942,6 @@ type POP_BC struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *POP_BC) Execute(v vm) error {
-	return nil
 }
 
 func (o *POP_BC) Write(w io.Writer) (int, error) {
@@ -7199,6 +7963,14 @@ func (o *POP_BC) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *POP_BC) Length() uint8 {
+	return 1
+}
+
+func (o *POP_BC) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *POP_BC) String() string {
 	return "POP " + o.operand1
 }
@@ -7211,10 +7983,6 @@ type JP_NZ_a16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *JP_NZ_a16) Execute(v vm) error {
-	return nil
 }
 
 func (o *JP_NZ_a16) Write(w io.Writer) (int, error) {
@@ -7247,6 +8015,14 @@ func (o *JP_NZ_a16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *JP_NZ_a16) Length() uint8 {
+	return 3
+}
+
+func (o *JP_NZ_a16) cycles() []uint8 {
+	return []uint8{16, 12}
+}
+
 func (o *JP_NZ_a16) String() string {
 	return "JP " + o.operand1 + ", " + o.operand2
 }
@@ -7259,10 +8035,6 @@ type JP_a16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *JP_a16) Execute(v vm) error {
-	return nil
 }
 
 func (o *JP_a16) Write(w io.Writer) (int, error) {
@@ -7295,6 +8067,14 @@ func (o *JP_a16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *JP_a16) Length() uint8 {
+	return 3
+}
+
+func (o *JP_a16) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *JP_a16) String() string {
 	return "JP " + o.operand1
 }
@@ -7307,10 +8087,6 @@ type CALL_NZ_a16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CALL_NZ_a16) Execute(v vm) error {
-	return nil
 }
 
 func (o *CALL_NZ_a16) Write(w io.Writer) (int, error) {
@@ -7343,6 +8119,14 @@ func (o *CALL_NZ_a16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CALL_NZ_a16) Length() uint8 {
+	return 3
+}
+
+func (o *CALL_NZ_a16) cycles() []uint8 {
+	return []uint8{24, 12}
+}
+
 func (o *CALL_NZ_a16) String() string {
 	return "CALL " + o.operand1 + ", " + o.operand2
 }
@@ -7355,10 +8139,6 @@ type PUSH_BC struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *PUSH_BC) Execute(v vm) error {
-	return nil
 }
 
 func (o *PUSH_BC) Write(w io.Writer) (int, error) {
@@ -7380,6 +8160,14 @@ func (o *PUSH_BC) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *PUSH_BC) Length() uint8 {
+	return 1
+}
+
+func (o *PUSH_BC) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *PUSH_BC) String() string {
 	return "PUSH " + o.operand1
 }
@@ -7392,10 +8180,6 @@ type ADD_A_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_A_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_A_d8) Write(w io.Writer) (int, error) {
@@ -7428,6 +8212,14 @@ func (o *ADD_A_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_A_d8) Length() uint8 {
+	return 2
+}
+
+func (o *ADD_A_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *ADD_A_d8) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -7440,10 +8232,6 @@ type RST_00H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RST_00H) Execute(v vm) error {
-	return nil
 }
 
 func (o *RST_00H) Write(w io.Writer) (int, error) {
@@ -7465,6 +8253,14 @@ func (o *RST_00H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RST_00H) Length() uint8 {
+	return 1
+}
+
+func (o *RST_00H) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *RST_00H) String() string {
 	return "RST " + o.operand1
 }
@@ -7477,10 +8273,6 @@ type RET_Z struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RET_Z) Execute(v vm) error {
-	return nil
 }
 
 func (o *RET_Z) Write(w io.Writer) (int, error) {
@@ -7502,6 +8294,14 @@ func (o *RET_Z) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RET_Z) Length() uint8 {
+	return 1
+}
+
+func (o *RET_Z) cycles() []uint8 {
+	return []uint8{20, 8}
+}
+
 func (o *RET_Z) String() string {
 	return "RET " + o.operand1
 }
@@ -7514,10 +8314,6 @@ type RET struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RET) Execute(v vm) error {
-	return nil
 }
 
 func (o *RET) Write(w io.Writer) (int, error) {
@@ -7539,6 +8335,14 @@ func (o *RET) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RET) Length() uint8 {
+	return 1
+}
+
+func (o *RET) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *RET) String() string {
 	return "RET " + o.operand1
 }
@@ -7551,10 +8355,6 @@ type JP_Z_a16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *JP_Z_a16) Execute(v vm) error {
-	return nil
 }
 
 func (o *JP_Z_a16) Write(w io.Writer) (int, error) {
@@ -7587,6 +8387,14 @@ func (o *JP_Z_a16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *JP_Z_a16) Length() uint8 {
+	return 3
+}
+
+func (o *JP_Z_a16) cycles() []uint8 {
+	return []uint8{16, 12}
+}
+
 func (o *JP_Z_a16) String() string {
 	return "JP " + o.operand1 + ", " + o.operand2
 }
@@ -7599,10 +8407,6 @@ type PREFIX_CB struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *PREFIX_CB) Execute(v vm) error {
-	return nil
 }
 
 func (o *PREFIX_CB) Write(w io.Writer) (int, error) {
@@ -7624,6 +8428,14 @@ func (o *PREFIX_CB) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *PREFIX_CB) Length() uint8 {
+	return 1
+}
+
+func (o *PREFIX_CB) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *PREFIX_CB) String() string {
 	return "PREFIX " + o.operand1
 }
@@ -7636,10 +8448,6 @@ type CALL_Z_a16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CALL_Z_a16) Execute(v vm) error {
-	return nil
 }
 
 func (o *CALL_Z_a16) Write(w io.Writer) (int, error) {
@@ -7672,6 +8480,14 @@ func (o *CALL_Z_a16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CALL_Z_a16) Length() uint8 {
+	return 3
+}
+
+func (o *CALL_Z_a16) cycles() []uint8 {
+	return []uint8{24, 12}
+}
+
 func (o *CALL_Z_a16) String() string {
 	return "CALL " + o.operand1 + ", " + o.operand2
 }
@@ -7684,10 +8500,6 @@ type CALL_a16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CALL_a16) Execute(v vm) error {
-	return nil
 }
 
 func (o *CALL_a16) Write(w io.Writer) (int, error) {
@@ -7720,6 +8532,14 @@ func (o *CALL_a16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CALL_a16) Length() uint8 {
+	return 3
+}
+
+func (o *CALL_a16) cycles() []uint8 {
+	return []uint8{24}
+}
+
 func (o *CALL_a16) String() string {
 	return "CALL " + o.operand1
 }
@@ -7732,10 +8552,6 @@ type ADC_A_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADC_A_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADC_A_d8) Write(w io.Writer) (int, error) {
@@ -7768,6 +8584,14 @@ func (o *ADC_A_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADC_A_d8) Length() uint8 {
+	return 2
+}
+
+func (o *ADC_A_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *ADC_A_d8) String() string {
 	return "ADC " + o.operand1 + ", " + o.operand2
 }
@@ -7780,10 +8604,6 @@ type RST_08H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RST_08H) Execute(v vm) error {
-	return nil
 }
 
 func (o *RST_08H) Write(w io.Writer) (int, error) {
@@ -7805,6 +8625,14 @@ func (o *RST_08H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RST_08H) Length() uint8 {
+	return 1
+}
+
+func (o *RST_08H) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *RST_08H) String() string {
 	return "RST " + o.operand1
 }
@@ -7817,10 +8645,6 @@ type DEC_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DEC_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *DEC_C) Write(w io.Writer) (int, error) {
@@ -7842,6 +8666,14 @@ func (o *DEC_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DEC_C) Length() uint8 {
+	return 1
+}
+
+func (o *DEC_C) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *DEC_C) String() string {
 	return "DEC " + o.operand1
 }
@@ -7854,10 +8686,6 @@ type RET_NC struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RET_NC) Execute(v vm) error {
-	return nil
 }
 
 func (o *RET_NC) Write(w io.Writer) (int, error) {
@@ -7879,6 +8707,14 @@ func (o *RET_NC) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RET_NC) Length() uint8 {
+	return 1
+}
+
+func (o *RET_NC) cycles() []uint8 {
+	return []uint8{20, 8}
+}
+
 func (o *RET_NC) String() string {
 	return "RET " + o.operand1
 }
@@ -7891,10 +8727,6 @@ type POP_DE struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *POP_DE) Execute(v vm) error {
-	return nil
 }
 
 func (o *POP_DE) Write(w io.Writer) (int, error) {
@@ -7916,6 +8748,14 @@ func (o *POP_DE) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *POP_DE) Length() uint8 {
+	return 1
+}
+
+func (o *POP_DE) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *POP_DE) String() string {
 	return "POP " + o.operand1
 }
@@ -7928,10 +8768,6 @@ type JP_NC_a16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *JP_NC_a16) Execute(v vm) error {
-	return nil
 }
 
 func (o *JP_NC_a16) Write(w io.Writer) (int, error) {
@@ -7964,6 +8800,14 @@ func (o *JP_NC_a16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *JP_NC_a16) Length() uint8 {
+	return 3
+}
+
+func (o *JP_NC_a16) cycles() []uint8 {
+	return []uint8{16, 12}
+}
+
 func (o *JP_NC_a16) String() string {
 	return "JP " + o.operand1 + ", " + o.operand2
 }
@@ -7976,10 +8820,6 @@ type CALL_NC_a16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CALL_NC_a16) Execute(v vm) error {
-	return nil
 }
 
 func (o *CALL_NC_a16) Write(w io.Writer) (int, error) {
@@ -8012,6 +8852,14 @@ func (o *CALL_NC_a16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CALL_NC_a16) Length() uint8 {
+	return 3
+}
+
+func (o *CALL_NC_a16) cycles() []uint8 {
+	return []uint8{24, 12}
+}
+
 func (o *CALL_NC_a16) String() string {
 	return "CALL " + o.operand1 + ", " + o.operand2
 }
@@ -8024,10 +8872,6 @@ type PUSH_DE struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *PUSH_DE) Execute(v vm) error {
-	return nil
 }
 
 func (o *PUSH_DE) Write(w io.Writer) (int, error) {
@@ -8049,6 +8893,14 @@ func (o *PUSH_DE) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *PUSH_DE) Length() uint8 {
+	return 1
+}
+
+func (o *PUSH_DE) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *PUSH_DE) String() string {
 	return "PUSH " + o.operand1
 }
@@ -8061,10 +8913,6 @@ type SUB_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SUB_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *SUB_d8) Write(w io.Writer) (int, error) {
@@ -8097,6 +8945,14 @@ func (o *SUB_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SUB_d8) Length() uint8 {
+	return 2
+}
+
+func (o *SUB_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *SUB_d8) String() string {
 	return "SUB " + o.operand1
 }
@@ -8109,10 +8965,6 @@ type RST_10H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RST_10H) Execute(v vm) error {
-	return nil
 }
 
 func (o *RST_10H) Write(w io.Writer) (int, error) {
@@ -8134,6 +8986,14 @@ func (o *RST_10H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RST_10H) Length() uint8 {
+	return 1
+}
+
+func (o *RST_10H) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *RST_10H) String() string {
 	return "RST " + o.operand1
 }
@@ -8146,10 +9006,6 @@ type RET_C struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RET_C) Execute(v vm) error {
-	return nil
 }
 
 func (o *RET_C) Write(w io.Writer) (int, error) {
@@ -8171,6 +9027,14 @@ func (o *RET_C) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RET_C) Length() uint8 {
+	return 1
+}
+
+func (o *RET_C) cycles() []uint8 {
+	return []uint8{20, 8}
+}
+
 func (o *RET_C) String() string {
 	return "RET " + o.operand1
 }
@@ -8183,10 +9047,6 @@ type RETI struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RETI) Execute(v vm) error {
-	return nil
 }
 
 func (o *RETI) Write(w io.Writer) (int, error) {
@@ -8208,6 +9068,14 @@ func (o *RETI) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RETI) Length() uint8 {
+	return 1
+}
+
+func (o *RETI) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *RETI) String() string {
 	return "RETI " + o.operand1
 }
@@ -8220,10 +9088,6 @@ type JP_C_a16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *JP_C_a16) Execute(v vm) error {
-	return nil
 }
 
 func (o *JP_C_a16) Write(w io.Writer) (int, error) {
@@ -8256,6 +9120,14 @@ func (o *JP_C_a16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *JP_C_a16) Length() uint8 {
+	return 3
+}
+
+func (o *JP_C_a16) cycles() []uint8 {
+	return []uint8{16, 12}
+}
+
 func (o *JP_C_a16) String() string {
 	return "JP " + o.operand1 + ", " + o.operand2
 }
@@ -8268,10 +9140,6 @@ type CALL_C_a16 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CALL_C_a16) Execute(v vm) error {
-	return nil
 }
 
 func (o *CALL_C_a16) Write(w io.Writer) (int, error) {
@@ -8304,6 +9172,14 @@ func (o *CALL_C_a16) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CALL_C_a16) Length() uint8 {
+	return 3
+}
+
+func (o *CALL_C_a16) cycles() []uint8 {
+	return []uint8{24, 12}
+}
+
 func (o *CALL_C_a16) String() string {
 	return "CALL " + o.operand1 + ", " + o.operand2
 }
@@ -8316,10 +9192,6 @@ type SBC_A_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *SBC_A_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *SBC_A_d8) Write(w io.Writer) (int, error) {
@@ -8352,6 +9224,14 @@ func (o *SBC_A_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *SBC_A_d8) Length() uint8 {
+	return 2
+}
+
+func (o *SBC_A_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *SBC_A_d8) String() string {
 	return "SBC " + o.operand1 + ", " + o.operand2
 }
@@ -8364,10 +9244,6 @@ type RST_18H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RST_18H) Execute(v vm) error {
-	return nil
 }
 
 func (o *RST_18H) Write(w io.Writer) (int, error) {
@@ -8389,6 +9265,14 @@ func (o *RST_18H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RST_18H) Length() uint8 {
+	return 1
+}
+
+func (o *RST_18H) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *RST_18H) String() string {
 	return "RST " + o.operand1
 }
@@ -8401,10 +9285,6 @@ type LD_C_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_C_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_C_d8) Write(w io.Writer) (int, error) {
@@ -8437,6 +9317,14 @@ func (o *LD_C_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_C_d8) Length() uint8 {
+	return 2
+}
+
+func (o *LD_C_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_C_d8) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -8449,10 +9337,6 @@ type LDH_a8Deref_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LDH_a8Deref_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LDH_a8Deref_A) Write(w io.Writer) (int, error) {
@@ -8485,6 +9369,14 @@ func (o *LDH_a8Deref_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LDH_a8Deref_A) Length() uint8 {
+	return 2
+}
+
+func (o *LDH_a8Deref_A) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *LDH_a8Deref_A) String() string {
 	return "LDH " + o.operand1 + ", " + o.operand2
 }
@@ -8497,10 +9389,6 @@ type POP_HL struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *POP_HL) Execute(v vm) error {
-	return nil
 }
 
 func (o *POP_HL) Write(w io.Writer) (int, error) {
@@ -8522,6 +9410,14 @@ func (o *POP_HL) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *POP_HL) Length() uint8 {
+	return 1
+}
+
+func (o *POP_HL) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *POP_HL) String() string {
 	return "POP " + o.operand1
 }
@@ -8534,10 +9430,6 @@ type LD_CDeref_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_CDeref_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_CDeref_A) Write(w io.Writer) (int, error) {
@@ -8559,6 +9451,14 @@ func (o *LD_CDeref_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_CDeref_A) Length() uint8 {
+	return 1
+}
+
+func (o *LD_CDeref_A) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_CDeref_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -8571,10 +9471,6 @@ type PUSH_HL struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *PUSH_HL) Execute(v vm) error {
-	return nil
 }
 
 func (o *PUSH_HL) Write(w io.Writer) (int, error) {
@@ -8596,6 +9492,14 @@ func (o *PUSH_HL) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *PUSH_HL) Length() uint8 {
+	return 1
+}
+
+func (o *PUSH_HL) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *PUSH_HL) String() string {
 	return "PUSH " + o.operand1
 }
@@ -8608,10 +9512,6 @@ type AND_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *AND_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *AND_d8) Write(w io.Writer) (int, error) {
@@ -8644,6 +9544,14 @@ func (o *AND_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *AND_d8) Length() uint8 {
+	return 2
+}
+
+func (o *AND_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *AND_d8) String() string {
 	return "AND " + o.operand1
 }
@@ -8656,10 +9564,6 @@ type RST_20H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RST_20H) Execute(v vm) error {
-	return nil
 }
 
 func (o *RST_20H) Write(w io.Writer) (int, error) {
@@ -8681,6 +9585,14 @@ func (o *RST_20H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RST_20H) Length() uint8 {
+	return 1
+}
+
+func (o *RST_20H) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *RST_20H) String() string {
 	return "RST " + o.operand1
 }
@@ -8693,10 +9605,6 @@ type ADD_SP_r8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *ADD_SP_r8) Execute(v vm) error {
-	return nil
 }
 
 func (o *ADD_SP_r8) Write(w io.Writer) (int, error) {
@@ -8718,6 +9626,14 @@ func (o *ADD_SP_r8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *ADD_SP_r8) Length() uint8 {
+	return 2
+}
+
+func (o *ADD_SP_r8) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *ADD_SP_r8) String() string {
 	return "ADD " + o.operand1 + ", " + o.operand2
 }
@@ -8730,10 +9646,6 @@ type JP_HLPtr struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *JP_HLPtr) Execute(v vm) error {
-	return nil
 }
 
 func (o *JP_HLPtr) Write(w io.Writer) (int, error) {
@@ -8755,6 +9667,14 @@ func (o *JP_HLPtr) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *JP_HLPtr) Length() uint8 {
+	return 1
+}
+
+func (o *JP_HLPtr) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *JP_HLPtr) String() string {
 	return "JP " + o.operand1
 }
@@ -8767,10 +9687,6 @@ type LD_a16Deref_A struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_a16Deref_A) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_a16Deref_A) Write(w io.Writer) (int, error) {
@@ -8803,6 +9719,14 @@ func (o *LD_a16Deref_A) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_a16Deref_A) Length() uint8 {
+	return 3
+}
+
+func (o *LD_a16Deref_A) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *LD_a16Deref_A) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -8815,10 +9739,6 @@ type XOR_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *XOR_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *XOR_d8) Write(w io.Writer) (int, error) {
@@ -8851,6 +9771,14 @@ func (o *XOR_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *XOR_d8) Length() uint8 {
+	return 2
+}
+
+func (o *XOR_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *XOR_d8) String() string {
 	return "XOR " + o.operand1
 }
@@ -8863,10 +9791,6 @@ type RST_28H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RST_28H) Execute(v vm) error {
-	return nil
 }
 
 func (o *RST_28H) Write(w io.Writer) (int, error) {
@@ -8888,6 +9812,14 @@ func (o *RST_28H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RST_28H) Length() uint8 {
+	return 1
+}
+
+func (o *RST_28H) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *RST_28H) String() string {
 	return "RST " + o.operand1
 }
@@ -8900,10 +9832,6 @@ type RRCA struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RRCA) Execute(v vm) error {
-	return nil
 }
 
 func (o *RRCA) Write(w io.Writer) (int, error) {
@@ -8925,6 +9853,14 @@ func (o *RRCA) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RRCA) Length() uint8 {
+	return 1
+}
+
+func (o *RRCA) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *RRCA) String() string {
 	return "RRCA " + o.operand1
 }
@@ -8937,10 +9873,6 @@ type LDH_A_a8Deref struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LDH_A_a8Deref) Execute(v vm) error {
-	return nil
 }
 
 func (o *LDH_A_a8Deref) Write(w io.Writer) (int, error) {
@@ -8973,6 +9905,14 @@ func (o *LDH_A_a8Deref) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LDH_A_a8Deref) Length() uint8 {
+	return 2
+}
+
+func (o *LDH_A_a8Deref) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *LDH_A_a8Deref) String() string {
 	return "LDH " + o.operand1 + ", " + o.operand2
 }
@@ -8985,10 +9925,6 @@ type POP_AF struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *POP_AF) Execute(v vm) error {
-	return nil
 }
 
 func (o *POP_AF) Write(w io.Writer) (int, error) {
@@ -9010,6 +9946,14 @@ func (o *POP_AF) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *POP_AF) Length() uint8 {
+	return 1
+}
+
+func (o *POP_AF) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *POP_AF) String() string {
 	return "POP " + o.operand1
 }
@@ -9022,10 +9966,6 @@ type LD_A_CDeref struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_CDeref) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_CDeref) Write(w io.Writer) (int, error) {
@@ -9047,6 +9987,14 @@ func (o *LD_A_CDeref) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_CDeref) Length() uint8 {
+	return 1
+}
+
+func (o *LD_A_CDeref) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_A_CDeref) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -9059,10 +10007,6 @@ type DI struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *DI) Execute(v vm) error {
-	return nil
 }
 
 func (o *DI) Write(w io.Writer) (int, error) {
@@ -9084,6 +10028,14 @@ func (o *DI) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *DI) Length() uint8 {
+	return 1
+}
+
+func (o *DI) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *DI) String() string {
 	return "DI " + o.operand1
 }
@@ -9096,10 +10048,6 @@ type PUSH_AF struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *PUSH_AF) Execute(v vm) error {
-	return nil
 }
 
 func (o *PUSH_AF) Write(w io.Writer) (int, error) {
@@ -9121,6 +10069,14 @@ func (o *PUSH_AF) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *PUSH_AF) Length() uint8 {
+	return 1
+}
+
+func (o *PUSH_AF) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *PUSH_AF) String() string {
 	return "PUSH " + o.operand1
 }
@@ -9133,10 +10089,6 @@ type OR_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *OR_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *OR_d8) Write(w io.Writer) (int, error) {
@@ -9169,6 +10121,14 @@ func (o *OR_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *OR_d8) Length() uint8 {
+	return 2
+}
+
+func (o *OR_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *OR_d8) String() string {
 	return "OR " + o.operand1
 }
@@ -9181,10 +10141,6 @@ type RST_30H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RST_30H) Execute(v vm) error {
-	return nil
 }
 
 func (o *RST_30H) Write(w io.Writer) (int, error) {
@@ -9206,6 +10162,14 @@ func (o *RST_30H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RST_30H) Length() uint8 {
+	return 1
+}
+
+func (o *RST_30H) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *RST_30H) String() string {
 	return "RST " + o.operand1
 }
@@ -9218,10 +10182,6 @@ type LD_HL_SP_plus_r8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_HL_SP_plus_r8) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_HL_SP_plus_r8) Write(w io.Writer) (int, error) {
@@ -9254,6 +10214,14 @@ func (o *LD_HL_SP_plus_r8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_HL_SP_plus_r8) Length() uint8 {
+	return 2
+}
+
+func (o *LD_HL_SP_plus_r8) cycles() []uint8 {
+	return []uint8{12}
+}
+
 func (o *LD_HL_SP_plus_r8) String() string {
 	return "LD " + o.operand1 + ", SP+" + o.operand2
 }
@@ -9266,10 +10234,6 @@ type LD_SP_HL struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_SP_HL) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_SP_HL) Write(w io.Writer) (int, error) {
@@ -9291,6 +10255,14 @@ func (o *LD_SP_HL) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_SP_HL) Length() uint8 {
+	return 1
+}
+
+func (o *LD_SP_HL) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *LD_SP_HL) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -9303,10 +10275,6 @@ type LD_A_a16Deref struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *LD_A_a16Deref) Execute(v vm) error {
-	return nil
 }
 
 func (o *LD_A_a16Deref) Write(w io.Writer) (int, error) {
@@ -9339,6 +10307,14 @@ func (o *LD_A_a16Deref) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *LD_A_a16Deref) Length() uint8 {
+	return 3
+}
+
+func (o *LD_A_a16Deref) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *LD_A_a16Deref) String() string {
 	return "LD " + o.operand1 + ", " + o.operand2
 }
@@ -9351,10 +10327,6 @@ type EI struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *EI) Execute(v vm) error {
-	return nil
 }
 
 func (o *EI) Write(w io.Writer) (int, error) {
@@ -9376,6 +10348,14 @@ func (o *EI) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *EI) Length() uint8 {
+	return 1
+}
+
+func (o *EI) cycles() []uint8 {
+	return []uint8{4}
+}
+
 func (o *EI) String() string {
 	return "EI " + o.operand1
 }
@@ -9388,10 +10368,6 @@ type CP_d8 struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *CP_d8) Execute(v vm) error {
-	return nil
 }
 
 func (o *CP_d8) Write(w io.Writer) (int, error) {
@@ -9424,6 +10400,14 @@ func (o *CP_d8) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *CP_d8) Length() uint8 {
+	return 2
+}
+
+func (o *CP_d8) cycles() []uint8 {
+	return []uint8{8}
+}
+
 func (o *CP_d8) String() string {
 	return "CP " + o.operand1
 }
@@ -9436,10 +10420,6 @@ type RST_38H struct {
 	operand1     string // literal, or reg name, or (HL)...
 	operand2     string // same
 	isCbPrefixed bool
-}
-
-func (o *RST_38H) Execute(v vm) error {
-	return nil
 }
 
 func (o *RST_38H) Write(w io.Writer) (int, error) {
@@ -9461,6 +10441,14 @@ func (o *RST_38H) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *RST_38H) Length() uint8 {
+	return 1
+}
+
+func (o *RST_38H) cycles() []uint8 {
+	return []uint8{16}
+}
+
 func (o *RST_38H) String() string {
 	return "RST " + o.operand1
 }
@@ -9475,10 +10463,6 @@ type RLC_B struct {
 	isCbPrefixed bool
 }
 
-func (o *RLC_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *RLC_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9488,9 +10472,7 @@ func (o *RLC_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x0,
 	})
 	if err != nil {
@@ -9498,6 +10480,14 @@ func (o *RLC_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RLC_B) Length() uint8 {
+	return 2
+}
+
+func (o *RLC_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RLC_B) String() string {
@@ -9514,10 +10504,6 @@ type RLC_C struct {
 	isCbPrefixed bool
 }
 
-func (o *RLC_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *RLC_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9527,9 +10513,7 @@ func (o *RLC_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x1,
 	})
 	if err != nil {
@@ -9537,6 +10521,14 @@ func (o *RLC_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RLC_C) Length() uint8 {
+	return 2
+}
+
+func (o *RLC_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RLC_C) String() string {
@@ -9553,10 +10545,6 @@ type RL_B struct {
 	isCbPrefixed bool
 }
 
-func (o *RL_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *RL_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9566,9 +10554,7 @@ func (o *RL_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x10,
 	})
 	if err != nil {
@@ -9576,6 +10562,14 @@ func (o *RL_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RL_B) Length() uint8 {
+	return 2
+}
+
+func (o *RL_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RL_B) String() string {
@@ -9592,10 +10586,6 @@ type RL_C struct {
 	isCbPrefixed bool
 }
 
-func (o *RL_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *RL_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9605,9 +10595,7 @@ func (o *RL_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x11,
 	})
 	if err != nil {
@@ -9615,6 +10603,14 @@ func (o *RL_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RL_C) Length() uint8 {
+	return 2
+}
+
+func (o *RL_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RL_C) String() string {
@@ -9631,10 +10627,6 @@ type RL_D struct {
 	isCbPrefixed bool
 }
 
-func (o *RL_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *RL_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9644,9 +10636,7 @@ func (o *RL_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x12,
 	})
 	if err != nil {
@@ -9654,6 +10644,14 @@ func (o *RL_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RL_D) Length() uint8 {
+	return 2
+}
+
+func (o *RL_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RL_D) String() string {
@@ -9670,10 +10668,6 @@ type RL_E struct {
 	isCbPrefixed bool
 }
 
-func (o *RL_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *RL_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9683,9 +10677,7 @@ func (o *RL_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x13,
 	})
 	if err != nil {
@@ -9693,6 +10685,14 @@ func (o *RL_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RL_E) Length() uint8 {
+	return 2
+}
+
+func (o *RL_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RL_E) String() string {
@@ -9709,10 +10709,6 @@ type RL_H struct {
 	isCbPrefixed bool
 }
 
-func (o *RL_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *RL_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9722,9 +10718,7 @@ func (o *RL_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x14,
 	})
 	if err != nil {
@@ -9732,6 +10726,14 @@ func (o *RL_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RL_H) Length() uint8 {
+	return 2
+}
+
+func (o *RL_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RL_H) String() string {
@@ -9748,10 +10750,6 @@ type RL_L struct {
 	isCbPrefixed bool
 }
 
-func (o *RL_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *RL_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9761,9 +10759,7 @@ func (o *RL_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x15,
 	})
 	if err != nil {
@@ -9771,6 +10767,14 @@ func (o *RL_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RL_L) Length() uint8 {
+	return 2
+}
+
+func (o *RL_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RL_L) String() string {
@@ -9787,10 +10791,6 @@ type RL_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *RL_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *RL_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9800,9 +10800,7 @@ func (o *RL_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x16,
 	})
 	if err != nil {
@@ -9810,6 +10808,14 @@ func (o *RL_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RL_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *RL_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *RL_HLPtr) String() string {
@@ -9826,10 +10832,6 @@ type RL_A struct {
 	isCbPrefixed bool
 }
 
-func (o *RL_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *RL_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9839,9 +10841,7 @@ func (o *RL_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x17,
 	})
 	if err != nil {
@@ -9849,6 +10849,14 @@ func (o *RL_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RL_A) Length() uint8 {
+	return 2
+}
+
+func (o *RL_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RL_A) String() string {
@@ -9865,10 +10873,6 @@ type RR_B struct {
 	isCbPrefixed bool
 }
 
-func (o *RR_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *RR_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9878,9 +10882,7 @@ func (o *RR_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x18,
 	})
 	if err != nil {
@@ -9888,6 +10890,14 @@ func (o *RR_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RR_B) Length() uint8 {
+	return 2
+}
+
+func (o *RR_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RR_B) String() string {
@@ -9904,10 +10914,6 @@ type RR_C struct {
 	isCbPrefixed bool
 }
 
-func (o *RR_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *RR_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9917,9 +10923,7 @@ func (o *RR_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x19,
 	})
 	if err != nil {
@@ -9927,6 +10931,14 @@ func (o *RR_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RR_C) Length() uint8 {
+	return 2
+}
+
+func (o *RR_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RR_C) String() string {
@@ -9943,10 +10955,6 @@ type RR_D struct {
 	isCbPrefixed bool
 }
 
-func (o *RR_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *RR_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9956,9 +10964,7 @@ func (o *RR_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x1a,
 	})
 	if err != nil {
@@ -9966,6 +10972,14 @@ func (o *RR_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RR_D) Length() uint8 {
+	return 2
+}
+
+func (o *RR_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RR_D) String() string {
@@ -9982,10 +10996,6 @@ type RR_E struct {
 	isCbPrefixed bool
 }
 
-func (o *RR_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *RR_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -9995,9 +11005,7 @@ func (o *RR_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x1b,
 	})
 	if err != nil {
@@ -10005,6 +11013,14 @@ func (o *RR_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RR_E) Length() uint8 {
+	return 2
+}
+
+func (o *RR_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RR_E) String() string {
@@ -10021,10 +11037,6 @@ type RR_H struct {
 	isCbPrefixed bool
 }
 
-func (o *RR_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *RR_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10034,9 +11046,7 @@ func (o *RR_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x1c,
 	})
 	if err != nil {
@@ -10044,6 +11054,14 @@ func (o *RR_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RR_H) Length() uint8 {
+	return 2
+}
+
+func (o *RR_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RR_H) String() string {
@@ -10060,10 +11078,6 @@ type RR_L struct {
 	isCbPrefixed bool
 }
 
-func (o *RR_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *RR_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10073,9 +11087,7 @@ func (o *RR_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x1d,
 	})
 	if err != nil {
@@ -10083,6 +11095,14 @@ func (o *RR_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RR_L) Length() uint8 {
+	return 2
+}
+
+func (o *RR_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RR_L) String() string {
@@ -10099,10 +11119,6 @@ type RR_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *RR_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *RR_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10112,9 +11128,7 @@ func (o *RR_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x1e,
 	})
 	if err != nil {
@@ -10122,6 +11136,14 @@ func (o *RR_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RR_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *RR_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *RR_HLPtr) String() string {
@@ -10138,10 +11160,6 @@ type RR_A struct {
 	isCbPrefixed bool
 }
 
-func (o *RR_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *RR_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10151,9 +11169,7 @@ func (o *RR_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x1f,
 	})
 	if err != nil {
@@ -10161,6 +11177,14 @@ func (o *RR_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RR_A) Length() uint8 {
+	return 2
+}
+
+func (o *RR_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RR_A) String() string {
@@ -10177,10 +11201,6 @@ type RLC_D struct {
 	isCbPrefixed bool
 }
 
-func (o *RLC_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *RLC_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10190,9 +11210,7 @@ func (o *RLC_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x2,
 	})
 	if err != nil {
@@ -10200,6 +11218,14 @@ func (o *RLC_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RLC_D) Length() uint8 {
+	return 2
+}
+
+func (o *RLC_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RLC_D) String() string {
@@ -10216,10 +11242,6 @@ type SLA_B struct {
 	isCbPrefixed bool
 }
 
-func (o *SLA_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *SLA_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10229,9 +11251,7 @@ func (o *SLA_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x20,
 	})
 	if err != nil {
@@ -10239,6 +11259,14 @@ func (o *SLA_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SLA_B) Length() uint8 {
+	return 2
+}
+
+func (o *SLA_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SLA_B) String() string {
@@ -10255,10 +11283,6 @@ type SLA_C struct {
 	isCbPrefixed bool
 }
 
-func (o *SLA_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *SLA_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10268,9 +11292,7 @@ func (o *SLA_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x21,
 	})
 	if err != nil {
@@ -10278,6 +11300,14 @@ func (o *SLA_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SLA_C) Length() uint8 {
+	return 2
+}
+
+func (o *SLA_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SLA_C) String() string {
@@ -10294,10 +11324,6 @@ type SLA_D struct {
 	isCbPrefixed bool
 }
 
-func (o *SLA_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *SLA_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10307,9 +11333,7 @@ func (o *SLA_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x22,
 	})
 	if err != nil {
@@ -10317,6 +11341,14 @@ func (o *SLA_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SLA_D) Length() uint8 {
+	return 2
+}
+
+func (o *SLA_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SLA_D) String() string {
@@ -10333,10 +11365,6 @@ type SLA_E struct {
 	isCbPrefixed bool
 }
 
-func (o *SLA_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *SLA_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10346,9 +11374,7 @@ func (o *SLA_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x23,
 	})
 	if err != nil {
@@ -10356,6 +11382,14 @@ func (o *SLA_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SLA_E) Length() uint8 {
+	return 2
+}
+
+func (o *SLA_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SLA_E) String() string {
@@ -10372,10 +11406,6 @@ type SLA_H struct {
 	isCbPrefixed bool
 }
 
-func (o *SLA_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *SLA_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10385,9 +11415,7 @@ func (o *SLA_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x24,
 	})
 	if err != nil {
@@ -10395,6 +11423,14 @@ func (o *SLA_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SLA_H) Length() uint8 {
+	return 2
+}
+
+func (o *SLA_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SLA_H) String() string {
@@ -10411,10 +11447,6 @@ type SLA_L struct {
 	isCbPrefixed bool
 }
 
-func (o *SLA_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *SLA_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10424,9 +11456,7 @@ func (o *SLA_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x25,
 	})
 	if err != nil {
@@ -10434,6 +11464,14 @@ func (o *SLA_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SLA_L) Length() uint8 {
+	return 2
+}
+
+func (o *SLA_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SLA_L) String() string {
@@ -10450,10 +11488,6 @@ type SLA_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *SLA_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *SLA_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10463,9 +11497,7 @@ func (o *SLA_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x26,
 	})
 	if err != nil {
@@ -10473,6 +11505,14 @@ func (o *SLA_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SLA_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *SLA_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *SLA_HLPtr) String() string {
@@ -10489,10 +11529,6 @@ type SLA_A struct {
 	isCbPrefixed bool
 }
 
-func (o *SLA_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *SLA_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10502,9 +11538,7 @@ func (o *SLA_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x27,
 	})
 	if err != nil {
@@ -10512,6 +11546,14 @@ func (o *SLA_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SLA_A) Length() uint8 {
+	return 2
+}
+
+func (o *SLA_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SLA_A) String() string {
@@ -10528,10 +11570,6 @@ type SRA_B struct {
 	isCbPrefixed bool
 }
 
-func (o *SRA_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRA_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10541,9 +11579,7 @@ func (o *SRA_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x28,
 	})
 	if err != nil {
@@ -10551,6 +11587,14 @@ func (o *SRA_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRA_B) Length() uint8 {
+	return 2
+}
+
+func (o *SRA_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRA_B) String() string {
@@ -10567,10 +11611,6 @@ type SRA_C struct {
 	isCbPrefixed bool
 }
 
-func (o *SRA_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRA_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10580,9 +11620,7 @@ func (o *SRA_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x29,
 	})
 	if err != nil {
@@ -10590,6 +11628,14 @@ func (o *SRA_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRA_C) Length() uint8 {
+	return 2
+}
+
+func (o *SRA_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRA_C) String() string {
@@ -10606,10 +11652,6 @@ type SRA_D struct {
 	isCbPrefixed bool
 }
 
-func (o *SRA_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRA_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10619,9 +11661,7 @@ func (o *SRA_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x2a,
 	})
 	if err != nil {
@@ -10629,6 +11669,14 @@ func (o *SRA_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRA_D) Length() uint8 {
+	return 2
+}
+
+func (o *SRA_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRA_D) String() string {
@@ -10645,10 +11693,6 @@ type SRA_E struct {
 	isCbPrefixed bool
 }
 
-func (o *SRA_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRA_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10658,9 +11702,7 @@ func (o *SRA_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x2b,
 	})
 	if err != nil {
@@ -10668,6 +11710,14 @@ func (o *SRA_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRA_E) Length() uint8 {
+	return 2
+}
+
+func (o *SRA_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRA_E) String() string {
@@ -10684,10 +11734,6 @@ type SRA_H struct {
 	isCbPrefixed bool
 }
 
-func (o *SRA_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRA_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10697,9 +11743,7 @@ func (o *SRA_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x2c,
 	})
 	if err != nil {
@@ -10707,6 +11751,14 @@ func (o *SRA_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRA_H) Length() uint8 {
+	return 2
+}
+
+func (o *SRA_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRA_H) String() string {
@@ -10723,10 +11775,6 @@ type SRA_L struct {
 	isCbPrefixed bool
 }
 
-func (o *SRA_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRA_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10736,9 +11784,7 @@ func (o *SRA_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x2d,
 	})
 	if err != nil {
@@ -10746,6 +11792,14 @@ func (o *SRA_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRA_L) Length() uint8 {
+	return 2
+}
+
+func (o *SRA_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRA_L) String() string {
@@ -10762,10 +11816,6 @@ type SRA_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *SRA_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRA_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10775,9 +11825,7 @@ func (o *SRA_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x2e,
 	})
 	if err != nil {
@@ -10785,6 +11833,14 @@ func (o *SRA_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRA_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *SRA_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *SRA_HLPtr) String() string {
@@ -10801,10 +11857,6 @@ type SRA_A struct {
 	isCbPrefixed bool
 }
 
-func (o *SRA_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRA_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10814,9 +11866,7 @@ func (o *SRA_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x2f,
 	})
 	if err != nil {
@@ -10824,6 +11874,14 @@ func (o *SRA_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRA_A) Length() uint8 {
+	return 2
+}
+
+func (o *SRA_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRA_A) String() string {
@@ -10840,10 +11898,6 @@ type RLC_E struct {
 	isCbPrefixed bool
 }
 
-func (o *RLC_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *RLC_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10853,9 +11907,7 @@ func (o *RLC_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x3,
 	})
 	if err != nil {
@@ -10863,6 +11915,14 @@ func (o *RLC_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RLC_E) Length() uint8 {
+	return 2
+}
+
+func (o *RLC_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RLC_E) String() string {
@@ -10879,10 +11939,6 @@ type SWAP_B struct {
 	isCbPrefixed bool
 }
 
-func (o *SWAP_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *SWAP_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10892,9 +11948,7 @@ func (o *SWAP_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x30,
 	})
 	if err != nil {
@@ -10902,6 +11956,14 @@ func (o *SWAP_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SWAP_B) Length() uint8 {
+	return 2
+}
+
+func (o *SWAP_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SWAP_B) String() string {
@@ -10918,10 +11980,6 @@ type SWAP_C struct {
 	isCbPrefixed bool
 }
 
-func (o *SWAP_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *SWAP_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10931,9 +11989,7 @@ func (o *SWAP_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x31,
 	})
 	if err != nil {
@@ -10941,6 +11997,14 @@ func (o *SWAP_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SWAP_C) Length() uint8 {
+	return 2
+}
+
+func (o *SWAP_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SWAP_C) String() string {
@@ -10957,10 +12021,6 @@ type SWAP_D struct {
 	isCbPrefixed bool
 }
 
-func (o *SWAP_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *SWAP_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -10970,9 +12030,7 @@ func (o *SWAP_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x32,
 	})
 	if err != nil {
@@ -10980,6 +12038,14 @@ func (o *SWAP_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SWAP_D) Length() uint8 {
+	return 2
+}
+
+func (o *SWAP_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SWAP_D) String() string {
@@ -10996,10 +12062,6 @@ type SWAP_E struct {
 	isCbPrefixed bool
 }
 
-func (o *SWAP_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *SWAP_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11009,9 +12071,7 @@ func (o *SWAP_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x33,
 	})
 	if err != nil {
@@ -11019,6 +12079,14 @@ func (o *SWAP_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SWAP_E) Length() uint8 {
+	return 2
+}
+
+func (o *SWAP_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SWAP_E) String() string {
@@ -11035,10 +12103,6 @@ type SWAP_H struct {
 	isCbPrefixed bool
 }
 
-func (o *SWAP_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *SWAP_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11048,9 +12112,7 @@ func (o *SWAP_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x34,
 	})
 	if err != nil {
@@ -11058,6 +12120,14 @@ func (o *SWAP_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SWAP_H) Length() uint8 {
+	return 2
+}
+
+func (o *SWAP_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SWAP_H) String() string {
@@ -11074,10 +12144,6 @@ type SWAP_L struct {
 	isCbPrefixed bool
 }
 
-func (o *SWAP_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *SWAP_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11087,9 +12153,7 @@ func (o *SWAP_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x35,
 	})
 	if err != nil {
@@ -11097,6 +12161,14 @@ func (o *SWAP_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SWAP_L) Length() uint8 {
+	return 2
+}
+
+func (o *SWAP_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SWAP_L) String() string {
@@ -11113,10 +12185,6 @@ type SWAP_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *SWAP_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *SWAP_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11126,9 +12194,7 @@ func (o *SWAP_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x36,
 	})
 	if err != nil {
@@ -11136,6 +12202,14 @@ func (o *SWAP_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SWAP_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *SWAP_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *SWAP_HLPtr) String() string {
@@ -11152,10 +12226,6 @@ type SWAP_A struct {
 	isCbPrefixed bool
 }
 
-func (o *SWAP_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *SWAP_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11165,9 +12235,7 @@ func (o *SWAP_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x37,
 	})
 	if err != nil {
@@ -11175,6 +12243,14 @@ func (o *SWAP_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SWAP_A) Length() uint8 {
+	return 2
+}
+
+func (o *SWAP_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SWAP_A) String() string {
@@ -11191,10 +12267,6 @@ type SRL_B struct {
 	isCbPrefixed bool
 }
 
-func (o *SRL_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRL_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11204,9 +12276,7 @@ func (o *SRL_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x38,
 	})
 	if err != nil {
@@ -11214,6 +12284,14 @@ func (o *SRL_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRL_B) Length() uint8 {
+	return 2
+}
+
+func (o *SRL_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRL_B) String() string {
@@ -11230,10 +12308,6 @@ type SRL_C struct {
 	isCbPrefixed bool
 }
 
-func (o *SRL_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRL_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11243,9 +12317,7 @@ func (o *SRL_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x39,
 	})
 	if err != nil {
@@ -11253,6 +12325,14 @@ func (o *SRL_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRL_C) Length() uint8 {
+	return 2
+}
+
+func (o *SRL_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRL_C) String() string {
@@ -11269,10 +12349,6 @@ type SRL_D struct {
 	isCbPrefixed bool
 }
 
-func (o *SRL_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRL_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11282,9 +12358,7 @@ func (o *SRL_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x3a,
 	})
 	if err != nil {
@@ -11292,6 +12366,14 @@ func (o *SRL_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRL_D) Length() uint8 {
+	return 2
+}
+
+func (o *SRL_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRL_D) String() string {
@@ -11308,10 +12390,6 @@ type SRL_E struct {
 	isCbPrefixed bool
 }
 
-func (o *SRL_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRL_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11321,9 +12399,7 @@ func (o *SRL_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x3b,
 	})
 	if err != nil {
@@ -11331,6 +12407,14 @@ func (o *SRL_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRL_E) Length() uint8 {
+	return 2
+}
+
+func (o *SRL_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRL_E) String() string {
@@ -11347,10 +12431,6 @@ type SRL_H struct {
 	isCbPrefixed bool
 }
 
-func (o *SRL_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRL_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11360,9 +12440,7 @@ func (o *SRL_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x3c,
 	})
 	if err != nil {
@@ -11370,6 +12448,14 @@ func (o *SRL_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRL_H) Length() uint8 {
+	return 2
+}
+
+func (o *SRL_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRL_H) String() string {
@@ -11386,10 +12472,6 @@ type SRL_L struct {
 	isCbPrefixed bool
 }
 
-func (o *SRL_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRL_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11399,9 +12481,7 @@ func (o *SRL_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x3d,
 	})
 	if err != nil {
@@ -11409,6 +12489,14 @@ func (o *SRL_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRL_L) Length() uint8 {
+	return 2
+}
+
+func (o *SRL_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRL_L) String() string {
@@ -11425,10 +12513,6 @@ type SRL_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *SRL_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRL_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11438,9 +12522,7 @@ func (o *SRL_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x3e,
 	})
 	if err != nil {
@@ -11448,6 +12530,14 @@ func (o *SRL_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRL_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *SRL_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *SRL_HLPtr) String() string {
@@ -11464,10 +12554,6 @@ type SRL_A struct {
 	isCbPrefixed bool
 }
 
-func (o *SRL_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *SRL_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11477,9 +12563,7 @@ func (o *SRL_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x3f,
 	})
 	if err != nil {
@@ -11487,6 +12571,14 @@ func (o *SRL_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SRL_A) Length() uint8 {
+	return 2
+}
+
+func (o *SRL_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SRL_A) String() string {
@@ -11503,10 +12595,6 @@ type RLC_H struct {
 	isCbPrefixed bool
 }
 
-func (o *RLC_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *RLC_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11516,9 +12604,7 @@ func (o *RLC_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x4,
 	})
 	if err != nil {
@@ -11526,6 +12612,14 @@ func (o *RLC_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RLC_H) Length() uint8 {
+	return 2
+}
+
+func (o *RLC_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RLC_H) String() string {
@@ -11542,10 +12636,6 @@ type BIT_0_B struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_0_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_0_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11555,9 +12645,7 @@ func (o *BIT_0_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x40,
 	})
 	if err != nil {
@@ -11565,6 +12653,14 @@ func (o *BIT_0_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_0_B) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_0_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_0_B) String() string {
@@ -11581,10 +12677,6 @@ type BIT_0_C struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_0_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_0_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11594,9 +12686,7 @@ func (o *BIT_0_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x41,
 	})
 	if err != nil {
@@ -11604,6 +12694,14 @@ func (o *BIT_0_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_0_C) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_0_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_0_C) String() string {
@@ -11620,10 +12718,6 @@ type BIT_0_D struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_0_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_0_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11633,9 +12727,7 @@ func (o *BIT_0_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x42,
 	})
 	if err != nil {
@@ -11643,6 +12735,14 @@ func (o *BIT_0_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_0_D) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_0_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_0_D) String() string {
@@ -11659,10 +12759,6 @@ type BIT_0_E struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_0_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_0_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11672,9 +12768,7 @@ func (o *BIT_0_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x43,
 	})
 	if err != nil {
@@ -11682,6 +12776,14 @@ func (o *BIT_0_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_0_E) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_0_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_0_E) String() string {
@@ -11698,10 +12800,6 @@ type BIT_0_H struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_0_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_0_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11711,9 +12809,7 @@ func (o *BIT_0_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x44,
 	})
 	if err != nil {
@@ -11721,6 +12817,14 @@ func (o *BIT_0_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_0_H) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_0_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_0_H) String() string {
@@ -11737,10 +12841,6 @@ type BIT_0_L struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_0_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_0_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11750,9 +12850,7 @@ func (o *BIT_0_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x45,
 	})
 	if err != nil {
@@ -11760,6 +12858,14 @@ func (o *BIT_0_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_0_L) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_0_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_0_L) String() string {
@@ -11776,10 +12882,6 @@ type BIT_0_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_0_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_0_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11789,9 +12891,7 @@ func (o *BIT_0_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x46,
 	})
 	if err != nil {
@@ -11799,6 +12899,14 @@ func (o *BIT_0_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_0_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_0_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *BIT_0_HLPtr) String() string {
@@ -11815,10 +12923,6 @@ type BIT_0_A struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_0_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_0_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11828,9 +12932,7 @@ func (o *BIT_0_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x47,
 	})
 	if err != nil {
@@ -11838,6 +12940,14 @@ func (o *BIT_0_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_0_A) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_0_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_0_A) String() string {
@@ -11854,10 +12964,6 @@ type BIT_1_B struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_1_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_1_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11867,9 +12973,7 @@ func (o *BIT_1_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x48,
 	})
 	if err != nil {
@@ -11877,6 +12981,14 @@ func (o *BIT_1_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_1_B) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_1_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_1_B) String() string {
@@ -11893,10 +13005,6 @@ type BIT_1_C struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_1_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_1_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11906,9 +13014,7 @@ func (o *BIT_1_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x49,
 	})
 	if err != nil {
@@ -11916,6 +13022,14 @@ func (o *BIT_1_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_1_C) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_1_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_1_C) String() string {
@@ -11932,10 +13046,6 @@ type BIT_1_D struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_1_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_1_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11945,9 +13055,7 @@ func (o *BIT_1_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x4a,
 	})
 	if err != nil {
@@ -11955,6 +13063,14 @@ func (o *BIT_1_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_1_D) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_1_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_1_D) String() string {
@@ -11971,10 +13087,6 @@ type BIT_1_E struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_1_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_1_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -11984,9 +13096,7 @@ func (o *BIT_1_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x4b,
 	})
 	if err != nil {
@@ -11994,6 +13104,14 @@ func (o *BIT_1_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_1_E) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_1_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_1_E) String() string {
@@ -12010,10 +13128,6 @@ type BIT_1_H struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_1_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_1_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12023,9 +13137,7 @@ func (o *BIT_1_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x4c,
 	})
 	if err != nil {
@@ -12033,6 +13145,14 @@ func (o *BIT_1_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_1_H) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_1_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_1_H) String() string {
@@ -12049,10 +13169,6 @@ type BIT_1_L struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_1_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_1_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12062,9 +13178,7 @@ func (o *BIT_1_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x4d,
 	})
 	if err != nil {
@@ -12072,6 +13186,14 @@ func (o *BIT_1_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_1_L) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_1_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_1_L) String() string {
@@ -12088,10 +13210,6 @@ type BIT_1_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_1_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_1_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12101,9 +13219,7 @@ func (o *BIT_1_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x4e,
 	})
 	if err != nil {
@@ -12111,6 +13227,14 @@ func (o *BIT_1_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_1_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_1_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *BIT_1_HLPtr) String() string {
@@ -12127,10 +13251,6 @@ type BIT_1_A struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_1_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_1_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12140,9 +13260,7 @@ func (o *BIT_1_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x4f,
 	})
 	if err != nil {
@@ -12150,6 +13268,14 @@ func (o *BIT_1_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_1_A) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_1_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_1_A) String() string {
@@ -12166,10 +13292,6 @@ type RLC_L struct {
 	isCbPrefixed bool
 }
 
-func (o *RLC_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *RLC_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12179,9 +13301,7 @@ func (o *RLC_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x5,
 	})
 	if err != nil {
@@ -12189,6 +13309,14 @@ func (o *RLC_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RLC_L) Length() uint8 {
+	return 2
+}
+
+func (o *RLC_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RLC_L) String() string {
@@ -12205,10 +13333,6 @@ type BIT_2_B struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_2_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_2_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12218,9 +13342,7 @@ func (o *BIT_2_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x50,
 	})
 	if err != nil {
@@ -12228,6 +13350,14 @@ func (o *BIT_2_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_2_B) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_2_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_2_B) String() string {
@@ -12244,10 +13374,6 @@ type BIT_2_C struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_2_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_2_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12257,9 +13383,7 @@ func (o *BIT_2_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x51,
 	})
 	if err != nil {
@@ -12267,6 +13391,14 @@ func (o *BIT_2_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_2_C) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_2_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_2_C) String() string {
@@ -12283,10 +13415,6 @@ type BIT_2_D struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_2_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_2_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12296,9 +13424,7 @@ func (o *BIT_2_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x52,
 	})
 	if err != nil {
@@ -12306,6 +13432,14 @@ func (o *BIT_2_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_2_D) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_2_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_2_D) String() string {
@@ -12322,10 +13456,6 @@ type BIT_2_E struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_2_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_2_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12335,9 +13465,7 @@ func (o *BIT_2_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x53,
 	})
 	if err != nil {
@@ -12345,6 +13473,14 @@ func (o *BIT_2_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_2_E) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_2_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_2_E) String() string {
@@ -12361,10 +13497,6 @@ type BIT_2_H struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_2_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_2_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12374,9 +13506,7 @@ func (o *BIT_2_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x54,
 	})
 	if err != nil {
@@ -12384,6 +13514,14 @@ func (o *BIT_2_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_2_H) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_2_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_2_H) String() string {
@@ -12400,10 +13538,6 @@ type BIT_2_L struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_2_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_2_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12413,9 +13547,7 @@ func (o *BIT_2_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x55,
 	})
 	if err != nil {
@@ -12423,6 +13555,14 @@ func (o *BIT_2_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_2_L) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_2_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_2_L) String() string {
@@ -12439,10 +13579,6 @@ type BIT_2_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_2_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_2_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12452,9 +13588,7 @@ func (o *BIT_2_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x56,
 	})
 	if err != nil {
@@ -12462,6 +13596,14 @@ func (o *BIT_2_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_2_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_2_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *BIT_2_HLPtr) String() string {
@@ -12478,10 +13620,6 @@ type BIT_2_A struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_2_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_2_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12491,9 +13629,7 @@ func (o *BIT_2_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x57,
 	})
 	if err != nil {
@@ -12501,6 +13637,14 @@ func (o *BIT_2_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_2_A) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_2_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_2_A) String() string {
@@ -12517,10 +13661,6 @@ type BIT_3_B struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_3_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_3_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12530,9 +13670,7 @@ func (o *BIT_3_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x58,
 	})
 	if err != nil {
@@ -12540,6 +13678,14 @@ func (o *BIT_3_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_3_B) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_3_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_3_B) String() string {
@@ -12556,10 +13702,6 @@ type BIT_3_C struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_3_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_3_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12569,9 +13711,7 @@ func (o *BIT_3_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x59,
 	})
 	if err != nil {
@@ -12579,6 +13719,14 @@ func (o *BIT_3_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_3_C) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_3_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_3_C) String() string {
@@ -12595,10 +13743,6 @@ type BIT_3_D struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_3_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_3_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12608,9 +13752,7 @@ func (o *BIT_3_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x5a,
 	})
 	if err != nil {
@@ -12618,6 +13760,14 @@ func (o *BIT_3_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_3_D) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_3_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_3_D) String() string {
@@ -12634,10 +13784,6 @@ type BIT_3_E struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_3_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_3_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12647,9 +13793,7 @@ func (o *BIT_3_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x5b,
 	})
 	if err != nil {
@@ -12657,6 +13801,14 @@ func (o *BIT_3_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_3_E) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_3_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_3_E) String() string {
@@ -12673,10 +13825,6 @@ type BIT_3_H struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_3_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_3_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12686,9 +13834,7 @@ func (o *BIT_3_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x5c,
 	})
 	if err != nil {
@@ -12696,6 +13842,14 @@ func (o *BIT_3_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_3_H) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_3_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_3_H) String() string {
@@ -12712,10 +13866,6 @@ type BIT_3_L struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_3_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_3_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12725,9 +13875,7 @@ func (o *BIT_3_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x5d,
 	})
 	if err != nil {
@@ -12735,6 +13883,14 @@ func (o *BIT_3_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_3_L) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_3_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_3_L) String() string {
@@ -12751,10 +13907,6 @@ type BIT_3_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_3_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_3_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12764,9 +13916,7 @@ func (o *BIT_3_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x5e,
 	})
 	if err != nil {
@@ -12774,6 +13924,14 @@ func (o *BIT_3_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_3_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_3_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *BIT_3_HLPtr) String() string {
@@ -12790,10 +13948,6 @@ type BIT_3_A struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_3_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_3_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12803,9 +13957,7 @@ func (o *BIT_3_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x5f,
 	})
 	if err != nil {
@@ -12813,6 +13965,14 @@ func (o *BIT_3_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_3_A) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_3_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_3_A) String() string {
@@ -12829,10 +13989,6 @@ type RLC_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *RLC_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *RLC_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12842,9 +13998,7 @@ func (o *RLC_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x6,
 	})
 	if err != nil {
@@ -12852,6 +14006,14 @@ func (o *RLC_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RLC_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *RLC_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *RLC_HLPtr) String() string {
@@ -12868,10 +14030,6 @@ type BIT_4_B struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_4_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_4_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12881,9 +14039,7 @@ func (o *BIT_4_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x60,
 	})
 	if err != nil {
@@ -12891,6 +14047,14 @@ func (o *BIT_4_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_4_B) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_4_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_4_B) String() string {
@@ -12907,10 +14071,6 @@ type BIT_4_C struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_4_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_4_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12920,9 +14080,7 @@ func (o *BIT_4_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x61,
 	})
 	if err != nil {
@@ -12930,6 +14088,14 @@ func (o *BIT_4_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_4_C) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_4_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_4_C) String() string {
@@ -12946,10 +14112,6 @@ type BIT_4_D struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_4_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_4_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12959,9 +14121,7 @@ func (o *BIT_4_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x62,
 	})
 	if err != nil {
@@ -12969,6 +14129,14 @@ func (o *BIT_4_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_4_D) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_4_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_4_D) String() string {
@@ -12985,10 +14153,6 @@ type BIT_4_E struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_4_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_4_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -12998,9 +14162,7 @@ func (o *BIT_4_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x63,
 	})
 	if err != nil {
@@ -13008,6 +14170,14 @@ func (o *BIT_4_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_4_E) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_4_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_4_E) String() string {
@@ -13024,10 +14194,6 @@ type BIT_4_H struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_4_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_4_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13037,9 +14203,7 @@ func (o *BIT_4_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x64,
 	})
 	if err != nil {
@@ -13047,6 +14211,14 @@ func (o *BIT_4_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_4_H) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_4_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_4_H) String() string {
@@ -13063,10 +14235,6 @@ type BIT_4_L struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_4_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_4_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13076,9 +14244,7 @@ func (o *BIT_4_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x65,
 	})
 	if err != nil {
@@ -13086,6 +14252,14 @@ func (o *BIT_4_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_4_L) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_4_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_4_L) String() string {
@@ -13102,10 +14276,6 @@ type BIT_4_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_4_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_4_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13115,9 +14285,7 @@ func (o *BIT_4_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x66,
 	})
 	if err != nil {
@@ -13125,6 +14293,14 @@ func (o *BIT_4_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_4_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_4_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *BIT_4_HLPtr) String() string {
@@ -13141,10 +14317,6 @@ type BIT_4_A struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_4_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_4_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13154,9 +14326,7 @@ func (o *BIT_4_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x67,
 	})
 	if err != nil {
@@ -13164,6 +14334,14 @@ func (o *BIT_4_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_4_A) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_4_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_4_A) String() string {
@@ -13180,10 +14358,6 @@ type BIT_5_B struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_5_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_5_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13193,9 +14367,7 @@ func (o *BIT_5_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x68,
 	})
 	if err != nil {
@@ -13203,6 +14375,14 @@ func (o *BIT_5_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_5_B) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_5_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_5_B) String() string {
@@ -13219,10 +14399,6 @@ type BIT_5_C struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_5_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_5_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13232,9 +14408,7 @@ func (o *BIT_5_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x69,
 	})
 	if err != nil {
@@ -13242,6 +14416,14 @@ func (o *BIT_5_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_5_C) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_5_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_5_C) String() string {
@@ -13258,10 +14440,6 @@ type BIT_5_D struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_5_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_5_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13271,9 +14449,7 @@ func (o *BIT_5_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x6a,
 	})
 	if err != nil {
@@ -13281,6 +14457,14 @@ func (o *BIT_5_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_5_D) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_5_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_5_D) String() string {
@@ -13297,10 +14481,6 @@ type BIT_5_E struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_5_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_5_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13310,9 +14490,7 @@ func (o *BIT_5_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x6b,
 	})
 	if err != nil {
@@ -13320,6 +14498,14 @@ func (o *BIT_5_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_5_E) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_5_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_5_E) String() string {
@@ -13336,10 +14522,6 @@ type BIT_5_H struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_5_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_5_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13349,9 +14531,7 @@ func (o *BIT_5_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x6c,
 	})
 	if err != nil {
@@ -13359,6 +14539,14 @@ func (o *BIT_5_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_5_H) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_5_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_5_H) String() string {
@@ -13375,10 +14563,6 @@ type BIT_5_L struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_5_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_5_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13388,9 +14572,7 @@ func (o *BIT_5_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x6d,
 	})
 	if err != nil {
@@ -13398,6 +14580,14 @@ func (o *BIT_5_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_5_L) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_5_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_5_L) String() string {
@@ -13414,10 +14604,6 @@ type BIT_5_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_5_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_5_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13427,9 +14613,7 @@ func (o *BIT_5_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x6e,
 	})
 	if err != nil {
@@ -13437,6 +14621,14 @@ func (o *BIT_5_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_5_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_5_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *BIT_5_HLPtr) String() string {
@@ -13453,10 +14645,6 @@ type BIT_5_A struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_5_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_5_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13466,9 +14654,7 @@ func (o *BIT_5_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x6f,
 	})
 	if err != nil {
@@ -13476,6 +14662,14 @@ func (o *BIT_5_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_5_A) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_5_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_5_A) String() string {
@@ -13492,10 +14686,6 @@ type RLC_A struct {
 	isCbPrefixed bool
 }
 
-func (o *RLC_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *RLC_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13505,9 +14695,7 @@ func (o *RLC_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x7,
 	})
 	if err != nil {
@@ -13515,6 +14703,14 @@ func (o *RLC_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RLC_A) Length() uint8 {
+	return 2
+}
+
+func (o *RLC_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RLC_A) String() string {
@@ -13531,10 +14727,6 @@ type BIT_6_B struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_6_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_6_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13544,9 +14736,7 @@ func (o *BIT_6_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x70,
 	})
 	if err != nil {
@@ -13554,6 +14744,14 @@ func (o *BIT_6_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_6_B) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_6_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_6_B) String() string {
@@ -13570,10 +14768,6 @@ type BIT_6_C struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_6_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_6_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13583,9 +14777,7 @@ func (o *BIT_6_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x71,
 	})
 	if err != nil {
@@ -13593,6 +14785,14 @@ func (o *BIT_6_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_6_C) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_6_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_6_C) String() string {
@@ -13609,10 +14809,6 @@ type BIT_6_D struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_6_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_6_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13622,9 +14818,7 @@ func (o *BIT_6_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x72,
 	})
 	if err != nil {
@@ -13632,6 +14826,14 @@ func (o *BIT_6_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_6_D) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_6_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_6_D) String() string {
@@ -13648,10 +14850,6 @@ type BIT_6_E struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_6_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_6_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13661,9 +14859,7 @@ func (o *BIT_6_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x73,
 	})
 	if err != nil {
@@ -13671,6 +14867,14 @@ func (o *BIT_6_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_6_E) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_6_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_6_E) String() string {
@@ -13687,10 +14891,6 @@ type BIT_6_H struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_6_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_6_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13700,9 +14900,7 @@ func (o *BIT_6_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x74,
 	})
 	if err != nil {
@@ -13710,6 +14908,14 @@ func (o *BIT_6_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_6_H) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_6_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_6_H) String() string {
@@ -13726,10 +14932,6 @@ type BIT_6_L struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_6_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_6_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13739,9 +14941,7 @@ func (o *BIT_6_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x75,
 	})
 	if err != nil {
@@ -13749,6 +14949,14 @@ func (o *BIT_6_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_6_L) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_6_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_6_L) String() string {
@@ -13774,9 +14982,7 @@ func (o *BIT_6_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x76,
 	})
 	if err != nil {
@@ -13784,6 +14990,14 @@ func (o *BIT_6_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_6_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_6_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *BIT_6_HLPtr) String() string {
@@ -13800,10 +15014,6 @@ type BIT_6_A struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_6_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_6_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13813,9 +15023,7 @@ func (o *BIT_6_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x77,
 	})
 	if err != nil {
@@ -13823,6 +15031,14 @@ func (o *BIT_6_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_6_A) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_6_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_6_A) String() string {
@@ -13839,10 +15055,6 @@ type BIT_7_B struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_7_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_7_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13852,9 +15064,7 @@ func (o *BIT_7_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x78,
 	})
 	if err != nil {
@@ -13862,6 +15072,14 @@ func (o *BIT_7_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_7_B) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_7_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_7_B) String() string {
@@ -13878,10 +15096,6 @@ type BIT_7_C struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_7_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_7_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13891,9 +15105,7 @@ func (o *BIT_7_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x79,
 	})
 	if err != nil {
@@ -13901,6 +15113,14 @@ func (o *BIT_7_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_7_C) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_7_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_7_C) String() string {
@@ -13917,10 +15137,6 @@ type BIT_7_D struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_7_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_7_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13930,9 +15146,7 @@ func (o *BIT_7_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x7a,
 	})
 	if err != nil {
@@ -13940,6 +15154,14 @@ func (o *BIT_7_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_7_D) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_7_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_7_D) String() string {
@@ -13956,10 +15178,6 @@ type BIT_7_E struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_7_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_7_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -13969,9 +15187,7 @@ func (o *BIT_7_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x7b,
 	})
 	if err != nil {
@@ -13979,6 +15195,14 @@ func (o *BIT_7_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_7_E) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_7_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_7_E) String() string {
@@ -13995,10 +15219,6 @@ type BIT_7_H struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_7_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_7_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14008,9 +15228,7 @@ func (o *BIT_7_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x7c,
 	})
 	if err != nil {
@@ -14018,6 +15236,14 @@ func (o *BIT_7_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_7_H) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_7_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_7_H) String() string {
@@ -14034,10 +15260,6 @@ type BIT_7_L struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_7_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_7_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14047,9 +15269,7 @@ func (o *BIT_7_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x7d,
 	})
 	if err != nil {
@@ -14057,6 +15277,14 @@ func (o *BIT_7_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_7_L) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_7_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_7_L) String() string {
@@ -14073,10 +15301,6 @@ type BIT_7_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_7_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_7_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14086,9 +15310,7 @@ func (o *BIT_7_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x7e,
 	})
 	if err != nil {
@@ -14096,6 +15318,14 @@ func (o *BIT_7_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_7_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_7_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *BIT_7_HLPtr) String() string {
@@ -14112,10 +15342,6 @@ type BIT_7_A struct {
 	isCbPrefixed bool
 }
 
-func (o *BIT_7_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *BIT_7_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14125,9 +15351,7 @@ func (o *BIT_7_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x7f,
 	})
 	if err != nil {
@@ -14135,6 +15359,14 @@ func (o *BIT_7_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *BIT_7_A) Length() uint8 {
+	return 2
+}
+
+func (o *BIT_7_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *BIT_7_A) String() string {
@@ -14151,10 +15383,6 @@ type RRC_B struct {
 	isCbPrefixed bool
 }
 
-func (o *RRC_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *RRC_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14164,9 +15392,7 @@ func (o *RRC_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x8,
 	})
 	if err != nil {
@@ -14174,6 +15400,14 @@ func (o *RRC_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RRC_B) Length() uint8 {
+	return 2
+}
+
+func (o *RRC_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RRC_B) String() string {
@@ -14199,9 +15433,7 @@ func (o *RES_0_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x80,
 	})
 	if err != nil {
@@ -14209,6 +15441,14 @@ func (o *RES_0_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_0_B) Length() uint8 {
+	return 2
+}
+
+func (o *RES_0_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_0_B) String() string {
@@ -14225,10 +15465,6 @@ type RES_0_C struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_0_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_0_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14238,9 +15474,7 @@ func (o *RES_0_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x81,
 	})
 	if err != nil {
@@ -14248,6 +15482,14 @@ func (o *RES_0_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_0_C) Length() uint8 {
+	return 2
+}
+
+func (o *RES_0_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_0_C) String() string {
@@ -14264,10 +15506,6 @@ type RES_0_D struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_0_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_0_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14277,9 +15515,7 @@ func (o *RES_0_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x82,
 	})
 	if err != nil {
@@ -14287,6 +15523,14 @@ func (o *RES_0_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_0_D) Length() uint8 {
+	return 2
+}
+
+func (o *RES_0_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_0_D) String() string {
@@ -14303,10 +15547,6 @@ type RES_0_E struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_0_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_0_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14316,9 +15556,7 @@ func (o *RES_0_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x83,
 	})
 	if err != nil {
@@ -14326,6 +15564,14 @@ func (o *RES_0_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_0_E) Length() uint8 {
+	return 2
+}
+
+func (o *RES_0_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_0_E) String() string {
@@ -14342,10 +15588,6 @@ type RES_0_H struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_0_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_0_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14355,9 +15597,7 @@ func (o *RES_0_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x84,
 	})
 	if err != nil {
@@ -14365,6 +15605,14 @@ func (o *RES_0_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_0_H) Length() uint8 {
+	return 2
+}
+
+func (o *RES_0_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_0_H) String() string {
@@ -14381,10 +15629,6 @@ type RES_0_L struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_0_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_0_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14394,9 +15638,7 @@ func (o *RES_0_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x85,
 	})
 	if err != nil {
@@ -14404,6 +15646,14 @@ func (o *RES_0_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_0_L) Length() uint8 {
+	return 2
+}
+
+func (o *RES_0_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_0_L) String() string {
@@ -14420,10 +15670,6 @@ type RES_0_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_0_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_0_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14433,9 +15679,7 @@ func (o *RES_0_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x86,
 	})
 	if err != nil {
@@ -14443,6 +15687,14 @@ func (o *RES_0_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_0_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *RES_0_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *RES_0_HLPtr) String() string {
@@ -14459,10 +15711,6 @@ type RES_0_A struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_0_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_0_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14472,9 +15720,7 @@ func (o *RES_0_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x87,
 	})
 	if err != nil {
@@ -14482,6 +15728,14 @@ func (o *RES_0_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_0_A) Length() uint8 {
+	return 2
+}
+
+func (o *RES_0_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_0_A) String() string {
@@ -14498,10 +15752,6 @@ type RES_1_B struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_1_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_1_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14511,9 +15761,7 @@ func (o *RES_1_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x88,
 	})
 	if err != nil {
@@ -14521,6 +15769,14 @@ func (o *RES_1_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_1_B) Length() uint8 {
+	return 2
+}
+
+func (o *RES_1_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_1_B) String() string {
@@ -14537,10 +15793,6 @@ type RES_1_C struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_1_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_1_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14550,9 +15802,7 @@ func (o *RES_1_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x89,
 	})
 	if err != nil {
@@ -14560,6 +15810,14 @@ func (o *RES_1_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_1_C) Length() uint8 {
+	return 2
+}
+
+func (o *RES_1_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_1_C) String() string {
@@ -14576,10 +15834,6 @@ type RES_1_D struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_1_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_1_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14589,9 +15843,7 @@ func (o *RES_1_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x8a,
 	})
 	if err != nil {
@@ -14599,6 +15851,14 @@ func (o *RES_1_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_1_D) Length() uint8 {
+	return 2
+}
+
+func (o *RES_1_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_1_D) String() string {
@@ -14615,10 +15875,6 @@ type RES_1_E struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_1_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_1_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14628,9 +15884,7 @@ func (o *RES_1_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x8b,
 	})
 	if err != nil {
@@ -14638,6 +15892,14 @@ func (o *RES_1_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_1_E) Length() uint8 {
+	return 2
+}
+
+func (o *RES_1_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_1_E) String() string {
@@ -14654,10 +15916,6 @@ type RES_1_H struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_1_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_1_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14667,9 +15925,7 @@ func (o *RES_1_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x8c,
 	})
 	if err != nil {
@@ -14677,6 +15933,14 @@ func (o *RES_1_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_1_H) Length() uint8 {
+	return 2
+}
+
+func (o *RES_1_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_1_H) String() string {
@@ -14693,10 +15957,6 @@ type RES_1_L struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_1_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_1_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14706,9 +15966,7 @@ func (o *RES_1_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x8d,
 	})
 	if err != nil {
@@ -14716,6 +15974,14 @@ func (o *RES_1_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_1_L) Length() uint8 {
+	return 2
+}
+
+func (o *RES_1_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_1_L) String() string {
@@ -14732,10 +15998,6 @@ type RES_1_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_1_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_1_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14745,9 +16007,7 @@ func (o *RES_1_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x8e,
 	})
 	if err != nil {
@@ -14755,6 +16015,14 @@ func (o *RES_1_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_1_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *RES_1_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *RES_1_HLPtr) String() string {
@@ -14771,10 +16039,6 @@ type RES_1_A struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_1_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_1_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14784,9 +16048,7 @@ func (o *RES_1_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x8f,
 	})
 	if err != nil {
@@ -14794,6 +16056,14 @@ func (o *RES_1_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_1_A) Length() uint8 {
+	return 2
+}
+
+func (o *RES_1_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_1_A) String() string {
@@ -14810,10 +16080,6 @@ type RRC_C struct {
 	isCbPrefixed bool
 }
 
-func (o *RRC_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *RRC_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14823,9 +16089,7 @@ func (o *RRC_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x9,
 	})
 	if err != nil {
@@ -14833,6 +16097,14 @@ func (o *RRC_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RRC_C) Length() uint8 {
+	return 2
+}
+
+func (o *RRC_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RRC_C) String() string {
@@ -14849,10 +16121,6 @@ type RES_2_B struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_2_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_2_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14862,9 +16130,7 @@ func (o *RES_2_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x90,
 	})
 	if err != nil {
@@ -14872,6 +16138,14 @@ func (o *RES_2_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_2_B) Length() uint8 {
+	return 2
+}
+
+func (o *RES_2_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_2_B) String() string {
@@ -14888,10 +16162,6 @@ type RES_2_C struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_2_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_2_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14901,9 +16171,7 @@ func (o *RES_2_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x91,
 	})
 	if err != nil {
@@ -14911,6 +16179,14 @@ func (o *RES_2_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_2_C) Length() uint8 {
+	return 2
+}
+
+func (o *RES_2_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_2_C) String() string {
@@ -14927,10 +16203,6 @@ type RES_2_D struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_2_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_2_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14940,9 +16212,7 @@ func (o *RES_2_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x92,
 	})
 	if err != nil {
@@ -14950,6 +16220,14 @@ func (o *RES_2_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_2_D) Length() uint8 {
+	return 2
+}
+
+func (o *RES_2_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_2_D) String() string {
@@ -14966,10 +16244,6 @@ type RES_2_E struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_2_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_2_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -14979,9 +16253,7 @@ func (o *RES_2_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x93,
 	})
 	if err != nil {
@@ -14989,6 +16261,14 @@ func (o *RES_2_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_2_E) Length() uint8 {
+	return 2
+}
+
+func (o *RES_2_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_2_E) String() string {
@@ -15005,10 +16285,6 @@ type RES_2_H struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_2_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_2_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15018,9 +16294,7 @@ func (o *RES_2_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x94,
 	})
 	if err != nil {
@@ -15028,6 +16302,14 @@ func (o *RES_2_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_2_H) Length() uint8 {
+	return 2
+}
+
+func (o *RES_2_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_2_H) String() string {
@@ -15044,10 +16326,6 @@ type RES_2_L struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_2_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_2_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15057,9 +16335,7 @@ func (o *RES_2_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x95,
 	})
 	if err != nil {
@@ -15067,6 +16343,14 @@ func (o *RES_2_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_2_L) Length() uint8 {
+	return 2
+}
+
+func (o *RES_2_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_2_L) String() string {
@@ -15083,10 +16367,6 @@ type RES_2_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_2_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_2_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15096,9 +16376,7 @@ func (o *RES_2_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x96,
 	})
 	if err != nil {
@@ -15106,6 +16384,14 @@ func (o *RES_2_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_2_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *RES_2_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *RES_2_HLPtr) String() string {
@@ -15122,10 +16408,6 @@ type RES_2_A struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_2_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_2_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15135,9 +16417,7 @@ func (o *RES_2_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x97,
 	})
 	if err != nil {
@@ -15145,6 +16425,14 @@ func (o *RES_2_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_2_A) Length() uint8 {
+	return 2
+}
+
+func (o *RES_2_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_2_A) String() string {
@@ -15161,10 +16449,6 @@ type RES_3_B struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_3_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_3_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15174,9 +16458,7 @@ func (o *RES_3_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x98,
 	})
 	if err != nil {
@@ -15184,6 +16466,14 @@ func (o *RES_3_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_3_B) Length() uint8 {
+	return 2
+}
+
+func (o *RES_3_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_3_B) String() string {
@@ -15200,10 +16490,6 @@ type RES_3_C struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_3_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_3_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15213,9 +16499,7 @@ func (o *RES_3_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x99,
 	})
 	if err != nil {
@@ -15223,6 +16507,14 @@ func (o *RES_3_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_3_C) Length() uint8 {
+	return 2
+}
+
+func (o *RES_3_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_3_C) String() string {
@@ -15239,10 +16531,6 @@ type RES_3_D struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_3_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_3_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15252,9 +16540,7 @@ func (o *RES_3_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x9a,
 	})
 	if err != nil {
@@ -15262,6 +16548,14 @@ func (o *RES_3_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_3_D) Length() uint8 {
+	return 2
+}
+
+func (o *RES_3_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_3_D) String() string {
@@ -15278,10 +16572,6 @@ type RES_3_E struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_3_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_3_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15291,9 +16581,7 @@ func (o *RES_3_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x9b,
 	})
 	if err != nil {
@@ -15301,6 +16589,14 @@ func (o *RES_3_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_3_E) Length() uint8 {
+	return 2
+}
+
+func (o *RES_3_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_3_E) String() string {
@@ -15317,10 +16613,6 @@ type RES_3_H struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_3_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_3_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15330,9 +16622,7 @@ func (o *RES_3_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x9c,
 	})
 	if err != nil {
@@ -15340,6 +16630,14 @@ func (o *RES_3_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_3_H) Length() uint8 {
+	return 2
+}
+
+func (o *RES_3_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_3_H) String() string {
@@ -15356,10 +16654,6 @@ type RES_3_L struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_3_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_3_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15369,9 +16663,7 @@ func (o *RES_3_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x9d,
 	})
 	if err != nil {
@@ -15379,6 +16671,14 @@ func (o *RES_3_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_3_L) Length() uint8 {
+	return 2
+}
+
+func (o *RES_3_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_3_L) String() string {
@@ -15395,10 +16695,6 @@ type RES_3_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_3_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_3_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15408,9 +16704,7 @@ func (o *RES_3_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x9e,
 	})
 	if err != nil {
@@ -15418,6 +16712,14 @@ func (o *RES_3_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_3_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *RES_3_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *RES_3_HLPtr) String() string {
@@ -15434,10 +16736,6 @@ type RES_3_A struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_3_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_3_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15447,9 +16745,7 @@ func (o *RES_3_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0x9f,
 	})
 	if err != nil {
@@ -15457,6 +16753,14 @@ func (o *RES_3_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_3_A) Length() uint8 {
+	return 2
+}
+
+func (o *RES_3_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_3_A) String() string {
@@ -15473,10 +16777,6 @@ type RRC_D struct {
 	isCbPrefixed bool
 }
 
-func (o *RRC_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *RRC_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15486,9 +16786,7 @@ func (o *RRC_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xa,
 	})
 	if err != nil {
@@ -15496,6 +16794,14 @@ func (o *RRC_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RRC_D) Length() uint8 {
+	return 2
+}
+
+func (o *RRC_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RRC_D) String() string {
@@ -15512,10 +16818,6 @@ type RES_4_B struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_4_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_4_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15525,9 +16827,7 @@ func (o *RES_4_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xa0,
 	})
 	if err != nil {
@@ -15535,6 +16835,14 @@ func (o *RES_4_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_4_B) Length() uint8 {
+	return 2
+}
+
+func (o *RES_4_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_4_B) String() string {
@@ -15551,10 +16859,6 @@ type RES_4_C struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_4_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_4_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15564,9 +16868,7 @@ func (o *RES_4_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xa1,
 	})
 	if err != nil {
@@ -15574,6 +16876,14 @@ func (o *RES_4_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_4_C) Length() uint8 {
+	return 2
+}
+
+func (o *RES_4_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_4_C) String() string {
@@ -15590,10 +16900,6 @@ type RES_4_D struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_4_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_4_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15603,9 +16909,7 @@ func (o *RES_4_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xa2,
 	})
 	if err != nil {
@@ -15613,6 +16917,14 @@ func (o *RES_4_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_4_D) Length() uint8 {
+	return 2
+}
+
+func (o *RES_4_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_4_D) String() string {
@@ -15629,10 +16941,6 @@ type RES_4_E struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_4_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_4_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15642,9 +16950,7 @@ func (o *RES_4_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xa3,
 	})
 	if err != nil {
@@ -15652,6 +16958,14 @@ func (o *RES_4_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_4_E) Length() uint8 {
+	return 2
+}
+
+func (o *RES_4_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_4_E) String() string {
@@ -15668,10 +16982,6 @@ type RES_4_H struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_4_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_4_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15681,9 +16991,7 @@ func (o *RES_4_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xa4,
 	})
 	if err != nil {
@@ -15691,6 +16999,14 @@ func (o *RES_4_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_4_H) Length() uint8 {
+	return 2
+}
+
+func (o *RES_4_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_4_H) String() string {
@@ -15707,10 +17023,6 @@ type RES_4_L struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_4_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_4_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15720,9 +17032,7 @@ func (o *RES_4_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xa5,
 	})
 	if err != nil {
@@ -15730,6 +17040,14 @@ func (o *RES_4_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_4_L) Length() uint8 {
+	return 2
+}
+
+func (o *RES_4_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_4_L) String() string {
@@ -15746,10 +17064,6 @@ type RES_4_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_4_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_4_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15759,9 +17073,7 @@ func (o *RES_4_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xa6,
 	})
 	if err != nil {
@@ -15769,6 +17081,14 @@ func (o *RES_4_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_4_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *RES_4_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *RES_4_HLPtr) String() string {
@@ -15785,10 +17105,6 @@ type RES_4_A struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_4_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_4_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15798,9 +17114,7 @@ func (o *RES_4_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xa7,
 	})
 	if err != nil {
@@ -15808,6 +17122,14 @@ func (o *RES_4_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_4_A) Length() uint8 {
+	return 2
+}
+
+func (o *RES_4_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_4_A) String() string {
@@ -15824,10 +17146,6 @@ type RES_5_B struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_5_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_5_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15837,9 +17155,7 @@ func (o *RES_5_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xa8,
 	})
 	if err != nil {
@@ -15847,6 +17163,14 @@ func (o *RES_5_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_5_B) Length() uint8 {
+	return 2
+}
+
+func (o *RES_5_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_5_B) String() string {
@@ -15863,10 +17187,6 @@ type RES_5_C struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_5_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_5_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15876,9 +17196,7 @@ func (o *RES_5_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xa9,
 	})
 	if err != nil {
@@ -15886,6 +17204,14 @@ func (o *RES_5_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_5_C) Length() uint8 {
+	return 2
+}
+
+func (o *RES_5_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_5_C) String() string {
@@ -15902,10 +17228,6 @@ type RES_5_D struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_5_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_5_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15915,9 +17237,7 @@ func (o *RES_5_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xaa,
 	})
 	if err != nil {
@@ -15925,6 +17245,14 @@ func (o *RES_5_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_5_D) Length() uint8 {
+	return 2
+}
+
+func (o *RES_5_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_5_D) String() string {
@@ -15941,10 +17269,6 @@ type RES_5_E struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_5_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_5_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15954,9 +17278,7 @@ func (o *RES_5_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xab,
 	})
 	if err != nil {
@@ -15964,6 +17286,14 @@ func (o *RES_5_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_5_E) Length() uint8 {
+	return 2
+}
+
+func (o *RES_5_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_5_E) String() string {
@@ -15980,10 +17310,6 @@ type RES_5_H struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_5_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_5_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -15993,9 +17319,7 @@ func (o *RES_5_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xac,
 	})
 	if err != nil {
@@ -16003,6 +17327,14 @@ func (o *RES_5_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_5_H) Length() uint8 {
+	return 2
+}
+
+func (o *RES_5_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_5_H) String() string {
@@ -16019,10 +17351,6 @@ type RES_5_L struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_5_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_5_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16032,9 +17360,7 @@ func (o *RES_5_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xad,
 	})
 	if err != nil {
@@ -16042,6 +17368,14 @@ func (o *RES_5_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_5_L) Length() uint8 {
+	return 2
+}
+
+func (o *RES_5_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_5_L) String() string {
@@ -16058,10 +17392,6 @@ type RES_5_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_5_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_5_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16071,9 +17401,7 @@ func (o *RES_5_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xae,
 	})
 	if err != nil {
@@ -16081,6 +17409,14 @@ func (o *RES_5_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_5_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *RES_5_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *RES_5_HLPtr) String() string {
@@ -16097,10 +17433,6 @@ type RES_5_A struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_5_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_5_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16110,9 +17442,7 @@ func (o *RES_5_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xaf,
 	})
 	if err != nil {
@@ -16120,6 +17450,14 @@ func (o *RES_5_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_5_A) Length() uint8 {
+	return 2
+}
+
+func (o *RES_5_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_5_A) String() string {
@@ -16136,10 +17474,6 @@ type RRC_E struct {
 	isCbPrefixed bool
 }
 
-func (o *RRC_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *RRC_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16149,9 +17483,7 @@ func (o *RRC_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xb,
 	})
 	if err != nil {
@@ -16159,6 +17491,14 @@ func (o *RRC_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RRC_E) Length() uint8 {
+	return 2
+}
+
+func (o *RRC_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RRC_E) String() string {
@@ -16175,10 +17515,6 @@ type RES_6_B struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_6_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_6_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16188,9 +17524,7 @@ func (o *RES_6_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xb0,
 	})
 	if err != nil {
@@ -16198,6 +17532,14 @@ func (o *RES_6_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_6_B) Length() uint8 {
+	return 2
+}
+
+func (o *RES_6_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_6_B) String() string {
@@ -16214,10 +17556,6 @@ type RES_6_C struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_6_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_6_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16227,9 +17565,7 @@ func (o *RES_6_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xb1,
 	})
 	if err != nil {
@@ -16237,6 +17573,14 @@ func (o *RES_6_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_6_C) Length() uint8 {
+	return 2
+}
+
+func (o *RES_6_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_6_C) String() string {
@@ -16253,10 +17597,6 @@ type RES_6_D struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_6_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_6_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16266,9 +17606,7 @@ func (o *RES_6_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xb2,
 	})
 	if err != nil {
@@ -16276,6 +17614,14 @@ func (o *RES_6_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_6_D) Length() uint8 {
+	return 2
+}
+
+func (o *RES_6_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_6_D) String() string {
@@ -16292,10 +17638,6 @@ type RES_6_E struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_6_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_6_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16305,9 +17647,7 @@ func (o *RES_6_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xb3,
 	})
 	if err != nil {
@@ -16315,6 +17655,14 @@ func (o *RES_6_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_6_E) Length() uint8 {
+	return 2
+}
+
+func (o *RES_6_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_6_E) String() string {
@@ -16331,10 +17679,6 @@ type RES_6_H struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_6_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_6_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16344,9 +17688,7 @@ func (o *RES_6_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xb4,
 	})
 	if err != nil {
@@ -16354,6 +17696,14 @@ func (o *RES_6_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_6_H) Length() uint8 {
+	return 2
+}
+
+func (o *RES_6_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_6_H) String() string {
@@ -16370,10 +17720,6 @@ type RES_6_L struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_6_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_6_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16383,9 +17729,7 @@ func (o *RES_6_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xb5,
 	})
 	if err != nil {
@@ -16393,6 +17737,14 @@ func (o *RES_6_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_6_L) Length() uint8 {
+	return 2
+}
+
+func (o *RES_6_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_6_L) String() string {
@@ -16409,10 +17761,6 @@ type RES_6_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_6_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_6_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16422,9 +17770,7 @@ func (o *RES_6_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xb6,
 	})
 	if err != nil {
@@ -16432,6 +17778,14 @@ func (o *RES_6_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_6_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *RES_6_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *RES_6_HLPtr) String() string {
@@ -16448,10 +17802,6 @@ type RES_6_A struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_6_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_6_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16461,9 +17811,7 @@ func (o *RES_6_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xb7,
 	})
 	if err != nil {
@@ -16471,6 +17819,14 @@ func (o *RES_6_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_6_A) Length() uint8 {
+	return 2
+}
+
+func (o *RES_6_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_6_A) String() string {
@@ -16487,10 +17843,6 @@ type RES_7_B struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_7_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_7_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16500,9 +17852,7 @@ func (o *RES_7_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xb8,
 	})
 	if err != nil {
@@ -16510,6 +17860,14 @@ func (o *RES_7_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_7_B) Length() uint8 {
+	return 2
+}
+
+func (o *RES_7_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_7_B) String() string {
@@ -16526,10 +17884,6 @@ type RES_7_C struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_7_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_7_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16539,9 +17893,7 @@ func (o *RES_7_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xb9,
 	})
 	if err != nil {
@@ -16549,6 +17901,14 @@ func (o *RES_7_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_7_C) Length() uint8 {
+	return 2
+}
+
+func (o *RES_7_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_7_C) String() string {
@@ -16565,10 +17925,6 @@ type RES_7_D struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_7_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_7_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16578,9 +17934,7 @@ func (o *RES_7_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xba,
 	})
 	if err != nil {
@@ -16588,6 +17942,14 @@ func (o *RES_7_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_7_D) Length() uint8 {
+	return 2
+}
+
+func (o *RES_7_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_7_D) String() string {
@@ -16604,10 +17966,6 @@ type RES_7_E struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_7_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_7_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16617,9 +17975,7 @@ func (o *RES_7_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xbb,
 	})
 	if err != nil {
@@ -16627,6 +17983,14 @@ func (o *RES_7_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_7_E) Length() uint8 {
+	return 2
+}
+
+func (o *RES_7_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_7_E) String() string {
@@ -16643,10 +18007,6 @@ type RES_7_H struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_7_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_7_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16656,9 +18016,7 @@ func (o *RES_7_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xbc,
 	})
 	if err != nil {
@@ -16666,6 +18024,14 @@ func (o *RES_7_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_7_H) Length() uint8 {
+	return 2
+}
+
+func (o *RES_7_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_7_H) String() string {
@@ -16682,10 +18048,6 @@ type RES_7_L struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_7_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_7_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16695,9 +18057,7 @@ func (o *RES_7_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xbd,
 	})
 	if err != nil {
@@ -16705,6 +18065,14 @@ func (o *RES_7_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_7_L) Length() uint8 {
+	return 2
+}
+
+func (o *RES_7_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_7_L) String() string {
@@ -16721,10 +18089,6 @@ type RES_7_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_7_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_7_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16734,9 +18098,7 @@ func (o *RES_7_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xbe,
 	})
 	if err != nil {
@@ -16744,6 +18106,14 @@ func (o *RES_7_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_7_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *RES_7_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *RES_7_HLPtr) String() string {
@@ -16760,10 +18130,6 @@ type RES_7_A struct {
 	isCbPrefixed bool
 }
 
-func (o *RES_7_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *RES_7_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16773,9 +18139,7 @@ func (o *RES_7_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xbf,
 	})
 	if err != nil {
@@ -16783,6 +18147,14 @@ func (o *RES_7_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RES_7_A) Length() uint8 {
+	return 2
+}
+
+func (o *RES_7_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RES_7_A) String() string {
@@ -16799,10 +18171,6 @@ type RRC_H struct {
 	isCbPrefixed bool
 }
 
-func (o *RRC_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *RRC_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16812,9 +18180,7 @@ func (o *RRC_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xc,
 	})
 	if err != nil {
@@ -16822,6 +18188,14 @@ func (o *RRC_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RRC_H) Length() uint8 {
+	return 2
+}
+
+func (o *RRC_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RRC_H) String() string {
@@ -16838,10 +18212,6 @@ type SET_0_B struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_0_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_0_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16851,9 +18221,7 @@ func (o *SET_0_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xc0,
 	})
 	if err != nil {
@@ -16861,6 +18229,14 @@ func (o *SET_0_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_0_B) Length() uint8 {
+	return 2
+}
+
+func (o *SET_0_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_0_B) String() string {
@@ -16877,10 +18253,6 @@ type SET_0_C struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_0_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_0_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16890,9 +18262,7 @@ func (o *SET_0_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xc1,
 	})
 	if err != nil {
@@ -16900,6 +18270,14 @@ func (o *SET_0_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_0_C) Length() uint8 {
+	return 2
+}
+
+func (o *SET_0_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_0_C) String() string {
@@ -16916,10 +18294,6 @@ type SET_0_D struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_0_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_0_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16929,9 +18303,7 @@ func (o *SET_0_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xc2,
 	})
 	if err != nil {
@@ -16939,6 +18311,14 @@ func (o *SET_0_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_0_D) Length() uint8 {
+	return 2
+}
+
+func (o *SET_0_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_0_D) String() string {
@@ -16955,10 +18335,6 @@ type SET_0_E struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_0_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_0_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -16968,9 +18344,7 @@ func (o *SET_0_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xc3,
 	})
 	if err != nil {
@@ -16978,6 +18352,14 @@ func (o *SET_0_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_0_E) Length() uint8 {
+	return 2
+}
+
+func (o *SET_0_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_0_E) String() string {
@@ -16994,10 +18376,6 @@ type SET_0_H struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_0_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_0_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17007,9 +18385,7 @@ func (o *SET_0_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xc4,
 	})
 	if err != nil {
@@ -17017,6 +18393,14 @@ func (o *SET_0_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_0_H) Length() uint8 {
+	return 2
+}
+
+func (o *SET_0_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_0_H) String() string {
@@ -17033,10 +18417,6 @@ type SET_0_L struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_0_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_0_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17046,9 +18426,7 @@ func (o *SET_0_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xc5,
 	})
 	if err != nil {
@@ -17056,6 +18434,14 @@ func (o *SET_0_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_0_L) Length() uint8 {
+	return 2
+}
+
+func (o *SET_0_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_0_L) String() string {
@@ -17072,10 +18458,6 @@ type SET_0_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_0_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_0_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17085,9 +18467,7 @@ func (o *SET_0_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xc6,
 	})
 	if err != nil {
@@ -17095,6 +18475,14 @@ func (o *SET_0_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_0_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *SET_0_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *SET_0_HLPtr) String() string {
@@ -17111,10 +18499,6 @@ type SET_0_A struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_0_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_0_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17124,9 +18508,7 @@ func (o *SET_0_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xc7,
 	})
 	if err != nil {
@@ -17134,6 +18516,14 @@ func (o *SET_0_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_0_A) Length() uint8 {
+	return 2
+}
+
+func (o *SET_0_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_0_A) String() string {
@@ -17150,10 +18540,6 @@ type SET_1_B struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_1_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_1_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17163,9 +18549,7 @@ func (o *SET_1_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xc8,
 	})
 	if err != nil {
@@ -17173,6 +18557,14 @@ func (o *SET_1_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_1_B) Length() uint8 {
+	return 2
+}
+
+func (o *SET_1_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_1_B) String() string {
@@ -17189,10 +18581,6 @@ type SET_1_C struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_1_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_1_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17202,9 +18590,7 @@ func (o *SET_1_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xc9,
 	})
 	if err != nil {
@@ -17212,6 +18598,14 @@ func (o *SET_1_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_1_C) Length() uint8 {
+	return 2
+}
+
+func (o *SET_1_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_1_C) String() string {
@@ -17228,10 +18622,6 @@ type SET_1_D struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_1_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_1_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17241,9 +18631,7 @@ func (o *SET_1_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xca,
 	})
 	if err != nil {
@@ -17251,6 +18639,14 @@ func (o *SET_1_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_1_D) Length() uint8 {
+	return 2
+}
+
+func (o *SET_1_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_1_D) String() string {
@@ -17267,10 +18663,6 @@ type SET_1_E struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_1_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_1_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17280,9 +18672,7 @@ func (o *SET_1_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xcb,
 	})
 	if err != nil {
@@ -17290,6 +18680,14 @@ func (o *SET_1_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_1_E) Length() uint8 {
+	return 2
+}
+
+func (o *SET_1_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_1_E) String() string {
@@ -17306,10 +18704,6 @@ type SET_1_H struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_1_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_1_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17319,9 +18713,7 @@ func (o *SET_1_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xcc,
 	})
 	if err != nil {
@@ -17329,6 +18721,14 @@ func (o *SET_1_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_1_H) Length() uint8 {
+	return 2
+}
+
+func (o *SET_1_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_1_H) String() string {
@@ -17345,10 +18745,6 @@ type SET_1_L struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_1_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_1_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17358,9 +18754,7 @@ func (o *SET_1_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xcd,
 	})
 	if err != nil {
@@ -17368,6 +18762,14 @@ func (o *SET_1_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_1_L) Length() uint8 {
+	return 2
+}
+
+func (o *SET_1_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_1_L) String() string {
@@ -17384,10 +18786,6 @@ type SET_1_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_1_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_1_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17397,9 +18795,7 @@ func (o *SET_1_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xce,
 	})
 	if err != nil {
@@ -17407,6 +18803,14 @@ func (o *SET_1_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_1_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *SET_1_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *SET_1_HLPtr) String() string {
@@ -17423,10 +18827,6 @@ type SET_1_A struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_1_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_1_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17436,9 +18836,7 @@ func (o *SET_1_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xcf,
 	})
 	if err != nil {
@@ -17446,6 +18844,14 @@ func (o *SET_1_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_1_A) Length() uint8 {
+	return 2
+}
+
+func (o *SET_1_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_1_A) String() string {
@@ -17462,10 +18868,6 @@ type RRC_L struct {
 	isCbPrefixed bool
 }
 
-func (o *RRC_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *RRC_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17475,9 +18877,7 @@ func (o *RRC_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xd,
 	})
 	if err != nil {
@@ -17485,6 +18885,14 @@ func (o *RRC_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RRC_L) Length() uint8 {
+	return 2
+}
+
+func (o *RRC_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RRC_L) String() string {
@@ -17501,10 +18909,6 @@ type SET_2_B struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_2_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_2_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17514,9 +18918,7 @@ func (o *SET_2_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xd0,
 	})
 	if err != nil {
@@ -17524,6 +18926,14 @@ func (o *SET_2_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_2_B) Length() uint8 {
+	return 2
+}
+
+func (o *SET_2_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_2_B) String() string {
@@ -17540,10 +18950,6 @@ type SET_2_C struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_2_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_2_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17553,9 +18959,7 @@ func (o *SET_2_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xd1,
 	})
 	if err != nil {
@@ -17563,6 +18967,14 @@ func (o *SET_2_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_2_C) Length() uint8 {
+	return 2
+}
+
+func (o *SET_2_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_2_C) String() string {
@@ -17579,10 +18991,6 @@ type SET_2_D struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_2_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_2_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17592,9 +19000,7 @@ func (o *SET_2_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xd2,
 	})
 	if err != nil {
@@ -17602,6 +19008,14 @@ func (o *SET_2_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_2_D) Length() uint8 {
+	return 2
+}
+
+func (o *SET_2_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_2_D) String() string {
@@ -17618,10 +19032,6 @@ type SET_2_E struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_2_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_2_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17631,9 +19041,7 @@ func (o *SET_2_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xd3,
 	})
 	if err != nil {
@@ -17641,6 +19049,14 @@ func (o *SET_2_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_2_E) Length() uint8 {
+	return 2
+}
+
+func (o *SET_2_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_2_E) String() string {
@@ -17657,10 +19073,6 @@ type SET_2_H struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_2_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_2_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17670,9 +19082,7 @@ func (o *SET_2_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xd4,
 	})
 	if err != nil {
@@ -17680,6 +19090,14 @@ func (o *SET_2_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_2_H) Length() uint8 {
+	return 2
+}
+
+func (o *SET_2_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_2_H) String() string {
@@ -17696,10 +19114,6 @@ type SET_2_L struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_2_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_2_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17709,9 +19123,7 @@ func (o *SET_2_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xd5,
 	})
 	if err != nil {
@@ -17719,6 +19131,14 @@ func (o *SET_2_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_2_L) Length() uint8 {
+	return 2
+}
+
+func (o *SET_2_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_2_L) String() string {
@@ -17735,10 +19155,6 @@ type SET_2_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_2_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_2_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17748,9 +19164,7 @@ func (o *SET_2_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xd6,
 	})
 	if err != nil {
@@ -17758,6 +19172,14 @@ func (o *SET_2_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_2_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *SET_2_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *SET_2_HLPtr) String() string {
@@ -17774,10 +19196,6 @@ type SET_2_A struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_2_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_2_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17787,9 +19205,7 @@ func (o *SET_2_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xd7,
 	})
 	if err != nil {
@@ -17797,6 +19213,14 @@ func (o *SET_2_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_2_A) Length() uint8 {
+	return 2
+}
+
+func (o *SET_2_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_2_A) String() string {
@@ -17813,10 +19237,6 @@ type SET_3_B struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_3_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_3_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17826,9 +19246,7 @@ func (o *SET_3_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xd8,
 	})
 	if err != nil {
@@ -17836,6 +19254,14 @@ func (o *SET_3_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_3_B) Length() uint8 {
+	return 2
+}
+
+func (o *SET_3_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_3_B) String() string {
@@ -17852,10 +19278,6 @@ type SET_3_C struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_3_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_3_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17865,9 +19287,7 @@ func (o *SET_3_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xd9,
 	})
 	if err != nil {
@@ -17875,6 +19295,14 @@ func (o *SET_3_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_3_C) Length() uint8 {
+	return 2
+}
+
+func (o *SET_3_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_3_C) String() string {
@@ -17891,10 +19319,6 @@ type SET_3_D struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_3_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_3_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17904,9 +19328,7 @@ func (o *SET_3_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xda,
 	})
 	if err != nil {
@@ -17914,6 +19336,14 @@ func (o *SET_3_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_3_D) Length() uint8 {
+	return 2
+}
+
+func (o *SET_3_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_3_D) String() string {
@@ -17930,10 +19360,6 @@ type SET_3_E struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_3_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_3_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17943,9 +19369,7 @@ func (o *SET_3_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xdb,
 	})
 	if err != nil {
@@ -17953,6 +19377,14 @@ func (o *SET_3_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_3_E) Length() uint8 {
+	return 2
+}
+
+func (o *SET_3_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_3_E) String() string {
@@ -17969,10 +19401,6 @@ type SET_3_H struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_3_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_3_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -17982,9 +19410,7 @@ func (o *SET_3_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xdc,
 	})
 	if err != nil {
@@ -17992,6 +19418,14 @@ func (o *SET_3_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_3_H) Length() uint8 {
+	return 2
+}
+
+func (o *SET_3_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_3_H) String() string {
@@ -18008,10 +19442,6 @@ type SET_3_L struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_3_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_3_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18021,9 +19451,7 @@ func (o *SET_3_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xdd,
 	})
 	if err != nil {
@@ -18031,6 +19459,14 @@ func (o *SET_3_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_3_L) Length() uint8 {
+	return 2
+}
+
+func (o *SET_3_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_3_L) String() string {
@@ -18047,10 +19483,6 @@ type SET_3_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_3_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_3_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18060,9 +19492,7 @@ func (o *SET_3_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xde,
 	})
 	if err != nil {
@@ -18070,6 +19500,14 @@ func (o *SET_3_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_3_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *SET_3_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *SET_3_HLPtr) String() string {
@@ -18086,10 +19524,6 @@ type SET_3_A struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_3_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_3_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18099,9 +19533,7 @@ func (o *SET_3_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xdf,
 	})
 	if err != nil {
@@ -18109,6 +19541,14 @@ func (o *SET_3_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_3_A) Length() uint8 {
+	return 2
+}
+
+func (o *SET_3_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_3_A) String() string {
@@ -18125,10 +19565,6 @@ type RRC_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *RRC_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *RRC_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18138,9 +19574,7 @@ func (o *RRC_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xe,
 	})
 	if err != nil {
@@ -18148,6 +19582,14 @@ func (o *RRC_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RRC_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *RRC_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *RRC_HLPtr) String() string {
@@ -18164,10 +19606,6 @@ type SET_4_B struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_4_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_4_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18177,9 +19615,7 @@ func (o *SET_4_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xe0,
 	})
 	if err != nil {
@@ -18187,6 +19623,14 @@ func (o *SET_4_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_4_B) Length() uint8 {
+	return 2
+}
+
+func (o *SET_4_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_4_B) String() string {
@@ -18203,10 +19647,6 @@ type SET_4_C struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_4_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_4_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18216,9 +19656,7 @@ func (o *SET_4_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xe1,
 	})
 	if err != nil {
@@ -18226,6 +19664,14 @@ func (o *SET_4_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_4_C) Length() uint8 {
+	return 2
+}
+
+func (o *SET_4_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_4_C) String() string {
@@ -18242,10 +19688,6 @@ type SET_4_D struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_4_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_4_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18255,9 +19697,7 @@ func (o *SET_4_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xe2,
 	})
 	if err != nil {
@@ -18265,6 +19705,14 @@ func (o *SET_4_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_4_D) Length() uint8 {
+	return 2
+}
+
+func (o *SET_4_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_4_D) String() string {
@@ -18281,10 +19729,6 @@ type SET_4_E struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_4_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_4_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18294,9 +19738,7 @@ func (o *SET_4_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xe3,
 	})
 	if err != nil {
@@ -18304,6 +19746,14 @@ func (o *SET_4_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_4_E) Length() uint8 {
+	return 2
+}
+
+func (o *SET_4_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_4_E) String() string {
@@ -18320,10 +19770,6 @@ type SET_4_H struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_4_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_4_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18333,9 +19779,7 @@ func (o *SET_4_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xe4,
 	})
 	if err != nil {
@@ -18343,6 +19787,14 @@ func (o *SET_4_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_4_H) Length() uint8 {
+	return 2
+}
+
+func (o *SET_4_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_4_H) String() string {
@@ -18359,10 +19811,6 @@ type SET_4_L struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_4_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_4_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18372,9 +19820,7 @@ func (o *SET_4_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xe5,
 	})
 	if err != nil {
@@ -18382,6 +19828,14 @@ func (o *SET_4_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_4_L) Length() uint8 {
+	return 2
+}
+
+func (o *SET_4_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_4_L) String() string {
@@ -18398,10 +19852,6 @@ type SET_4_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_4_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_4_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18411,9 +19861,7 @@ func (o *SET_4_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xe6,
 	})
 	if err != nil {
@@ -18421,6 +19869,14 @@ func (o *SET_4_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_4_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *SET_4_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *SET_4_HLPtr) String() string {
@@ -18437,10 +19893,6 @@ type SET_4_A struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_4_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_4_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18450,9 +19902,7 @@ func (o *SET_4_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xe7,
 	})
 	if err != nil {
@@ -18460,6 +19910,14 @@ func (o *SET_4_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_4_A) Length() uint8 {
+	return 2
+}
+
+func (o *SET_4_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_4_A) String() string {
@@ -18476,10 +19934,6 @@ type SET_5_B struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_5_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_5_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18489,9 +19943,7 @@ func (o *SET_5_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xe8,
 	})
 	if err != nil {
@@ -18499,6 +19951,14 @@ func (o *SET_5_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_5_B) Length() uint8 {
+	return 2
+}
+
+func (o *SET_5_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_5_B) String() string {
@@ -18515,10 +19975,6 @@ type SET_5_C struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_5_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_5_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18528,9 +19984,7 @@ func (o *SET_5_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xe9,
 	})
 	if err != nil {
@@ -18538,6 +19992,14 @@ func (o *SET_5_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_5_C) Length() uint8 {
+	return 2
+}
+
+func (o *SET_5_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_5_C) String() string {
@@ -18554,10 +20016,6 @@ type SET_5_D struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_5_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_5_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18567,9 +20025,7 @@ func (o *SET_5_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xea,
 	})
 	if err != nil {
@@ -18577,6 +20033,14 @@ func (o *SET_5_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_5_D) Length() uint8 {
+	return 2
+}
+
+func (o *SET_5_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_5_D) String() string {
@@ -18593,10 +20057,6 @@ type SET_5_E struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_5_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_5_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18606,9 +20066,7 @@ func (o *SET_5_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xeb,
 	})
 	if err != nil {
@@ -18616,6 +20074,14 @@ func (o *SET_5_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_5_E) Length() uint8 {
+	return 2
+}
+
+func (o *SET_5_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_5_E) String() string {
@@ -18632,10 +20098,6 @@ type SET_5_H struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_5_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_5_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18645,9 +20107,7 @@ func (o *SET_5_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xec,
 	})
 	if err != nil {
@@ -18655,6 +20115,14 @@ func (o *SET_5_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_5_H) Length() uint8 {
+	return 2
+}
+
+func (o *SET_5_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_5_H) String() string {
@@ -18671,10 +20139,6 @@ type SET_5_L struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_5_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_5_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18684,9 +20148,7 @@ func (o *SET_5_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xed,
 	})
 	if err != nil {
@@ -18694,6 +20156,14 @@ func (o *SET_5_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_5_L) Length() uint8 {
+	return 2
+}
+
+func (o *SET_5_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_5_L) String() string {
@@ -18710,10 +20180,6 @@ type SET_5_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_5_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_5_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18723,9 +20189,7 @@ func (o *SET_5_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xee,
 	})
 	if err != nil {
@@ -18733,6 +20197,14 @@ func (o *SET_5_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_5_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *SET_5_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *SET_5_HLPtr) String() string {
@@ -18749,10 +20221,6 @@ type SET_5_A struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_5_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_5_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18762,9 +20230,7 @@ func (o *SET_5_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xef,
 	})
 	if err != nil {
@@ -18772,6 +20238,14 @@ func (o *SET_5_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_5_A) Length() uint8 {
+	return 2
+}
+
+func (o *SET_5_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_5_A) String() string {
@@ -18788,10 +20262,6 @@ type RRC_A struct {
 	isCbPrefixed bool
 }
 
-func (o *RRC_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *RRC_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18801,9 +20271,7 @@ func (o *RRC_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xf,
 	})
 	if err != nil {
@@ -18811,6 +20279,14 @@ func (o *RRC_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *RRC_A) Length() uint8 {
+	return 2
+}
+
+func (o *RRC_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *RRC_A) String() string {
@@ -18827,10 +20303,6 @@ type SET_6_B struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_6_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_6_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18840,9 +20312,7 @@ func (o *SET_6_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xf0,
 	})
 	if err != nil {
@@ -18850,6 +20320,14 @@ func (o *SET_6_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_6_B) Length() uint8 {
+	return 2
+}
+
+func (o *SET_6_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_6_B) String() string {
@@ -18866,10 +20344,6 @@ type SET_6_C struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_6_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_6_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18879,9 +20353,7 @@ func (o *SET_6_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xf1,
 	})
 	if err != nil {
@@ -18889,6 +20361,14 @@ func (o *SET_6_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_6_C) Length() uint8 {
+	return 2
+}
+
+func (o *SET_6_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_6_C) String() string {
@@ -18905,10 +20385,6 @@ type SET_6_D struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_6_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_6_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18918,9 +20394,7 @@ func (o *SET_6_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xf2,
 	})
 	if err != nil {
@@ -18928,6 +20402,14 @@ func (o *SET_6_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_6_D) Length() uint8 {
+	return 2
+}
+
+func (o *SET_6_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_6_D) String() string {
@@ -18944,10 +20426,6 @@ type SET_6_E struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_6_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_6_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18957,9 +20435,7 @@ func (o *SET_6_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xf3,
 	})
 	if err != nil {
@@ -18967,6 +20443,14 @@ func (o *SET_6_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_6_E) Length() uint8 {
+	return 2
+}
+
+func (o *SET_6_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_6_E) String() string {
@@ -18983,10 +20467,6 @@ type SET_6_H struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_6_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_6_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -18996,9 +20476,7 @@ func (o *SET_6_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xf4,
 	})
 	if err != nil {
@@ -19006,6 +20484,14 @@ func (o *SET_6_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_6_H) Length() uint8 {
+	return 2
+}
+
+func (o *SET_6_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_6_H) String() string {
@@ -19022,10 +20508,6 @@ type SET_6_L struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_6_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_6_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -19035,9 +20517,7 @@ func (o *SET_6_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xf5,
 	})
 	if err != nil {
@@ -19045,6 +20525,14 @@ func (o *SET_6_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_6_L) Length() uint8 {
+	return 2
+}
+
+func (o *SET_6_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_6_L) String() string {
@@ -19061,10 +20549,6 @@ type SET_6_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_6_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_6_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -19074,9 +20558,7 @@ func (o *SET_6_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xf6,
 	})
 	if err != nil {
@@ -19084,6 +20566,14 @@ func (o *SET_6_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_6_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *SET_6_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *SET_6_HLPtr) String() string {
@@ -19100,10 +20590,6 @@ type SET_6_A struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_6_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_6_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -19113,9 +20599,7 @@ func (o *SET_6_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xf7,
 	})
 	if err != nil {
@@ -19123,6 +20607,14 @@ func (o *SET_6_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_6_A) Length() uint8 {
+	return 2
+}
+
+func (o *SET_6_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_6_A) String() string {
@@ -19139,10 +20631,6 @@ type SET_7_B struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_7_B) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_7_B) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -19152,9 +20640,7 @@ func (o *SET_7_B) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xf8,
 	})
 	if err != nil {
@@ -19162,6 +20648,14 @@ func (o *SET_7_B) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_7_B) Length() uint8 {
+	return 2
+}
+
+func (o *SET_7_B) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_7_B) String() string {
@@ -19178,10 +20672,6 @@ type SET_7_C struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_7_C) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_7_C) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -19191,9 +20681,7 @@ func (o *SET_7_C) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xf9,
 	})
 	if err != nil {
@@ -19201,6 +20689,14 @@ func (o *SET_7_C) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_7_C) Length() uint8 {
+	return 2
+}
+
+func (o *SET_7_C) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_7_C) String() string {
@@ -19217,10 +20713,6 @@ type SET_7_D struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_7_D) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_7_D) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -19230,9 +20722,7 @@ func (o *SET_7_D) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xfa,
 	})
 	if err != nil {
@@ -19240,6 +20730,14 @@ func (o *SET_7_D) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_7_D) Length() uint8 {
+	return 2
+}
+
+func (o *SET_7_D) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_7_D) String() string {
@@ -19256,10 +20754,6 @@ type SET_7_E struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_7_E) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_7_E) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -19269,9 +20763,7 @@ func (o *SET_7_E) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xfb,
 	})
 	if err != nil {
@@ -19279,6 +20771,14 @@ func (o *SET_7_E) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_7_E) Length() uint8 {
+	return 2
+}
+
+func (o *SET_7_E) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_7_E) String() string {
@@ -19295,10 +20795,6 @@ type SET_7_H struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_7_H) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_7_H) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -19308,9 +20804,7 @@ func (o *SET_7_H) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xfc,
 	})
 	if err != nil {
@@ -19318,6 +20812,14 @@ func (o *SET_7_H) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_7_H) Length() uint8 {
+	return 2
+}
+
+func (o *SET_7_H) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_7_H) String() string {
@@ -19334,10 +20836,6 @@ type SET_7_L struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_7_L) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_7_L) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -19347,9 +20845,7 @@ func (o *SET_7_L) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xfd,
 	})
 	if err != nil {
@@ -19357,6 +20853,14 @@ func (o *SET_7_L) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_7_L) Length() uint8 {
+	return 2
+}
+
+func (o *SET_7_L) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_7_L) String() string {
@@ -19373,10 +20877,6 @@ type SET_7_HLPtr struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_7_HLPtr) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_7_HLPtr) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -19386,9 +20886,7 @@ func (o *SET_7_HLPtr) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xfe,
 	})
 	if err != nil {
@@ -19396,6 +20894,14 @@ func (o *SET_7_HLPtr) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_7_HLPtr) Length() uint8 {
+	return 2
+}
+
+func (o *SET_7_HLPtr) cycles() []uint8 {
+	return []uint8{16}
 }
 
 func (o *SET_7_HLPtr) String() string {
@@ -19412,10 +20918,6 @@ type SET_7_A struct {
 	isCbPrefixed bool
 }
 
-func (o *SET_7_A) Execute(v vm) error {
-	return nil
-}
-
 func (o *SET_7_A) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -19425,9 +20927,7 @@ func (o *SET_7_A) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands
 
 	written, err := w.Write([]byte{
-
 		0xCB,
-
 		0xff,
 	})
 	if err != nil {
@@ -19435,6 +20935,14 @@ func (o *SET_7_A) Write(w io.Writer) (int, error) {
 	}
 
 	return written, err
+}
+
+func (o *SET_7_A) Length() uint8 {
+	return 2
+}
+
+func (o *SET_7_A) cycles() []uint8 {
+	return []uint8{8}
 }
 
 func (o *SET_7_A) String() string {

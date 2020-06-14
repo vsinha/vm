@@ -69,14 +69,6 @@ type {{.ExtendedMnemonic}} struct {
 	isCbPrefixed bool
 }
 
-{{ if ne .Addr "0x80" }}
-{{ if ne .Addr "0x76" }}
-func (o *{{.ExtendedMnemonic}}) Execute(v vm) error {
-	return nil
-}
-{{end}}
-{{end}}
-
 func (o *{{.ExtendedMnemonic}}) Write(w io.Writer) (int, error) {
 	var b []byte
 
@@ -101,12 +93,25 @@ func (o *{{.ExtendedMnemonic}}) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
+func (o *{{.ExtendedMnemonic}}) Length() uint8 {
+	return {{.Length}} 
+}
+
+func (o *{{.ExtendedMnemonic}}) cycles() []uint8 {
+	return []uint8{
+		{{ range $key, $value := .Cycles }}
+		{{.$value}},
+		{{end}}
+	}
+}
+
 func (o *{{.ExtendedMnemonic}}) String() string {
 	return "{{.Mnemonic}} " + o.operand1 {{if eq .Operand2 "SP+r8"}} + ", SP+" + o.operand2 {{else if .Operand2}} + ", " + o.operand2 {{end}}
 }
 func (o *{{.ExtendedMnemonic}}) SymbolicString() string {
 	return "{{.Mnemonic}}{{if .Operand1}} {{.Operand1}}{{end}}{{if .Operand2}},{{.Operand2}}{{end}}"
 }
+
 {{end}}
 {{end}}
 

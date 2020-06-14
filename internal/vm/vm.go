@@ -37,17 +37,17 @@ func New(mem memory.Memory) *VM {
 
 // Run executes the virtual machine.
 func (v *VM) Run() error {
-	//o := Op(v.mem[v.pc])
 
 	v.r.PC = 0
-
-	count := 1
+	instructionCount := 1
+	cycles := uint(0)
 	max := 100
 	for {
-		count++
-		if count > max {
+		instructionCount++
+		if instructionCount > max {
 			return fmt.Errorf("Ran %d instructions, bailing", max)
 		}
+
 		// Instructions are parseable in a direct way where the CPU can run an
 		// opcode and move on to the next. However, there are times when you
 		// will jump not to the beginning of an opcode, but instead to the
@@ -69,54 +69,24 @@ func (v *VM) Run() error {
 		}
 
 		fmt.Printf("Running PC = %d: %v\n", v.r.PC, i)
+
 		// execute
-		if err := i.Execute(v); err != nil {
+		executionResult, err := i.Execute(v)
+		if err != nil {
 			return err
 		}
 
+		// Increment PC by the length of the instruction.
+		if !executionResult.DidSetPC {
+			v.Reg().PC += uint16(i.Length())
+		}
+
 		// increment cycles
+		cycles += uint(executionResult.Cycles)
 
 		// if cycles > cycles_between_interrupts
 		// then handle interrupts
 	}
-
-	/*
-		for o != Halt {
-
-			// while !timeForVblank
-			// fetch (this depends on width)
-			// Go to memory, read instruction, decode instruction (generated) returns a *opcodes.NOP
-
-			// execute  instruction.Execute(vm)
-			// exceute vm.Execute(instruction)
-			// instruction.Execute(vm)
-			// cycles += instrucntion.Cycles()
-			//
-
-			// increment something
-
-			// vblank
-			// sound things
-
-			ex := OpExec[o]
-
-			v.log("PC: %d Executing: %s\n", v.pc, ex.Name)
-			ex.f(v)
-
-			if ex.Kind != jType {
-				// If we're jType, we assume the implementation handled moving the pc by itself
-				v.pc += ex.Kind.Size
-
-			}
-			if v.pc == uint(len(v.mem)) {
-				return fmt.Errorf("finished VM without halting")
-			}
-			o = Op(v.mem[v.pc])
-		}
-	*/
-
-	v.log("Found halt instruction. Done.\n")
-	return nil
 }
 
 func (v *VM) log(msg string, args ...interface{}) {

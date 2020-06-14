@@ -155,6 +155,8 @@ func parse() (*opcodes, error) {
 	return &data, nil
 }
 
+type validateOpcode func(*opcode) error
+
 func main() {
 	opcodes, err := parse()
 	if err != nil {
@@ -167,6 +169,21 @@ func main() {
 
 	for _, val := range opcodes.CBPrefixed {
 		val.CBPrefixed = true
+	}
+
+	validate := func(f validateOpcode, opcodes map[string]*opcode) {
+		for _, o := range opcodes {
+			if err := f(o); err != nil {
+				panic(fmt.Sprintf("Error validating opcode %v error: %v", o.Addr, err))
+			}
+		}
+	}
+
+	for _, f := range []validateOpcode{
+		addMnemonicHasOnlyOneCycle,
+	} {
+		validate(f, opcodes.Unprefixed)
+		validate(f, opcodes.CBPrefixed)
 	}
 
 	outFile, err := os.Create("../opcodes_generated.go")
@@ -195,4 +212,12 @@ func main() {
 
 func generateTemplate() *template.Template {
 	return template.Must(template.ParseGlob("*.tmpl"))
+}
+
+func addMnemonicHasOnlyOneCycle(o *opcode) error {
+	if o.Mnemonic == "ADD" && len(o.Cycles) != 1 {
+		return fmt.Errorf("ADD mnemoniced opcode with hex value %v has multiple cycle counts to return. All add instructions should be constant time", o.Addr)
+	}
+
+	return nil
 }
