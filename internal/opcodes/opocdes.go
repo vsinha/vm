@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"strconv"
 
 	"github.com/vsinha/vm/internal/memory"
 	"github.com/vsinha/vm/internal/registers"
@@ -16,6 +15,10 @@ var ErrUnimplemented = errors.New("this opcode has not yet been implemented")
 
 // ErrHalt is the control flow error for when the VM should be stoppped.
 var ErrHalt = errors.New("HALTED")
+
+// ErrOperatorNotValidType is returned when the in memory representation of the
+// operator doesn't match the opcode's required type.
+var ErrOperatorNotValidType = errors.New("operator was not the expected type for this opcode")
 
 type ExecutionResult struct {
 	Cycles uint8
@@ -45,6 +48,28 @@ type vm interface {
 }
 
 var endianness = binary.BigEndian
+
+func readImmediate16BitAddress(r io.Reader) (uint16, error) {
+	return readImmediate16BitData(r)
+}
+func readImmediate16BitData(r io.Reader) (uint16, error) {
+	var v uint16
+	err := binary.Read(r, endianness, &v)
+	return v, err
+}
+func readImmediate8BitAddress(r io.Reader) (uint8, error) {
+	return readImmediate8BitData(r)
+}
+func readImmediate8BitData(r io.Reader) (uint8, error) {
+	var v uint8
+	err := binary.Read(r, endianness, &v)
+	return v, err
+}
+func readImmediateSigned8BitData(r io.Reader) (int8, error) {
+	var v int8
+	err := binary.Read(r, endianness, &v)
+	return v, err
+}
 
 func readBytesAsString(r io.Reader, n int) (string, error) {
 	d := make([]byte, n)
@@ -83,17 +108,17 @@ func addIntoA(v vm, i Instruction, a registers.Reg, b registers.Reg) (ExecutionR
 	return addInto(v, i, &v.Reg().A, a, b)
 }
 
-// Execute NOP instruction.
+// Execute NOP instruction. 0x0
 func (i *NOP) Execute(v vm) (ExecutionResult, error) {
 	return ExecutionResult{}, nil
 }
 
-// Execute LD_BC_d16 instruction.
+// Execute LD_BC_d16 instruction. 0x1
 func (i *LD_BC_d16) Execute(v vm) (ExecutionResult, error) {
 	return ExecutionResult{}, ErrUnimplemented
 }
 
-// Execute STOP_0 instruction.
+// Execute STOP_0 instruction. 0x10
 func (i *STOP_0) Execute(v vm) (ExecutionResult, error) {
 	return ExecutionResult{}, ErrUnimplemented
 }
@@ -1063,9 +1088,9 @@ func (i *PUSH_BC) Execute(v vm) (ExecutionResult, error) {
 
 // Execute ADD_A_d8 instruction.
 func (i *ADD_A_d8) Execute(v vm) (ExecutionResult, error) {
-	d, err := strconv.ParseInt(i.operand2, 16, 16)
-	if err != nil {
-		return ExecutionResult{}, err
+	d, ok := i.operand2.(uint8)
+	if !ok {
+		return ExecutionResult{}, ErrOperatorNotValidType
 	}
 
 	return addIntoA(v, i, v.Reg().A, registers.Reg(d))

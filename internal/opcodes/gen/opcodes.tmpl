@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"strconv"
 )
 
 // ErrNoOpCode is a little alias for the error message returned below
@@ -16,24 +15,14 @@ var ErrNoOpCode = errors.New("no opcode with that address exists")
 type Op int
 
 {{define "write8BitOperand"}}
-	v, err = strconv.ParseInt(o.operand{{.}}, /*base*/16, /*bitsize*/16)
-	if err != nil {
-		return written, err
-	}
-
-	err = binary.Write(w, endianness, int8(v))
+	err = binary.Write(w, endianness, o.operand{{.}}.(int8))
 	if err != nil {
 		return written, err
 	}
 	written += 1
 {{end}}
 {{define "write16BitOperand"}}
-	v, err = strconv.ParseInt(o.operand{{.}}, /*base*/16, /*bitsize*/32)
-	if err != nil {
-		return written, err
-	}
-	
-	err = binary.Write(w, endianness, int16(v))
+	err = binary.Write(w, endianness, o.operand{{.}}.(int16))
 	if err != nil {
 		return written, err
 	}
@@ -63,13 +52,13 @@ type Op int
 {{define "opcodeTypeStruct" }}
 {{range $key, $value := .}}
 type {{.ExtendedMnemonic}} struct {
-	addr string // 0x50
-	operand1 string // literal, or reg name, or (HL)...
-	operand2 string // same
+	addr string // {{ .Addr }}
+	operand1 interface{} // literal, or reg name, or (HL)...
+	operand2 interface{} // same
 	isCbPrefixed bool
 }
 
-func (o *{{.ExtendedMnemonic}}) Write(w io.Writer) (int, error) {
+func (o *{{.ExtendedMnemonic}}) Write(w io.Writer) (int, error) { // {{.Addr}}
 	var b []byte
 
 	b = append(b, {{.Addr}})
@@ -78,9 +67,7 @@ func (o *{{.ExtendedMnemonic}}) Write(w io.Writer) (int, error) {
 	_ = v // suppress unused variable warning in the case we have no operands 
 
 	written, err := w.Write([]byte{ 
-	{{ if .CBPrefixed }} 
-		0xCB,
-	{{end}}
+		{{ if .CBPrefixed }} 0xCB, {{end}}
 		{{.Addr}},
 	})
 	if err != nil {
@@ -93,23 +80,25 @@ func (o *{{.ExtendedMnemonic}}) Write(w io.Writer) (int, error) {
 	return written, err
 }
 
-func (o *{{.ExtendedMnemonic}}) Length() uint8 {
+func (o *{{.ExtendedMnemonic}}) Length() uint8 { // {{.Addr}}
 	return {{.Length}} 
 }
 
-func (o *{{.ExtendedMnemonic}}) cycles() []uint8 {
-	return []uint8{
-		{{ range $key, $value := .Cycles }}
-		{{.$value}},
-		{{end}}
-	}
+func (o *{{.ExtendedMnemonic}}) cycles() []uint8 { // {{.Addr}}
+	return []uint8{ {{ range $key, $value := .Cycles }} {{$value}}, {{end}} }
 }
 
-func (o *{{.ExtendedMnemonic}}) String() string {
-	return "{{.Mnemonic}} " + o.operand1 {{if eq .Operand2 "SP+r8"}} + ", SP+" + o.operand2 {{else if .Operand2}} + ", " + o.operand2 {{end}}
+func (o *{{.ExtendedMnemonic}}) String() string { // {{.Addr}}
+	{{if eq .Operand2 "SP+r8"}}
+	return fmt.Sprintf("{{.Mnemonic}} %v SP+%d", o.operand1, o.operand2)
+	{{else if .Operand2}}
+	return fmt.Sprintf("{{.Mnemonic}} %v %v", o.operand1, o.operand2)
+	{{else}}
+	return fmt.Sprintf("{{.Mnemonic}} %v", o.operand1)
+	{{end}}
 }
-func (o *{{.ExtendedMnemonic}}) SymbolicString() string {
-	return "{{.Mnemonic}}{{if .Operand1}} {{.Operand1}}{{end}}{{if .Operand2}},{{.Operand2}}{{end}}"
+func (o *{{.ExtendedMnemonic}}) SymbolicString() string { // {{.Addr}}
+	return "{{.Mnemonic}}{{if .Operand1}} {{.RawOperand1}}{{end}}{{if .Operand2}},{{.RawOperand2}}{{end}}"
 }
 
 {{end}}
@@ -131,17 +120,17 @@ func (o *{{.ExtendedMnemonic}}) SymbolicString() string {
 	}
 {{end}}
 {{define "handleOperand"}}
-	{{ if eq . "a8" }} {{ template "readOneByte" . }}
-	{{ else if eq . "(a8)" }} {{ template "readOneByte" . }}
-	{{ else if eq . "d8" }} {{ template "readOneByte" . }}
-	{{ else if eq . "SP+r8" }} {{ template "readOneByte" . }}
-	{{ else if eq . "a16" }} {{ template "readTwoBytes" . }}
-	{{ else if eq . "(a16)" }} {{ template "readTwoBytes" . }}
-	{{ else if eq . "d16" }} {{ template "readTwoBytes" . }}
-	{{ else if eq . "(HL)" }} {{ template "readTwoBytes" . }}
-	{{ else if eq . "(HL-)" }} {{ template "readTwoBytes" . }}
-	{{ else if eq . "(HL+)" }} {{ template "readTwoBytes" . }}
-	{{ else }} s = "{{ . }}"
+	{{ if eq . "(a8)" }}       s, err := readImmediate8BitAddress   (data)
+	{{ else if eq . "d8" }}    s, err := readImmediate8BitData      (data)
+	{{ else if eq . "r8" }}    s, err := readImmediateSigned8BitData(data)
+	{{ else if eq . "SP+r8" }} s, err := readImmediateSigned8BitData(data)
+	{{ else if eq . "a16" }}   s, err := readImmediate16BitAddress  (data)
+	{{ else if eq . "(a16)" }} s, err := readImmediate16BitAddress  (data)
+	{{ else if eq . "d16" }}   s, err := readImmediate16BitData     (data)
+	{{ else if eq . "(HL)" }}  s, err := readImmediate16BitData     (data)
+	{{ else if eq . "(HL-)" }} s, err := readImmediate16BitData     (data)
+	{{ else if eq . "(HL+)" }} s, err := readImmediate16BitData     (data)
+	{{ else }}                 s      := "{{ . }}"
 	{{- end }}
 {{end}}
 
@@ -160,11 +149,20 @@ func (o *{{.ExtendedMnemonic}}) SymbolicString() string {
 		{{- else}}
 			o := &{{$value.ExtendedMnemonic}}{}
 
-			var s string
-			{{- template "handleOperand" .RawOperand1 -}}
-			o.operand1 = s
-			{{- template "handleOperand" .RawOperand2 -}}
-			o.operand2 = s
+			{
+				{{- template "handleOperand" .RawOperand1 -}}
+				if err != nil {
+					return nil, err
+				}
+				o.operand1 = s
+			}
+			{
+				{{- template "handleOperand" .RawOperand2 -}}
+				if err != nil {
+					return nil, err
+				}
+				o.operand2 = s
+			}
 
 			return o, nil
 		{{end}}
