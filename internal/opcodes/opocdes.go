@@ -71,6 +71,22 @@ func readImmediateSigned8BitData(r io.Reader) (int8, error) {
 	return v, err
 }
 
+func writeImmediate16BitAddress(w io.Writer, v interface{}) error {
+	return binary.Write(w, endianness, v.(uint16))
+}
+func writeImmediate16BitData(w io.Writer, v interface{}) error {
+	return binary.Write(w, endianness, v.(uint16))
+}
+func writeImmediate8BitAddress(w io.Writer, v interface{}) error {
+	return binary.Write(w, endianness, v.(uint8))
+}
+func writeImmediate8BitData(w io.Writer, v interface{}) error {
+	return binary.Write(w, endianness, v.(uint8))
+}
+func writeImmediateSigned8BitData(w io.Writer, v interface{}) error {
+	return binary.Write(w, endianness, v.(int8))
+}
+
 func readBytesAsString(r io.Reader, n int) (string, error) {
 	d := make([]byte, n)
 

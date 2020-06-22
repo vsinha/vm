@@ -210,8 +210,124 @@ func main() {
 	}
 }
 
+func handleStringOfOperand(opcode opcode, operandID int) string {
+	var rawOperand string
+	if operandID == 1 {
+		rawOperand = opcode.RawOperand1
+	} else if operandID == 2 {
+		rawOperand = opcode.RawOperand2
+	}
+	switch rawOperand {
+	case "(a8)":
+		return fmt.Sprintf(`fmt.Sprintf("(%%X)", o.operand%d)`, operandID)
+	case "d8":
+		return fmt.Sprintf(`fmt.Sprintf("%%X", o.operand%d)`, operandID)
+	case "r8", "SP+r8":
+		return fmt.Sprintf(`fmt.Sprintf("SP+%%X", o.operand%d)`, operandID)
+	case "a16", "(a16)":
+		return fmt.Sprintf(`fmt.Sprintf("%%X", o.operand%d)`, operandID)
+	case "d16":
+		return fmt.Sprintf(`fmt.Sprintf("%%X", o.operand%d)`, operandID)
+	case "HL", "(HL)", "(HL-)", "(HL+)",
+		"A", "AF", "B", "C", "(C)", "BC", "(BC)", "D", "E", "DE", "(DE)",
+		"H", "L", "F",
+		"SP", "PC",
+		"Z",
+		"NZ",
+		"NC",
+		"",
+		"0", "1", "2", "3", "4", "5", "6", "7",
+		"00H", "08H", "10H", "18H", "20H", "28H", "30H", "38H",
+		"CB" /* CB prefixed opcodes, not the register C+B */ :
+		return fmt.Sprintf(`"%s" /* operand%d */`, rawOperand, operandID)
+	default:
+		panic(fmt.Sprintf("You need to implement an stringer for %v operand%d \"%v\"", opcode.Mnemonic, operandID, rawOperand))
+	}
+}
+
+func handleReadOperand(opcode opcode, operandID int) string {
+	var rawOperand string
+	if operandID == 1 {
+		rawOperand = opcode.RawOperand1
+	} else if operandID == 2 {
+		rawOperand = opcode.RawOperand2
+	}
+	switch rawOperand {
+	case "(a8)":
+		return "s, err := readImmediate8BitAddress(data)"
+	case "d8":
+		return "s, err := readImmediate8BitData(data)"
+	case "r8", "SP+r8":
+		return "s, err := readImmediateSigned8BitData(data)"
+	case "a16", "(a16)":
+		return "s, err := readImmediate16BitAddress(data)"
+	case "d16":
+		return "s, err := readImmediate16BitData(data)"
+	case "HL", "(HL)", "(HL-)", "(HL+)",
+		"A", "AF", "B", "C", "(C)", "BC", "(BC)", "D", "E", "DE", "(DE)",
+		"H", "L", "F",
+		"SP", "PC",
+		"Z",
+		"NZ",
+		"NC",
+		"",
+		"0", "1", "2", "3", "4", "5", "6", "7",
+		"00H", "08H", "10H", "18H", "20H", "28H", "30H", "38H",
+		"CB" /* CB prefixed opcodes, not the register C+B */ :
+		return fmt.Sprintf("s := \"%v\" // %v is implicit in this instruction.", rawOperand, rawOperand)
+	default:
+		panic(fmt.Sprintf("You need to implement an writer for %v operand%d \"%v\"", opcode.Mnemonic, operandID, rawOperand))
+	}
+}
+
+func handleWriteByteOperand(opcode opcode, operandID int) string {
+	var rawOperand string
+	if operandID == 1 {
+		rawOperand = opcode.RawOperand1
+	} else if operandID == 2 {
+		rawOperand = opcode.RawOperand2
+	}
+	switch rawOperand {
+	case "(a8)":
+		return fmt.Sprintf("err = writeImmediate8BitAddress   (w, o.operand%d); written += 1", operandID)
+	case "d8":
+		return fmt.Sprintf("err = writeImmediate8BitData      (w, o.operand%d); written += 1", operandID)
+	case "r8", "SP+r8":
+		return fmt.Sprintf("err = writeImmediateSigned8BitData(w, o.operand%d); written += 1", operandID)
+	case "a16", "(a16)":
+		return fmt.Sprintf("err = writeImmediate16BitAddress  (w, o.operand%d); written += 2", operandID)
+	case "d16":
+		return fmt.Sprintf("err = writeImmediate16BitData     (w, o.operand%d); written += 2", operandID)
+	case "HL", "(HL)", "(HL-)", "(HL+)",
+		"A", "AF", "B", "C", "(C)", "BC", "(BC)", "D", "E", "DE", "(DE)",
+		"H", "L", "F",
+		"SP", "PC",
+		"Z",
+		"NZ",
+		"NC",
+		"",
+		"0", "1", "2", "3", "4", "5", "6", "7",
+		"00H", "08H", "10H", "18H", "20H", "28H", "30H", "38H",
+		"CB" /* CB prefixed opcodes, not the register C+B */ :
+		return fmt.Sprintf("// %v is implicit in this instruction.", rawOperand)
+	default:
+		panic(fmt.Sprintf("You need to implement an writer for %v operand%d \"%v\"", opcode.Mnemonic, operandID, rawOperand))
+	}
+}
+
 func generateTemplate() *template.Template {
-	return template.Must(template.ParseGlob("*.tmpl"))
+	b, err := ioutil.ReadFile("opcodes.tmpl")
+	if err != nil {
+		panic(err)
+	}
+
+	return template.Must(template.New("opcodes.tmpl").
+		Funcs(template.FuncMap{
+			"handleWriteByteOperand": handleWriteByteOperand,
+			"handleStringOfOperand":  handleStringOfOperand,
+			"handleReadOperand":      handleReadOperand,
+		}).
+		Parse(string(b)))
 }
 
 func addMnemonicHasOnlyOneCycle(o *opcode) error {

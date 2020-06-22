@@ -1,7 +1,6 @@
 package opcodes
 
 import (
-	"encoding/binary"
 	"errors"
 	"fmt"
 	"io"
@@ -37,6 +36,9 @@ func (o *NOP) Write(w io.Writer) (int, error) { // 0x0
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -49,10 +51,9 @@ func (o *NOP) cycles() []uint8 { // 0x0
 }
 
 func (o *NOP) String() string { // 0x0
-
-	return fmt.Sprintf("NOP %v", o.operand1)
-
+	return "NOP"
 }
+
 func (o *NOP) SymbolicString() string { // 0x0
 	return "NOP"
 }
@@ -80,10 +81,8 @@ func (o *LD_BC_d16) Write(w io.Writer) (int, error) { // 0x1
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// BC is implicit in this instruction.
+	err = writeImmediate16BitData(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -98,10 +97,9 @@ func (o *LD_BC_d16) cycles() []uint8 { // 0x1
 }
 
 func (o *LD_BC_d16) String() string { // 0x1
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "BC" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_BC_d16) SymbolicString() string { // 0x1
 	return "LD BC,d16"
 }
@@ -129,6 +127,9 @@ func (o *STOP_0) Write(w io.Writer) (int, error) { // 0x10
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -141,10 +142,9 @@ func (o *STOP_0) cycles() []uint8 { // 0x10
 }
 
 func (o *STOP_0) String() string { // 0x10
-
-	return fmt.Sprintf("STOP %v", o.operand1)
-
+	return "STOP" + " " + "0" /* operand1 */
 }
+
 func (o *STOP_0) SymbolicString() string { // 0x10
 	return "STOP 0"
 }
@@ -172,10 +172,8 @@ func (o *LD_DE_d16) Write(w io.Writer) (int, error) { // 0x11
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// DE is implicit in this instruction.
+	err = writeImmediate16BitData(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -190,10 +188,9 @@ func (o *LD_DE_d16) cycles() []uint8 { // 0x11
 }
 
 func (o *LD_DE_d16) String() string { // 0x11
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "DE" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_DE_d16) SymbolicString() string { // 0x11
 	return "LD DE,d16"
 }
@@ -221,6 +218,9 @@ func (o *LD_DEDeref_A) Write(w io.Writer) (int, error) { // 0x12
 		return written, err
 	}
 
+	// (DE) is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -233,10 +233,9 @@ func (o *LD_DEDeref_A) cycles() []uint8 { // 0x12
 }
 
 func (o *LD_DEDeref_A) String() string { // 0x12
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(DE)" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_DEDeref_A) SymbolicString() string { // 0x12
 	return "LD (DE),A"
 }
@@ -264,6 +263,9 @@ func (o *INC_DE) Write(w io.Writer) (int, error) { // 0x13
 		return written, err
 	}
 
+	// DE is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -276,10 +278,9 @@ func (o *INC_DE) cycles() []uint8 { // 0x13
 }
 
 func (o *INC_DE) String() string { // 0x13
-
-	return fmt.Sprintf("INC %v", o.operand1)
-
+	return "INC" + " " + "DE" /* operand1 */
 }
+
 func (o *INC_DE) SymbolicString() string { // 0x13
 	return "INC DE"
 }
@@ -307,6 +308,9 @@ func (o *INC_D) Write(w io.Writer) (int, error) { // 0x14
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -319,10 +323,9 @@ func (o *INC_D) cycles() []uint8 { // 0x14
 }
 
 func (o *INC_D) String() string { // 0x14
-
-	return fmt.Sprintf("INC %v", o.operand1)
-
+	return "INC" + " " + "D" /* operand1 */
 }
+
 func (o *INC_D) SymbolicString() string { // 0x14
 	return "INC D"
 }
@@ -350,6 +353,9 @@ func (o *DEC_D) Write(w io.Writer) (int, error) { // 0x15
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -362,10 +368,9 @@ func (o *DEC_D) cycles() []uint8 { // 0x15
 }
 
 func (o *DEC_D) String() string { // 0x15
-
-	return fmt.Sprintf("DEC %v", o.operand1)
-
+	return "DEC" + " " + "D" /* operand1 */
 }
+
 func (o *DEC_D) SymbolicString() string { // 0x15
 	return "DEC D"
 }
@@ -393,10 +398,8 @@ func (o *LD_D_d8) Write(w io.Writer) (int, error) { // 0x16
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// D is implicit in this instruction.
+	err = writeImmediate8BitData(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -411,10 +414,9 @@ func (o *LD_D_d8) cycles() []uint8 { // 0x16
 }
 
 func (o *LD_D_d8) String() string { // 0x16
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "D" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_D_d8) SymbolicString() string { // 0x16
 	return "LD D,d8"
 }
@@ -442,6 +444,9 @@ func (o *RLA) Write(w io.Writer) (int, error) { // 0x17
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -454,10 +459,9 @@ func (o *RLA) cycles() []uint8 { // 0x17
 }
 
 func (o *RLA) String() string { // 0x17
-
-	return fmt.Sprintf("RLA %v", o.operand1)
-
+	return "RLA"
 }
+
 func (o *RLA) SymbolicString() string { // 0x17
 	return "RLA"
 }
@@ -485,6 +489,10 @@ func (o *JR_r8) Write(w io.Writer) (int, error) { // 0x18
 		return written, err
 	}
 
+	err = writeImmediateSigned8BitData(w, o.operand1)
+	written += 1
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -497,10 +505,9 @@ func (o *JR_r8) cycles() []uint8 { // 0x18
 }
 
 func (o *JR_r8) String() string { // 0x18
-
-	return fmt.Sprintf("JR %v", o.operand1)
-
+	return "JR" + " " + fmt.Sprintf("SP+%X", o.operand1)
 }
+
 func (o *JR_r8) SymbolicString() string { // 0x18
 	return "JR r8"
 }
@@ -528,6 +535,9 @@ func (o *ADD_HL_DE) Write(w io.Writer) (int, error) { // 0x19
 		return written, err
 	}
 
+	// HL is implicit in this instruction.
+	// DE is implicit in this instruction.
+
 	return written, err
 }
 
@@ -540,10 +550,9 @@ func (o *ADD_HL_DE) cycles() []uint8 { // 0x19
 }
 
 func (o *ADD_HL_DE) String() string { // 0x19
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "HL" /* operand1 */ + " " + "DE" /* operand2 */
 }
+
 func (o *ADD_HL_DE) SymbolicString() string { // 0x19
 	return "ADD HL,DE"
 }
@@ -571,6 +580,9 @@ func (o *LD_A_DEDeref) Write(w io.Writer) (int, error) { // 0x1a
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// (DE) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -583,10 +595,9 @@ func (o *LD_A_DEDeref) cycles() []uint8 { // 0x1a
 }
 
 func (o *LD_A_DEDeref) String() string { // 0x1a
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "(DE)" /* operand2 */
 }
+
 func (o *LD_A_DEDeref) SymbolicString() string { // 0x1a
 	return "LD A,(DE)"
 }
@@ -614,6 +625,9 @@ func (o *DEC_DE) Write(w io.Writer) (int, error) { // 0x1b
 		return written, err
 	}
 
+	// DE is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -626,10 +640,9 @@ func (o *DEC_DE) cycles() []uint8 { // 0x1b
 }
 
 func (o *DEC_DE) String() string { // 0x1b
-
-	return fmt.Sprintf("DEC %v", o.operand1)
-
+	return "DEC" + " " + "DE" /* operand1 */
 }
+
 func (o *DEC_DE) SymbolicString() string { // 0x1b
 	return "DEC DE"
 }
@@ -657,6 +670,9 @@ func (o *INC_E) Write(w io.Writer) (int, error) { // 0x1c
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -669,10 +685,9 @@ func (o *INC_E) cycles() []uint8 { // 0x1c
 }
 
 func (o *INC_E) String() string { // 0x1c
-
-	return fmt.Sprintf("INC %v", o.operand1)
-
+	return "INC" + " " + "E" /* operand1 */
 }
+
 func (o *INC_E) SymbolicString() string { // 0x1c
 	return "INC E"
 }
@@ -700,6 +715,9 @@ func (o *DEC_E) Write(w io.Writer) (int, error) { // 0x1d
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -712,10 +730,9 @@ func (o *DEC_E) cycles() []uint8 { // 0x1d
 }
 
 func (o *DEC_E) String() string { // 0x1d
-
-	return fmt.Sprintf("DEC %v", o.operand1)
-
+	return "DEC" + " " + "E" /* operand1 */
 }
+
 func (o *DEC_E) SymbolicString() string { // 0x1d
 	return "DEC E"
 }
@@ -743,10 +760,8 @@ func (o *LD_E_d8) Write(w io.Writer) (int, error) { // 0x1e
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// E is implicit in this instruction.
+	err = writeImmediate8BitData(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -761,10 +776,9 @@ func (o *LD_E_d8) cycles() []uint8 { // 0x1e
 }
 
 func (o *LD_E_d8) String() string { // 0x1e
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "E" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_E_d8) SymbolicString() string { // 0x1e
 	return "LD E,d8"
 }
@@ -792,6 +806,9 @@ func (o *RRA) Write(w io.Writer) (int, error) { // 0x1f
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -804,10 +821,9 @@ func (o *RRA) cycles() []uint8 { // 0x1f
 }
 
 func (o *RRA) String() string { // 0x1f
-
-	return fmt.Sprintf("RRA %v", o.operand1)
-
+	return "RRA"
 }
+
 func (o *RRA) SymbolicString() string { // 0x1f
 	return "RRA"
 }
@@ -835,6 +851,9 @@ func (o *LD_BCDeref_A) Write(w io.Writer) (int, error) { // 0x2
 		return written, err
 	}
 
+	// (BC) is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -847,10 +866,9 @@ func (o *LD_BCDeref_A) cycles() []uint8 { // 0x2
 }
 
 func (o *LD_BCDeref_A) String() string { // 0x2
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(BC)" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_BCDeref_A) SymbolicString() string { // 0x2
 	return "LD (BC),A"
 }
@@ -878,6 +896,10 @@ func (o *JR_NZ_r8) Write(w io.Writer) (int, error) { // 0x20
 		return written, err
 	}
 
+	// NZ is implicit in this instruction.
+	err = writeImmediateSigned8BitData(w, o.operand2)
+	written += 1
+
 	return written, err
 }
 
@@ -890,10 +912,9 @@ func (o *JR_NZ_r8) cycles() []uint8 { // 0x20
 }
 
 func (o *JR_NZ_r8) String() string { // 0x20
-
-	return fmt.Sprintf("JR %v %v", o.operand1, o.operand2)
-
+	return "JR" + " " + "NZ" /* operand1 */ + " " + fmt.Sprintf("SP+%X", o.operand2)
 }
+
 func (o *JR_NZ_r8) SymbolicString() string { // 0x20
 	return "JR NZ,r8"
 }
@@ -921,10 +942,8 @@ func (o *LD_HL_d16) Write(w io.Writer) (int, error) { // 0x21
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// HL is implicit in this instruction.
+	err = writeImmediate16BitData(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -939,10 +958,9 @@ func (o *LD_HL_d16) cycles() []uint8 { // 0x21
 }
 
 func (o *LD_HL_d16) String() string { // 0x21
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "HL" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_HL_d16) SymbolicString() string { // 0x21
 	return "LD HL,d16"
 }
@@ -970,6 +988,9 @@ func (o *LD_HLPtrInc_A) Write(w io.Writer) (int, error) { // 0x22
 		return written, err
 	}
 
+	// (HL+) is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -982,10 +1003,9 @@ func (o *LD_HLPtrInc_A) cycles() []uint8 { // 0x22
 }
 
 func (o *LD_HLPtrInc_A) String() string { // 0x22
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(HL+)" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_HLPtrInc_A) SymbolicString() string { // 0x22
 	return "LD (HL+),A"
 }
@@ -1013,6 +1033,9 @@ func (o *INC_HL) Write(w io.Writer) (int, error) { // 0x23
 		return written, err
 	}
 
+	// HL is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1025,10 +1048,9 @@ func (o *INC_HL) cycles() []uint8 { // 0x23
 }
 
 func (o *INC_HL) String() string { // 0x23
-
-	return fmt.Sprintf("INC %v", o.operand1)
-
+	return "INC" + " " + "HL" /* operand1 */
 }
+
 func (o *INC_HL) SymbolicString() string { // 0x23
 	return "INC HL"
 }
@@ -1056,6 +1078,9 @@ func (o *INC_H) Write(w io.Writer) (int, error) { // 0x24
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1068,10 +1093,9 @@ func (o *INC_H) cycles() []uint8 { // 0x24
 }
 
 func (o *INC_H) String() string { // 0x24
-
-	return fmt.Sprintf("INC %v", o.operand1)
-
+	return "INC" + " " + "H" /* operand1 */
 }
+
 func (o *INC_H) SymbolicString() string { // 0x24
 	return "INC H"
 }
@@ -1099,6 +1123,9 @@ func (o *DEC_H) Write(w io.Writer) (int, error) { // 0x25
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1111,10 +1138,9 @@ func (o *DEC_H) cycles() []uint8 { // 0x25
 }
 
 func (o *DEC_H) String() string { // 0x25
-
-	return fmt.Sprintf("DEC %v", o.operand1)
-
+	return "DEC" + " " + "H" /* operand1 */
 }
+
 func (o *DEC_H) SymbolicString() string { // 0x25
 	return "DEC H"
 }
@@ -1142,10 +1168,8 @@ func (o *LD_H_d8) Write(w io.Writer) (int, error) { // 0x26
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// H is implicit in this instruction.
+	err = writeImmediate8BitData(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -1160,10 +1184,9 @@ func (o *LD_H_d8) cycles() []uint8 { // 0x26
 }
 
 func (o *LD_H_d8) String() string { // 0x26
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "H" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_H_d8) SymbolicString() string { // 0x26
 	return "LD H,d8"
 }
@@ -1191,6 +1214,9 @@ func (o *DAA) Write(w io.Writer) (int, error) { // 0x27
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1203,10 +1229,9 @@ func (o *DAA) cycles() []uint8 { // 0x27
 }
 
 func (o *DAA) String() string { // 0x27
-
-	return fmt.Sprintf("DAA %v", o.operand1)
-
+	return "DAA"
 }
+
 func (o *DAA) SymbolicString() string { // 0x27
 	return "DAA"
 }
@@ -1234,6 +1259,10 @@ func (o *JR_Z_r8) Write(w io.Writer) (int, error) { // 0x28
 		return written, err
 	}
 
+	// Z is implicit in this instruction.
+	err = writeImmediateSigned8BitData(w, o.operand2)
+	written += 1
+
 	return written, err
 }
 
@@ -1246,10 +1275,9 @@ func (o *JR_Z_r8) cycles() []uint8 { // 0x28
 }
 
 func (o *JR_Z_r8) String() string { // 0x28
-
-	return fmt.Sprintf("JR %v %v", o.operand1, o.operand2)
-
+	return "JR" + " " + "Z" /* operand1 */ + " " + fmt.Sprintf("SP+%X", o.operand2)
 }
+
 func (o *JR_Z_r8) SymbolicString() string { // 0x28
 	return "JR Z,r8"
 }
@@ -1277,6 +1305,9 @@ func (o *ADD_HL_HL) Write(w io.Writer) (int, error) { // 0x29
 		return written, err
 	}
 
+	// HL is implicit in this instruction.
+	// HL is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1289,10 +1320,9 @@ func (o *ADD_HL_HL) cycles() []uint8 { // 0x29
 }
 
 func (o *ADD_HL_HL) String() string { // 0x29
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "HL" /* operand1 */ + " " + "HL" /* operand2 */
 }
+
 func (o *ADD_HL_HL) SymbolicString() string { // 0x29
 	return "ADD HL,HL"
 }
@@ -1320,6 +1350,9 @@ func (o *LD_A_HLPtrInc) Write(w io.Writer) (int, error) { // 0x2a
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// (HL+) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1332,10 +1365,9 @@ func (o *LD_A_HLPtrInc) cycles() []uint8 { // 0x2a
 }
 
 func (o *LD_A_HLPtrInc) String() string { // 0x2a
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "(HL+)" /* operand2 */
 }
+
 func (o *LD_A_HLPtrInc) SymbolicString() string { // 0x2a
 	return "LD A,(HL+)"
 }
@@ -1363,6 +1395,9 @@ func (o *DEC_HL) Write(w io.Writer) (int, error) { // 0x2b
 		return written, err
 	}
 
+	// HL is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1375,10 +1410,9 @@ func (o *DEC_HL) cycles() []uint8 { // 0x2b
 }
 
 func (o *DEC_HL) String() string { // 0x2b
-
-	return fmt.Sprintf("DEC %v", o.operand1)
-
+	return "DEC" + " " + "HL" /* operand1 */
 }
+
 func (o *DEC_HL) SymbolicString() string { // 0x2b
 	return "DEC HL"
 }
@@ -1406,6 +1440,9 @@ func (o *INC_L) Write(w io.Writer) (int, error) { // 0x2c
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1418,10 +1455,9 @@ func (o *INC_L) cycles() []uint8 { // 0x2c
 }
 
 func (o *INC_L) String() string { // 0x2c
-
-	return fmt.Sprintf("INC %v", o.operand1)
-
+	return "INC" + " " + "L" /* operand1 */
 }
+
 func (o *INC_L) SymbolicString() string { // 0x2c
 	return "INC L"
 }
@@ -1449,6 +1485,9 @@ func (o *DEC_L) Write(w io.Writer) (int, error) { // 0x2d
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1461,10 +1500,9 @@ func (o *DEC_L) cycles() []uint8 { // 0x2d
 }
 
 func (o *DEC_L) String() string { // 0x2d
-
-	return fmt.Sprintf("DEC %v", o.operand1)
-
+	return "DEC" + " " + "L" /* operand1 */
 }
+
 func (o *DEC_L) SymbolicString() string { // 0x2d
 	return "DEC L"
 }
@@ -1492,10 +1530,8 @@ func (o *LD_L_d8) Write(w io.Writer) (int, error) { // 0x2e
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// L is implicit in this instruction.
+	err = writeImmediate8BitData(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -1510,10 +1546,9 @@ func (o *LD_L_d8) cycles() []uint8 { // 0x2e
 }
 
 func (o *LD_L_d8) String() string { // 0x2e
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "L" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_L_d8) SymbolicString() string { // 0x2e
 	return "LD L,d8"
 }
@@ -1541,6 +1576,9 @@ func (o *CPL) Write(w io.Writer) (int, error) { // 0x2f
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1553,10 +1591,9 @@ func (o *CPL) cycles() []uint8 { // 0x2f
 }
 
 func (o *CPL) String() string { // 0x2f
-
-	return fmt.Sprintf("CPL %v", o.operand1)
-
+	return "CPL"
 }
+
 func (o *CPL) SymbolicString() string { // 0x2f
 	return "CPL"
 }
@@ -1584,6 +1621,9 @@ func (o *INC_BC) Write(w io.Writer) (int, error) { // 0x3
 		return written, err
 	}
 
+	// BC is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1596,10 +1636,9 @@ func (o *INC_BC) cycles() []uint8 { // 0x3
 }
 
 func (o *INC_BC) String() string { // 0x3
-
-	return fmt.Sprintf("INC %v", o.operand1)
-
+	return "INC" + " " + "BC" /* operand1 */
 }
+
 func (o *INC_BC) SymbolicString() string { // 0x3
 	return "INC BC"
 }
@@ -1627,6 +1666,10 @@ func (o *JR_NC_r8) Write(w io.Writer) (int, error) { // 0x30
 		return written, err
 	}
 
+	// NC is implicit in this instruction.
+	err = writeImmediateSigned8BitData(w, o.operand2)
+	written += 1
+
 	return written, err
 }
 
@@ -1639,10 +1682,9 @@ func (o *JR_NC_r8) cycles() []uint8 { // 0x30
 }
 
 func (o *JR_NC_r8) String() string { // 0x30
-
-	return fmt.Sprintf("JR %v %v", o.operand1, o.operand2)
-
+	return "JR" + " " + "NC" /* operand1 */ + " " + fmt.Sprintf("SP+%X", o.operand2)
 }
+
 func (o *JR_NC_r8) SymbolicString() string { // 0x30
 	return "JR NC,r8"
 }
@@ -1670,10 +1712,8 @@ func (o *LD_SP_d16) Write(w io.Writer) (int, error) { // 0x31
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// SP is implicit in this instruction.
+	err = writeImmediate16BitData(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -1688,10 +1728,9 @@ func (o *LD_SP_d16) cycles() []uint8 { // 0x31
 }
 
 func (o *LD_SP_d16) String() string { // 0x31
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "SP" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_SP_d16) SymbolicString() string { // 0x31
 	return "LD SP,d16"
 }
@@ -1719,6 +1758,9 @@ func (o *LD_HLPtrDec_A) Write(w io.Writer) (int, error) { // 0x32
 		return written, err
 	}
 
+	// (HL-) is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1731,10 +1773,9 @@ func (o *LD_HLPtrDec_A) cycles() []uint8 { // 0x32
 }
 
 func (o *LD_HLPtrDec_A) String() string { // 0x32
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(HL-)" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_HLPtrDec_A) SymbolicString() string { // 0x32
 	return "LD (HL-),A"
 }
@@ -1762,6 +1803,9 @@ func (o *INC_SP) Write(w io.Writer) (int, error) { // 0x33
 		return written, err
 	}
 
+	// SP is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1774,10 +1818,9 @@ func (o *INC_SP) cycles() []uint8 { // 0x33
 }
 
 func (o *INC_SP) String() string { // 0x33
-
-	return fmt.Sprintf("INC %v", o.operand1)
-
+	return "INC" + " " + "SP" /* operand1 */
 }
+
 func (o *INC_SP) SymbolicString() string { // 0x33
 	return "INC SP"
 }
@@ -1805,6 +1848,9 @@ func (o *INC_HLPtr) Write(w io.Writer) (int, error) { // 0x34
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1817,10 +1863,9 @@ func (o *INC_HLPtr) cycles() []uint8 { // 0x34
 }
 
 func (o *INC_HLPtr) String() string { // 0x34
-
-	return fmt.Sprintf("INC %v", o.operand1)
-
+	return "INC" + " " + "(HL)" /* operand1 */
 }
+
 func (o *INC_HLPtr) SymbolicString() string { // 0x34
 	return "INC (HL)"
 }
@@ -1848,6 +1893,9 @@ func (o *DEC_HLPtr) Write(w io.Writer) (int, error) { // 0x35
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1860,10 +1908,9 @@ func (o *DEC_HLPtr) cycles() []uint8 { // 0x35
 }
 
 func (o *DEC_HLPtr) String() string { // 0x35
-
-	return fmt.Sprintf("DEC %v", o.operand1)
-
+	return "DEC" + " " + "(HL)" /* operand1 */
 }
+
 func (o *DEC_HLPtr) SymbolicString() string { // 0x35
 	return "DEC (HL)"
 }
@@ -1891,10 +1938,8 @@ func (o *LD_HLPtr_d8) Write(w io.Writer) (int, error) { // 0x36
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// (HL) is implicit in this instruction.
+	err = writeImmediate8BitData(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -1909,10 +1954,9 @@ func (o *LD_HLPtr_d8) cycles() []uint8 { // 0x36
 }
 
 func (o *LD_HLPtr_d8) String() string { // 0x36
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(HL)" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_HLPtr_d8) SymbolicString() string { // 0x36
 	return "LD (HL),d8"
 }
@@ -1940,6 +1984,9 @@ func (o *SCF) Write(w io.Writer) (int, error) { // 0x37
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -1952,10 +1999,9 @@ func (o *SCF) cycles() []uint8 { // 0x37
 }
 
 func (o *SCF) String() string { // 0x37
-
-	return fmt.Sprintf("SCF %v", o.operand1)
-
+	return "SCF"
 }
+
 func (o *SCF) SymbolicString() string { // 0x37
 	return "SCF"
 }
@@ -1983,6 +2029,10 @@ func (o *JR_C_r8) Write(w io.Writer) (int, error) { // 0x38
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	err = writeImmediateSigned8BitData(w, o.operand2)
+	written += 1
+
 	return written, err
 }
 
@@ -1995,10 +2045,9 @@ func (o *JR_C_r8) cycles() []uint8 { // 0x38
 }
 
 func (o *JR_C_r8) String() string { // 0x38
-
-	return fmt.Sprintf("JR %v %v", o.operand1, o.operand2)
-
+	return "JR" + " " + "C" /* operand1 */ + " " + fmt.Sprintf("SP+%X", o.operand2)
 }
+
 func (o *JR_C_r8) SymbolicString() string { // 0x38
 	return "JR C,r8"
 }
@@ -2026,6 +2075,9 @@ func (o *ADD_HL_SP) Write(w io.Writer) (int, error) { // 0x39
 		return written, err
 	}
 
+	// HL is implicit in this instruction.
+	// SP is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2038,10 +2090,9 @@ func (o *ADD_HL_SP) cycles() []uint8 { // 0x39
 }
 
 func (o *ADD_HL_SP) String() string { // 0x39
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "HL" /* operand1 */ + " " + "SP" /* operand2 */
 }
+
 func (o *ADD_HL_SP) SymbolicString() string { // 0x39
 	return "ADD HL,SP"
 }
@@ -2069,6 +2120,9 @@ func (o *LD_A_HLPtrDec) Write(w io.Writer) (int, error) { // 0x3a
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// (HL-) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2081,10 +2135,9 @@ func (o *LD_A_HLPtrDec) cycles() []uint8 { // 0x3a
 }
 
 func (o *LD_A_HLPtrDec) String() string { // 0x3a
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "(HL-)" /* operand2 */
 }
+
 func (o *LD_A_HLPtrDec) SymbolicString() string { // 0x3a
 	return "LD A,(HL-)"
 }
@@ -2112,6 +2165,9 @@ func (o *DEC_SP) Write(w io.Writer) (int, error) { // 0x3b
 		return written, err
 	}
 
+	// SP is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2124,10 +2180,9 @@ func (o *DEC_SP) cycles() []uint8 { // 0x3b
 }
 
 func (o *DEC_SP) String() string { // 0x3b
-
-	return fmt.Sprintf("DEC %v", o.operand1)
-
+	return "DEC" + " " + "SP" /* operand1 */
 }
+
 func (o *DEC_SP) SymbolicString() string { // 0x3b
 	return "DEC SP"
 }
@@ -2155,6 +2210,9 @@ func (o *INC_A) Write(w io.Writer) (int, error) { // 0x3c
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2167,10 +2225,9 @@ func (o *INC_A) cycles() []uint8 { // 0x3c
 }
 
 func (o *INC_A) String() string { // 0x3c
-
-	return fmt.Sprintf("INC %v", o.operand1)
-
+	return "INC" + " " + "A" /* operand1 */
 }
+
 func (o *INC_A) SymbolicString() string { // 0x3c
 	return "INC A"
 }
@@ -2198,6 +2255,9 @@ func (o *DEC_A) Write(w io.Writer) (int, error) { // 0x3d
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2210,10 +2270,9 @@ func (o *DEC_A) cycles() []uint8 { // 0x3d
 }
 
 func (o *DEC_A) String() string { // 0x3d
-
-	return fmt.Sprintf("DEC %v", o.operand1)
-
+	return "DEC" + " " + "A" /* operand1 */
 }
+
 func (o *DEC_A) SymbolicString() string { // 0x3d
 	return "DEC A"
 }
@@ -2241,10 +2300,8 @@ func (o *LD_A_d8) Write(w io.Writer) (int, error) { // 0x3e
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// A is implicit in this instruction.
+	err = writeImmediate8BitData(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -2259,10 +2316,9 @@ func (o *LD_A_d8) cycles() []uint8 { // 0x3e
 }
 
 func (o *LD_A_d8) String() string { // 0x3e
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_A_d8) SymbolicString() string { // 0x3e
 	return "LD A,d8"
 }
@@ -2290,6 +2346,9 @@ func (o *CCF) Write(w io.Writer) (int, error) { // 0x3f
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2302,10 +2361,9 @@ func (o *CCF) cycles() []uint8 { // 0x3f
 }
 
 func (o *CCF) String() string { // 0x3f
-
-	return fmt.Sprintf("CCF %v", o.operand1)
-
+	return "CCF"
 }
+
 func (o *CCF) SymbolicString() string { // 0x3f
 	return "CCF"
 }
@@ -2333,6 +2391,9 @@ func (o *INC_B) Write(w io.Writer) (int, error) { // 0x4
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2345,10 +2406,9 @@ func (o *INC_B) cycles() []uint8 { // 0x4
 }
 
 func (o *INC_B) String() string { // 0x4
-
-	return fmt.Sprintf("INC %v", o.operand1)
-
+	return "INC" + " " + "B" /* operand1 */
 }
+
 func (o *INC_B) SymbolicString() string { // 0x4
 	return "INC B"
 }
@@ -2376,6 +2436,9 @@ func (o *LD_B_B) Write(w io.Writer) (int, error) { // 0x40
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2388,10 +2451,9 @@ func (o *LD_B_B) cycles() []uint8 { // 0x40
 }
 
 func (o *LD_B_B) String() string { // 0x40
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "B" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *LD_B_B) SymbolicString() string { // 0x40
 	return "LD B,B"
 }
@@ -2419,6 +2481,9 @@ func (o *LD_B_C) Write(w io.Writer) (int, error) { // 0x41
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2431,10 +2496,9 @@ func (o *LD_B_C) cycles() []uint8 { // 0x41
 }
 
 func (o *LD_B_C) String() string { // 0x41
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "B" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *LD_B_C) SymbolicString() string { // 0x41
 	return "LD B,C"
 }
@@ -2462,6 +2526,9 @@ func (o *LD_B_D) Write(w io.Writer) (int, error) { // 0x42
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2474,10 +2541,9 @@ func (o *LD_B_D) cycles() []uint8 { // 0x42
 }
 
 func (o *LD_B_D) String() string { // 0x42
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "B" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *LD_B_D) SymbolicString() string { // 0x42
 	return "LD B,D"
 }
@@ -2505,6 +2571,9 @@ func (o *LD_B_E) Write(w io.Writer) (int, error) { // 0x43
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2517,10 +2586,9 @@ func (o *LD_B_E) cycles() []uint8 { // 0x43
 }
 
 func (o *LD_B_E) String() string { // 0x43
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "B" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *LD_B_E) SymbolicString() string { // 0x43
 	return "LD B,E"
 }
@@ -2548,6 +2616,9 @@ func (o *LD_B_H) Write(w io.Writer) (int, error) { // 0x44
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2560,10 +2631,9 @@ func (o *LD_B_H) cycles() []uint8 { // 0x44
 }
 
 func (o *LD_B_H) String() string { // 0x44
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "B" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *LD_B_H) SymbolicString() string { // 0x44
 	return "LD B,H"
 }
@@ -2591,6 +2661,9 @@ func (o *LD_B_L) Write(w io.Writer) (int, error) { // 0x45
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2603,10 +2676,9 @@ func (o *LD_B_L) cycles() []uint8 { // 0x45
 }
 
 func (o *LD_B_L) String() string { // 0x45
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "B" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *LD_B_L) SymbolicString() string { // 0x45
 	return "LD B,L"
 }
@@ -2634,6 +2706,9 @@ func (o *LD_B_HLPtr) Write(w io.Writer) (int, error) { // 0x46
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2646,10 +2721,9 @@ func (o *LD_B_HLPtr) cycles() []uint8 { // 0x46
 }
 
 func (o *LD_B_HLPtr) String() string { // 0x46
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "B" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *LD_B_HLPtr) SymbolicString() string { // 0x46
 	return "LD B,(HL)"
 }
@@ -2677,6 +2751,9 @@ func (o *LD_B_A) Write(w io.Writer) (int, error) { // 0x47
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2689,10 +2766,9 @@ func (o *LD_B_A) cycles() []uint8 { // 0x47
 }
 
 func (o *LD_B_A) String() string { // 0x47
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "B" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_B_A) SymbolicString() string { // 0x47
 	return "LD B,A"
 }
@@ -2720,6 +2796,9 @@ func (o *LD_C_B) Write(w io.Writer) (int, error) { // 0x48
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2732,10 +2811,9 @@ func (o *LD_C_B) cycles() []uint8 { // 0x48
 }
 
 func (o *LD_C_B) String() string { // 0x48
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "C" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *LD_C_B) SymbolicString() string { // 0x48
 	return "LD C,B"
 }
@@ -2763,6 +2841,9 @@ func (o *LD_C_C) Write(w io.Writer) (int, error) { // 0x49
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2775,10 +2856,9 @@ func (o *LD_C_C) cycles() []uint8 { // 0x49
 }
 
 func (o *LD_C_C) String() string { // 0x49
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "C" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *LD_C_C) SymbolicString() string { // 0x49
 	return "LD C,C"
 }
@@ -2806,6 +2886,9 @@ func (o *LD_C_D) Write(w io.Writer) (int, error) { // 0x4a
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2818,10 +2901,9 @@ func (o *LD_C_D) cycles() []uint8 { // 0x4a
 }
 
 func (o *LD_C_D) String() string { // 0x4a
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "C" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *LD_C_D) SymbolicString() string { // 0x4a
 	return "LD C,D"
 }
@@ -2849,6 +2931,9 @@ func (o *LD_C_E) Write(w io.Writer) (int, error) { // 0x4b
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2861,10 +2946,9 @@ func (o *LD_C_E) cycles() []uint8 { // 0x4b
 }
 
 func (o *LD_C_E) String() string { // 0x4b
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "C" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *LD_C_E) SymbolicString() string { // 0x4b
 	return "LD C,E"
 }
@@ -2892,6 +2976,9 @@ func (o *LD_C_H) Write(w io.Writer) (int, error) { // 0x4c
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2904,10 +2991,9 @@ func (o *LD_C_H) cycles() []uint8 { // 0x4c
 }
 
 func (o *LD_C_H) String() string { // 0x4c
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "C" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *LD_C_H) SymbolicString() string { // 0x4c
 	return "LD C,H"
 }
@@ -2935,6 +3021,9 @@ func (o *LD_C_L) Write(w io.Writer) (int, error) { // 0x4d
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2947,10 +3036,9 @@ func (o *LD_C_L) cycles() []uint8 { // 0x4d
 }
 
 func (o *LD_C_L) String() string { // 0x4d
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "C" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *LD_C_L) SymbolicString() string { // 0x4d
 	return "LD C,L"
 }
@@ -2978,6 +3066,9 @@ func (o *LD_C_HLPtr) Write(w io.Writer) (int, error) { // 0x4e
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -2990,10 +3081,9 @@ func (o *LD_C_HLPtr) cycles() []uint8 { // 0x4e
 }
 
 func (o *LD_C_HLPtr) String() string { // 0x4e
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "C" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *LD_C_HLPtr) SymbolicString() string { // 0x4e
 	return "LD C,(HL)"
 }
@@ -3021,6 +3111,9 @@ func (o *LD_C_A) Write(w io.Writer) (int, error) { // 0x4f
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3033,10 +3126,9 @@ func (o *LD_C_A) cycles() []uint8 { // 0x4f
 }
 
 func (o *LD_C_A) String() string { // 0x4f
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "C" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_C_A) SymbolicString() string { // 0x4f
 	return "LD C,A"
 }
@@ -3064,6 +3156,9 @@ func (o *DEC_B) Write(w io.Writer) (int, error) { // 0x5
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3076,10 +3171,9 @@ func (o *DEC_B) cycles() []uint8 { // 0x5
 }
 
 func (o *DEC_B) String() string { // 0x5
-
-	return fmt.Sprintf("DEC %v", o.operand1)
-
+	return "DEC" + " " + "B" /* operand1 */
 }
+
 func (o *DEC_B) SymbolicString() string { // 0x5
 	return "DEC B"
 }
@@ -3107,6 +3201,9 @@ func (o *LD_D_B) Write(w io.Writer) (int, error) { // 0x50
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3119,10 +3216,9 @@ func (o *LD_D_B) cycles() []uint8 { // 0x50
 }
 
 func (o *LD_D_B) String() string { // 0x50
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "D" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *LD_D_B) SymbolicString() string { // 0x50
 	return "LD D,B"
 }
@@ -3150,6 +3246,9 @@ func (o *LD_D_C) Write(w io.Writer) (int, error) { // 0x51
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3162,10 +3261,9 @@ func (o *LD_D_C) cycles() []uint8 { // 0x51
 }
 
 func (o *LD_D_C) String() string { // 0x51
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "D" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *LD_D_C) SymbolicString() string { // 0x51
 	return "LD D,C"
 }
@@ -3193,6 +3291,9 @@ func (o *LD_D_D) Write(w io.Writer) (int, error) { // 0x52
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3205,10 +3306,9 @@ func (o *LD_D_D) cycles() []uint8 { // 0x52
 }
 
 func (o *LD_D_D) String() string { // 0x52
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "D" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *LD_D_D) SymbolicString() string { // 0x52
 	return "LD D,D"
 }
@@ -3236,6 +3336,9 @@ func (o *LD_D_E) Write(w io.Writer) (int, error) { // 0x53
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3248,10 +3351,9 @@ func (o *LD_D_E) cycles() []uint8 { // 0x53
 }
 
 func (o *LD_D_E) String() string { // 0x53
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "D" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *LD_D_E) SymbolicString() string { // 0x53
 	return "LD D,E"
 }
@@ -3279,6 +3381,9 @@ func (o *LD_D_H) Write(w io.Writer) (int, error) { // 0x54
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3291,10 +3396,9 @@ func (o *LD_D_H) cycles() []uint8 { // 0x54
 }
 
 func (o *LD_D_H) String() string { // 0x54
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "D" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *LD_D_H) SymbolicString() string { // 0x54
 	return "LD D,H"
 }
@@ -3322,6 +3426,9 @@ func (o *LD_D_L) Write(w io.Writer) (int, error) { // 0x55
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3334,10 +3441,9 @@ func (o *LD_D_L) cycles() []uint8 { // 0x55
 }
 
 func (o *LD_D_L) String() string { // 0x55
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "D" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *LD_D_L) SymbolicString() string { // 0x55
 	return "LD D,L"
 }
@@ -3365,6 +3471,9 @@ func (o *LD_D_HLPtr) Write(w io.Writer) (int, error) { // 0x56
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3377,10 +3486,9 @@ func (o *LD_D_HLPtr) cycles() []uint8 { // 0x56
 }
 
 func (o *LD_D_HLPtr) String() string { // 0x56
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "D" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *LD_D_HLPtr) SymbolicString() string { // 0x56
 	return "LD D,(HL)"
 }
@@ -3408,6 +3516,9 @@ func (o *LD_D_A) Write(w io.Writer) (int, error) { // 0x57
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3420,10 +3531,9 @@ func (o *LD_D_A) cycles() []uint8 { // 0x57
 }
 
 func (o *LD_D_A) String() string { // 0x57
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "D" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_D_A) SymbolicString() string { // 0x57
 	return "LD D,A"
 }
@@ -3451,6 +3561,9 @@ func (o *LD_E_B) Write(w io.Writer) (int, error) { // 0x58
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3463,10 +3576,9 @@ func (o *LD_E_B) cycles() []uint8 { // 0x58
 }
 
 func (o *LD_E_B) String() string { // 0x58
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "E" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *LD_E_B) SymbolicString() string { // 0x58
 	return "LD E,B"
 }
@@ -3494,6 +3606,9 @@ func (o *LD_E_C) Write(w io.Writer) (int, error) { // 0x59
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3506,10 +3621,9 @@ func (o *LD_E_C) cycles() []uint8 { // 0x59
 }
 
 func (o *LD_E_C) String() string { // 0x59
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "E" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *LD_E_C) SymbolicString() string { // 0x59
 	return "LD E,C"
 }
@@ -3537,6 +3651,9 @@ func (o *LD_E_D) Write(w io.Writer) (int, error) { // 0x5a
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3549,10 +3666,9 @@ func (o *LD_E_D) cycles() []uint8 { // 0x5a
 }
 
 func (o *LD_E_D) String() string { // 0x5a
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "E" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *LD_E_D) SymbolicString() string { // 0x5a
 	return "LD E,D"
 }
@@ -3580,6 +3696,9 @@ func (o *LD_E_E) Write(w io.Writer) (int, error) { // 0x5b
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3592,10 +3711,9 @@ func (o *LD_E_E) cycles() []uint8 { // 0x5b
 }
 
 func (o *LD_E_E) String() string { // 0x5b
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "E" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *LD_E_E) SymbolicString() string { // 0x5b
 	return "LD E,E"
 }
@@ -3623,6 +3741,9 @@ func (o *LD_E_H) Write(w io.Writer) (int, error) { // 0x5c
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3635,10 +3756,9 @@ func (o *LD_E_H) cycles() []uint8 { // 0x5c
 }
 
 func (o *LD_E_H) String() string { // 0x5c
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "E" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *LD_E_H) SymbolicString() string { // 0x5c
 	return "LD E,H"
 }
@@ -3666,6 +3786,9 @@ func (o *LD_E_L) Write(w io.Writer) (int, error) { // 0x5d
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3678,10 +3801,9 @@ func (o *LD_E_L) cycles() []uint8 { // 0x5d
 }
 
 func (o *LD_E_L) String() string { // 0x5d
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "E" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *LD_E_L) SymbolicString() string { // 0x5d
 	return "LD E,L"
 }
@@ -3709,6 +3831,9 @@ func (o *LD_E_HLPtr) Write(w io.Writer) (int, error) { // 0x5e
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3721,10 +3846,9 @@ func (o *LD_E_HLPtr) cycles() []uint8 { // 0x5e
 }
 
 func (o *LD_E_HLPtr) String() string { // 0x5e
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "E" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *LD_E_HLPtr) SymbolicString() string { // 0x5e
 	return "LD E,(HL)"
 }
@@ -3752,6 +3876,9 @@ func (o *LD_E_A) Write(w io.Writer) (int, error) { // 0x5f
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3764,10 +3891,9 @@ func (o *LD_E_A) cycles() []uint8 { // 0x5f
 }
 
 func (o *LD_E_A) String() string { // 0x5f
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "E" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_E_A) SymbolicString() string { // 0x5f
 	return "LD E,A"
 }
@@ -3795,10 +3921,8 @@ func (o *LD_B_d8) Write(w io.Writer) (int, error) { // 0x6
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// B is implicit in this instruction.
+	err = writeImmediate8BitData(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -3813,10 +3937,9 @@ func (o *LD_B_d8) cycles() []uint8 { // 0x6
 }
 
 func (o *LD_B_d8) String() string { // 0x6
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "B" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_B_d8) SymbolicString() string { // 0x6
 	return "LD B,d8"
 }
@@ -3844,6 +3967,9 @@ func (o *LD_H_B) Write(w io.Writer) (int, error) { // 0x60
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3856,10 +3982,9 @@ func (o *LD_H_B) cycles() []uint8 { // 0x60
 }
 
 func (o *LD_H_B) String() string { // 0x60
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "H" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *LD_H_B) SymbolicString() string { // 0x60
 	return "LD H,B"
 }
@@ -3887,6 +4012,9 @@ func (o *LD_H_C) Write(w io.Writer) (int, error) { // 0x61
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3899,10 +4027,9 @@ func (o *LD_H_C) cycles() []uint8 { // 0x61
 }
 
 func (o *LD_H_C) String() string { // 0x61
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "H" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *LD_H_C) SymbolicString() string { // 0x61
 	return "LD H,C"
 }
@@ -3930,6 +4057,9 @@ func (o *LD_H_D) Write(w io.Writer) (int, error) { // 0x62
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3942,10 +4072,9 @@ func (o *LD_H_D) cycles() []uint8 { // 0x62
 }
 
 func (o *LD_H_D) String() string { // 0x62
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "H" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *LD_H_D) SymbolicString() string { // 0x62
 	return "LD H,D"
 }
@@ -3973,6 +4102,9 @@ func (o *LD_H_E) Write(w io.Writer) (int, error) { // 0x63
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -3985,10 +4117,9 @@ func (o *LD_H_E) cycles() []uint8 { // 0x63
 }
 
 func (o *LD_H_E) String() string { // 0x63
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "H" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *LD_H_E) SymbolicString() string { // 0x63
 	return "LD H,E"
 }
@@ -4016,6 +4147,9 @@ func (o *LD_H_H) Write(w io.Writer) (int, error) { // 0x64
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4028,10 +4162,9 @@ func (o *LD_H_H) cycles() []uint8 { // 0x64
 }
 
 func (o *LD_H_H) String() string { // 0x64
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "H" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *LD_H_H) SymbolicString() string { // 0x64
 	return "LD H,H"
 }
@@ -4059,6 +4192,9 @@ func (o *LD_H_L) Write(w io.Writer) (int, error) { // 0x65
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4071,10 +4207,9 @@ func (o *LD_H_L) cycles() []uint8 { // 0x65
 }
 
 func (o *LD_H_L) String() string { // 0x65
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "H" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *LD_H_L) SymbolicString() string { // 0x65
 	return "LD H,L"
 }
@@ -4102,6 +4237,9 @@ func (o *LD_H_HLPtr) Write(w io.Writer) (int, error) { // 0x66
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4114,10 +4252,9 @@ func (o *LD_H_HLPtr) cycles() []uint8 { // 0x66
 }
 
 func (o *LD_H_HLPtr) String() string { // 0x66
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "H" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *LD_H_HLPtr) SymbolicString() string { // 0x66
 	return "LD H,(HL)"
 }
@@ -4145,6 +4282,9 @@ func (o *LD_H_A) Write(w io.Writer) (int, error) { // 0x67
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4157,10 +4297,9 @@ func (o *LD_H_A) cycles() []uint8 { // 0x67
 }
 
 func (o *LD_H_A) String() string { // 0x67
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "H" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_H_A) SymbolicString() string { // 0x67
 	return "LD H,A"
 }
@@ -4188,6 +4327,9 @@ func (o *LD_L_B) Write(w io.Writer) (int, error) { // 0x68
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4200,10 +4342,9 @@ func (o *LD_L_B) cycles() []uint8 { // 0x68
 }
 
 func (o *LD_L_B) String() string { // 0x68
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "L" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *LD_L_B) SymbolicString() string { // 0x68
 	return "LD L,B"
 }
@@ -4231,6 +4372,9 @@ func (o *LD_L_C) Write(w io.Writer) (int, error) { // 0x69
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4243,10 +4387,9 @@ func (o *LD_L_C) cycles() []uint8 { // 0x69
 }
 
 func (o *LD_L_C) String() string { // 0x69
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "L" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *LD_L_C) SymbolicString() string { // 0x69
 	return "LD L,C"
 }
@@ -4274,6 +4417,9 @@ func (o *LD_L_D) Write(w io.Writer) (int, error) { // 0x6a
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4286,10 +4432,9 @@ func (o *LD_L_D) cycles() []uint8 { // 0x6a
 }
 
 func (o *LD_L_D) String() string { // 0x6a
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "L" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *LD_L_D) SymbolicString() string { // 0x6a
 	return "LD L,D"
 }
@@ -4317,6 +4462,9 @@ func (o *LD_L_E) Write(w io.Writer) (int, error) { // 0x6b
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4329,10 +4477,9 @@ func (o *LD_L_E) cycles() []uint8 { // 0x6b
 }
 
 func (o *LD_L_E) String() string { // 0x6b
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "L" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *LD_L_E) SymbolicString() string { // 0x6b
 	return "LD L,E"
 }
@@ -4360,6 +4507,9 @@ func (o *LD_L_H) Write(w io.Writer) (int, error) { // 0x6c
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4372,10 +4522,9 @@ func (o *LD_L_H) cycles() []uint8 { // 0x6c
 }
 
 func (o *LD_L_H) String() string { // 0x6c
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "L" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *LD_L_H) SymbolicString() string { // 0x6c
 	return "LD L,H"
 }
@@ -4403,6 +4552,9 @@ func (o *LD_L_L) Write(w io.Writer) (int, error) { // 0x6d
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4415,10 +4567,9 @@ func (o *LD_L_L) cycles() []uint8 { // 0x6d
 }
 
 func (o *LD_L_L) String() string { // 0x6d
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "L" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *LD_L_L) SymbolicString() string { // 0x6d
 	return "LD L,L"
 }
@@ -4446,6 +4597,9 @@ func (o *LD_L_HLPtr) Write(w io.Writer) (int, error) { // 0x6e
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4458,10 +4612,9 @@ func (o *LD_L_HLPtr) cycles() []uint8 { // 0x6e
 }
 
 func (o *LD_L_HLPtr) String() string { // 0x6e
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "L" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *LD_L_HLPtr) SymbolicString() string { // 0x6e
 	return "LD L,(HL)"
 }
@@ -4489,6 +4642,9 @@ func (o *LD_L_A) Write(w io.Writer) (int, error) { // 0x6f
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4501,10 +4657,9 @@ func (o *LD_L_A) cycles() []uint8 { // 0x6f
 }
 
 func (o *LD_L_A) String() string { // 0x6f
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "L" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_L_A) SymbolicString() string { // 0x6f
 	return "LD L,A"
 }
@@ -4532,6 +4687,9 @@ func (o *RLCA) Write(w io.Writer) (int, error) { // 0x7
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4544,10 +4702,9 @@ func (o *RLCA) cycles() []uint8 { // 0x7
 }
 
 func (o *RLCA) String() string { // 0x7
-
-	return fmt.Sprintf("RLCA %v", o.operand1)
-
+	return "RLCA"
 }
+
 func (o *RLCA) SymbolicString() string { // 0x7
 	return "RLCA"
 }
@@ -4575,6 +4732,9 @@ func (o *LD_HLPtr_B) Write(w io.Writer) (int, error) { // 0x70
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4587,10 +4747,9 @@ func (o *LD_HLPtr_B) cycles() []uint8 { // 0x70
 }
 
 func (o *LD_HLPtr_B) String() string { // 0x70
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(HL)" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *LD_HLPtr_B) SymbolicString() string { // 0x70
 	return "LD (HL),B"
 }
@@ -4618,6 +4777,9 @@ func (o *LD_HLPtr_C) Write(w io.Writer) (int, error) { // 0x71
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4630,10 +4792,9 @@ func (o *LD_HLPtr_C) cycles() []uint8 { // 0x71
 }
 
 func (o *LD_HLPtr_C) String() string { // 0x71
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(HL)" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *LD_HLPtr_C) SymbolicString() string { // 0x71
 	return "LD (HL),C"
 }
@@ -4661,6 +4822,9 @@ func (o *LD_HLPtr_D) Write(w io.Writer) (int, error) { // 0x72
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4673,10 +4837,9 @@ func (o *LD_HLPtr_D) cycles() []uint8 { // 0x72
 }
 
 func (o *LD_HLPtr_D) String() string { // 0x72
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(HL)" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *LD_HLPtr_D) SymbolicString() string { // 0x72
 	return "LD (HL),D"
 }
@@ -4704,6 +4867,9 @@ func (o *LD_HLPtr_E) Write(w io.Writer) (int, error) { // 0x73
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4716,10 +4882,9 @@ func (o *LD_HLPtr_E) cycles() []uint8 { // 0x73
 }
 
 func (o *LD_HLPtr_E) String() string { // 0x73
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(HL)" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *LD_HLPtr_E) SymbolicString() string { // 0x73
 	return "LD (HL),E"
 }
@@ -4747,6 +4912,9 @@ func (o *LD_HLPtr_H) Write(w io.Writer) (int, error) { // 0x74
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4759,10 +4927,9 @@ func (o *LD_HLPtr_H) cycles() []uint8 { // 0x74
 }
 
 func (o *LD_HLPtr_H) String() string { // 0x74
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(HL)" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *LD_HLPtr_H) SymbolicString() string { // 0x74
 	return "LD (HL),H"
 }
@@ -4790,6 +4957,9 @@ func (o *LD_HLPtr_L) Write(w io.Writer) (int, error) { // 0x75
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4802,10 +4972,9 @@ func (o *LD_HLPtr_L) cycles() []uint8 { // 0x75
 }
 
 func (o *LD_HLPtr_L) String() string { // 0x75
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(HL)" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *LD_HLPtr_L) SymbolicString() string { // 0x75
 	return "LD (HL),L"
 }
@@ -4833,6 +5002,9 @@ func (o *HALT) Write(w io.Writer) (int, error) { // 0x76
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4845,10 +5017,9 @@ func (o *HALT) cycles() []uint8 { // 0x76
 }
 
 func (o *HALT) String() string { // 0x76
-
-	return fmt.Sprintf("HALT %v", o.operand1)
-
+	return "HALT"
 }
+
 func (o *HALT) SymbolicString() string { // 0x76
 	return "HALT"
 }
@@ -4876,6 +5047,9 @@ func (o *LD_HLPtr_A) Write(w io.Writer) (int, error) { // 0x77
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4888,10 +5062,9 @@ func (o *LD_HLPtr_A) cycles() []uint8 { // 0x77
 }
 
 func (o *LD_HLPtr_A) String() string { // 0x77
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(HL)" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_HLPtr_A) SymbolicString() string { // 0x77
 	return "LD (HL),A"
 }
@@ -4919,6 +5092,9 @@ func (o *LD_A_B) Write(w io.Writer) (int, error) { // 0x78
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4931,10 +5107,9 @@ func (o *LD_A_B) cycles() []uint8 { // 0x78
 }
 
 func (o *LD_A_B) String() string { // 0x78
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *LD_A_B) SymbolicString() string { // 0x78
 	return "LD A,B"
 }
@@ -4962,6 +5137,9 @@ func (o *LD_A_C) Write(w io.Writer) (int, error) { // 0x79
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -4974,10 +5152,9 @@ func (o *LD_A_C) cycles() []uint8 { // 0x79
 }
 
 func (o *LD_A_C) String() string { // 0x79
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *LD_A_C) SymbolicString() string { // 0x79
 	return "LD A,C"
 }
@@ -5005,6 +5182,9 @@ func (o *LD_A_D) Write(w io.Writer) (int, error) { // 0x7a
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5017,10 +5197,9 @@ func (o *LD_A_D) cycles() []uint8 { // 0x7a
 }
 
 func (o *LD_A_D) String() string { // 0x7a
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *LD_A_D) SymbolicString() string { // 0x7a
 	return "LD A,D"
 }
@@ -5048,6 +5227,9 @@ func (o *LD_A_E) Write(w io.Writer) (int, error) { // 0x7b
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5060,10 +5242,9 @@ func (o *LD_A_E) cycles() []uint8 { // 0x7b
 }
 
 func (o *LD_A_E) String() string { // 0x7b
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *LD_A_E) SymbolicString() string { // 0x7b
 	return "LD A,E"
 }
@@ -5091,6 +5272,9 @@ func (o *LD_A_H) Write(w io.Writer) (int, error) { // 0x7c
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5103,10 +5287,9 @@ func (o *LD_A_H) cycles() []uint8 { // 0x7c
 }
 
 func (o *LD_A_H) String() string { // 0x7c
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *LD_A_H) SymbolicString() string { // 0x7c
 	return "LD A,H"
 }
@@ -5134,6 +5317,9 @@ func (o *LD_A_L) Write(w io.Writer) (int, error) { // 0x7d
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5146,10 +5332,9 @@ func (o *LD_A_L) cycles() []uint8 { // 0x7d
 }
 
 func (o *LD_A_L) String() string { // 0x7d
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *LD_A_L) SymbolicString() string { // 0x7d
 	return "LD A,L"
 }
@@ -5177,6 +5362,9 @@ func (o *LD_A_HLPtr) Write(w io.Writer) (int, error) { // 0x7e
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5189,10 +5377,9 @@ func (o *LD_A_HLPtr) cycles() []uint8 { // 0x7e
 }
 
 func (o *LD_A_HLPtr) String() string { // 0x7e
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *LD_A_HLPtr) SymbolicString() string { // 0x7e
 	return "LD A,(HL)"
 }
@@ -5220,6 +5407,9 @@ func (o *LD_A_A) Write(w io.Writer) (int, error) { // 0x7f
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5232,10 +5422,9 @@ func (o *LD_A_A) cycles() []uint8 { // 0x7f
 }
 
 func (o *LD_A_A) String() string { // 0x7f
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_A_A) SymbolicString() string { // 0x7f
 	return "LD A,A"
 }
@@ -5263,11 +5452,9 @@ func (o *LD_a16Deref_SP) Write(w io.Writer) (int, error) { // 0x8
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand1.(int16))
-	if err != nil {
-		return written, err
-	}
+	err = writeImmediate16BitAddress(w, o.operand1)
 	written += 2
+	// SP is implicit in this instruction.
 
 	return written, err
 }
@@ -5281,10 +5468,9 @@ func (o *LD_a16Deref_SP) cycles() []uint8 { // 0x8
 }
 
 func (o *LD_a16Deref_SP) String() string { // 0x8
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + fmt.Sprintf("%X", o.operand1) + " " + "SP" /* operand2 */
 }
+
 func (o *LD_a16Deref_SP) SymbolicString() string { // 0x8
 	return "LD (a16),SP"
 }
@@ -5312,6 +5498,9 @@ func (o *ADD_A_B) Write(w io.Writer) (int, error) { // 0x80
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5324,10 +5513,9 @@ func (o *ADD_A_B) cycles() []uint8 { // 0x80
 }
 
 func (o *ADD_A_B) String() string { // 0x80
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "A" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *ADD_A_B) SymbolicString() string { // 0x80
 	return "ADD A,B"
 }
@@ -5355,6 +5543,9 @@ func (o *ADD_A_C) Write(w io.Writer) (int, error) { // 0x81
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5367,10 +5558,9 @@ func (o *ADD_A_C) cycles() []uint8 { // 0x81
 }
 
 func (o *ADD_A_C) String() string { // 0x81
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "A" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *ADD_A_C) SymbolicString() string { // 0x81
 	return "ADD A,C"
 }
@@ -5398,6 +5588,9 @@ func (o *ADD_A_D) Write(w io.Writer) (int, error) { // 0x82
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5410,10 +5603,9 @@ func (o *ADD_A_D) cycles() []uint8 { // 0x82
 }
 
 func (o *ADD_A_D) String() string { // 0x82
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "A" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *ADD_A_D) SymbolicString() string { // 0x82
 	return "ADD A,D"
 }
@@ -5441,6 +5633,9 @@ func (o *ADD_A_E) Write(w io.Writer) (int, error) { // 0x83
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5453,10 +5648,9 @@ func (o *ADD_A_E) cycles() []uint8 { // 0x83
 }
 
 func (o *ADD_A_E) String() string { // 0x83
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "A" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *ADD_A_E) SymbolicString() string { // 0x83
 	return "ADD A,E"
 }
@@ -5484,6 +5678,9 @@ func (o *ADD_A_H) Write(w io.Writer) (int, error) { // 0x84
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5496,10 +5693,9 @@ func (o *ADD_A_H) cycles() []uint8 { // 0x84
 }
 
 func (o *ADD_A_H) String() string { // 0x84
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "A" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *ADD_A_H) SymbolicString() string { // 0x84
 	return "ADD A,H"
 }
@@ -5527,6 +5723,9 @@ func (o *ADD_A_L) Write(w io.Writer) (int, error) { // 0x85
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5539,10 +5738,9 @@ func (o *ADD_A_L) cycles() []uint8 { // 0x85
 }
 
 func (o *ADD_A_L) String() string { // 0x85
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "A" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *ADD_A_L) SymbolicString() string { // 0x85
 	return "ADD A,L"
 }
@@ -5570,6 +5768,9 @@ func (o *ADD_A_HLPtr) Write(w io.Writer) (int, error) { // 0x86
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5582,10 +5783,9 @@ func (o *ADD_A_HLPtr) cycles() []uint8 { // 0x86
 }
 
 func (o *ADD_A_HLPtr) String() string { // 0x86
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "A" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *ADD_A_HLPtr) SymbolicString() string { // 0x86
 	return "ADD A,(HL)"
 }
@@ -5613,6 +5813,9 @@ func (o *ADD_A_A) Write(w io.Writer) (int, error) { // 0x87
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5625,10 +5828,9 @@ func (o *ADD_A_A) cycles() []uint8 { // 0x87
 }
 
 func (o *ADD_A_A) String() string { // 0x87
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "A" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *ADD_A_A) SymbolicString() string { // 0x87
 	return "ADD A,A"
 }
@@ -5656,6 +5858,9 @@ func (o *ADC_A_B) Write(w io.Writer) (int, error) { // 0x88
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5668,10 +5873,9 @@ func (o *ADC_A_B) cycles() []uint8 { // 0x88
 }
 
 func (o *ADC_A_B) String() string { // 0x88
-
-	return fmt.Sprintf("ADC %v %v", o.operand1, o.operand2)
-
+	return "ADC" + " " + "A" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *ADC_A_B) SymbolicString() string { // 0x88
 	return "ADC A,B"
 }
@@ -5699,6 +5903,9 @@ func (o *ADC_A_C) Write(w io.Writer) (int, error) { // 0x89
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5711,10 +5918,9 @@ func (o *ADC_A_C) cycles() []uint8 { // 0x89
 }
 
 func (o *ADC_A_C) String() string { // 0x89
-
-	return fmt.Sprintf("ADC %v %v", o.operand1, o.operand2)
-
+	return "ADC" + " " + "A" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *ADC_A_C) SymbolicString() string { // 0x89
 	return "ADC A,C"
 }
@@ -5742,6 +5948,9 @@ func (o *ADC_A_D) Write(w io.Writer) (int, error) { // 0x8a
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5754,10 +5963,9 @@ func (o *ADC_A_D) cycles() []uint8 { // 0x8a
 }
 
 func (o *ADC_A_D) String() string { // 0x8a
-
-	return fmt.Sprintf("ADC %v %v", o.operand1, o.operand2)
-
+	return "ADC" + " " + "A" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *ADC_A_D) SymbolicString() string { // 0x8a
 	return "ADC A,D"
 }
@@ -5785,6 +5993,9 @@ func (o *ADC_A_E) Write(w io.Writer) (int, error) { // 0x8b
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5797,10 +6008,9 @@ func (o *ADC_A_E) cycles() []uint8 { // 0x8b
 }
 
 func (o *ADC_A_E) String() string { // 0x8b
-
-	return fmt.Sprintf("ADC %v %v", o.operand1, o.operand2)
-
+	return "ADC" + " " + "A" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *ADC_A_E) SymbolicString() string { // 0x8b
 	return "ADC A,E"
 }
@@ -5828,6 +6038,9 @@ func (o *ADC_A_H) Write(w io.Writer) (int, error) { // 0x8c
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5840,10 +6053,9 @@ func (o *ADC_A_H) cycles() []uint8 { // 0x8c
 }
 
 func (o *ADC_A_H) String() string { // 0x8c
-
-	return fmt.Sprintf("ADC %v %v", o.operand1, o.operand2)
-
+	return "ADC" + " " + "A" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *ADC_A_H) SymbolicString() string { // 0x8c
 	return "ADC A,H"
 }
@@ -5871,6 +6083,9 @@ func (o *ADC_A_L) Write(w io.Writer) (int, error) { // 0x8d
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5883,10 +6098,9 @@ func (o *ADC_A_L) cycles() []uint8 { // 0x8d
 }
 
 func (o *ADC_A_L) String() string { // 0x8d
-
-	return fmt.Sprintf("ADC %v %v", o.operand1, o.operand2)
-
+	return "ADC" + " " + "A" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *ADC_A_L) SymbolicString() string { // 0x8d
 	return "ADC A,L"
 }
@@ -5914,6 +6128,9 @@ func (o *ADC_A_HLPtr) Write(w io.Writer) (int, error) { // 0x8e
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5926,10 +6143,9 @@ func (o *ADC_A_HLPtr) cycles() []uint8 { // 0x8e
 }
 
 func (o *ADC_A_HLPtr) String() string { // 0x8e
-
-	return fmt.Sprintf("ADC %v %v", o.operand1, o.operand2)
-
+	return "ADC" + " " + "A" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *ADC_A_HLPtr) SymbolicString() string { // 0x8e
 	return "ADC A,(HL)"
 }
@@ -5957,6 +6173,9 @@ func (o *ADC_A_A) Write(w io.Writer) (int, error) { // 0x8f
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -5969,10 +6188,9 @@ func (o *ADC_A_A) cycles() []uint8 { // 0x8f
 }
 
 func (o *ADC_A_A) String() string { // 0x8f
-
-	return fmt.Sprintf("ADC %v %v", o.operand1, o.operand2)
-
+	return "ADC" + " " + "A" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *ADC_A_A) SymbolicString() string { // 0x8f
 	return "ADC A,A"
 }
@@ -6000,6 +6218,9 @@ func (o *ADD_HL_BC) Write(w io.Writer) (int, error) { // 0x9
 		return written, err
 	}
 
+	// HL is implicit in this instruction.
+	// BC is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6012,10 +6233,9 @@ func (o *ADD_HL_BC) cycles() []uint8 { // 0x9
 }
 
 func (o *ADD_HL_BC) String() string { // 0x9
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "HL" /* operand1 */ + " " + "BC" /* operand2 */
 }
+
 func (o *ADD_HL_BC) SymbolicString() string { // 0x9
 	return "ADD HL,BC"
 }
@@ -6043,6 +6263,9 @@ func (o *SUB_B) Write(w io.Writer) (int, error) { // 0x90
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6055,10 +6278,9 @@ func (o *SUB_B) cycles() []uint8 { // 0x90
 }
 
 func (o *SUB_B) String() string { // 0x90
-
-	return fmt.Sprintf("SUB %v", o.operand1)
-
+	return "SUB" + " " + "B" /* operand1 */
 }
+
 func (o *SUB_B) SymbolicString() string { // 0x90
 	return "SUB B"
 }
@@ -6086,6 +6308,9 @@ func (o *SUB_C) Write(w io.Writer) (int, error) { // 0x91
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6098,10 +6323,9 @@ func (o *SUB_C) cycles() []uint8 { // 0x91
 }
 
 func (o *SUB_C) String() string { // 0x91
-
-	return fmt.Sprintf("SUB %v", o.operand1)
-
+	return "SUB" + " " + "C" /* operand1 */
 }
+
 func (o *SUB_C) SymbolicString() string { // 0x91
 	return "SUB C"
 }
@@ -6129,6 +6353,9 @@ func (o *SUB_D) Write(w io.Writer) (int, error) { // 0x92
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6141,10 +6368,9 @@ func (o *SUB_D) cycles() []uint8 { // 0x92
 }
 
 func (o *SUB_D) String() string { // 0x92
-
-	return fmt.Sprintf("SUB %v", o.operand1)
-
+	return "SUB" + " " + "D" /* operand1 */
 }
+
 func (o *SUB_D) SymbolicString() string { // 0x92
 	return "SUB D"
 }
@@ -6172,6 +6398,9 @@ func (o *SUB_E) Write(w io.Writer) (int, error) { // 0x93
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6184,10 +6413,9 @@ func (o *SUB_E) cycles() []uint8 { // 0x93
 }
 
 func (o *SUB_E) String() string { // 0x93
-
-	return fmt.Sprintf("SUB %v", o.operand1)
-
+	return "SUB" + " " + "E" /* operand1 */
 }
+
 func (o *SUB_E) SymbolicString() string { // 0x93
 	return "SUB E"
 }
@@ -6215,6 +6443,9 @@ func (o *SUB_H) Write(w io.Writer) (int, error) { // 0x94
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6227,10 +6458,9 @@ func (o *SUB_H) cycles() []uint8 { // 0x94
 }
 
 func (o *SUB_H) String() string { // 0x94
-
-	return fmt.Sprintf("SUB %v", o.operand1)
-
+	return "SUB" + " " + "H" /* operand1 */
 }
+
 func (o *SUB_H) SymbolicString() string { // 0x94
 	return "SUB H"
 }
@@ -6258,6 +6488,9 @@ func (o *SUB_L) Write(w io.Writer) (int, error) { // 0x95
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6270,10 +6503,9 @@ func (o *SUB_L) cycles() []uint8 { // 0x95
 }
 
 func (o *SUB_L) String() string { // 0x95
-
-	return fmt.Sprintf("SUB %v", o.operand1)
-
+	return "SUB" + " " + "L" /* operand1 */
 }
+
 func (o *SUB_L) SymbolicString() string { // 0x95
 	return "SUB L"
 }
@@ -6301,6 +6533,9 @@ func (o *SUB_HLPtr) Write(w io.Writer) (int, error) { // 0x96
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6313,10 +6548,9 @@ func (o *SUB_HLPtr) cycles() []uint8 { // 0x96
 }
 
 func (o *SUB_HLPtr) String() string { // 0x96
-
-	return fmt.Sprintf("SUB %v", o.operand1)
-
+	return "SUB" + " " + "(HL)" /* operand1 */
 }
+
 func (o *SUB_HLPtr) SymbolicString() string { // 0x96
 	return "SUB (HL)"
 }
@@ -6344,6 +6578,9 @@ func (o *SUB_A) Write(w io.Writer) (int, error) { // 0x97
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6356,10 +6593,9 @@ func (o *SUB_A) cycles() []uint8 { // 0x97
 }
 
 func (o *SUB_A) String() string { // 0x97
-
-	return fmt.Sprintf("SUB %v", o.operand1)
-
+	return "SUB" + " " + "A" /* operand1 */
 }
+
 func (o *SUB_A) SymbolicString() string { // 0x97
 	return "SUB A"
 }
@@ -6387,6 +6623,9 @@ func (o *SBC_A_B) Write(w io.Writer) (int, error) { // 0x98
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6399,10 +6638,9 @@ func (o *SBC_A_B) cycles() []uint8 { // 0x98
 }
 
 func (o *SBC_A_B) String() string { // 0x98
-
-	return fmt.Sprintf("SBC %v %v", o.operand1, o.operand2)
-
+	return "SBC" + " " + "A" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *SBC_A_B) SymbolicString() string { // 0x98
 	return "SBC A,B"
 }
@@ -6430,6 +6668,9 @@ func (o *SBC_A_C) Write(w io.Writer) (int, error) { // 0x99
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6442,10 +6683,9 @@ func (o *SBC_A_C) cycles() []uint8 { // 0x99
 }
 
 func (o *SBC_A_C) String() string { // 0x99
-
-	return fmt.Sprintf("SBC %v %v", o.operand1, o.operand2)
-
+	return "SBC" + " " + "A" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *SBC_A_C) SymbolicString() string { // 0x99
 	return "SBC A,C"
 }
@@ -6473,6 +6713,9 @@ func (o *SBC_A_D) Write(w io.Writer) (int, error) { // 0x9a
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6485,10 +6728,9 @@ func (o *SBC_A_D) cycles() []uint8 { // 0x9a
 }
 
 func (o *SBC_A_D) String() string { // 0x9a
-
-	return fmt.Sprintf("SBC %v %v", o.operand1, o.operand2)
-
+	return "SBC" + " " + "A" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *SBC_A_D) SymbolicString() string { // 0x9a
 	return "SBC A,D"
 }
@@ -6516,6 +6758,9 @@ func (o *SBC_A_E) Write(w io.Writer) (int, error) { // 0x9b
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6528,10 +6773,9 @@ func (o *SBC_A_E) cycles() []uint8 { // 0x9b
 }
 
 func (o *SBC_A_E) String() string { // 0x9b
-
-	return fmt.Sprintf("SBC %v %v", o.operand1, o.operand2)
-
+	return "SBC" + " " + "A" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *SBC_A_E) SymbolicString() string { // 0x9b
 	return "SBC A,E"
 }
@@ -6559,6 +6803,9 @@ func (o *SBC_A_H) Write(w io.Writer) (int, error) { // 0x9c
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6571,10 +6818,9 @@ func (o *SBC_A_H) cycles() []uint8 { // 0x9c
 }
 
 func (o *SBC_A_H) String() string { // 0x9c
-
-	return fmt.Sprintf("SBC %v %v", o.operand1, o.operand2)
-
+	return "SBC" + " " + "A" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *SBC_A_H) SymbolicString() string { // 0x9c
 	return "SBC A,H"
 }
@@ -6602,6 +6848,9 @@ func (o *SBC_A_L) Write(w io.Writer) (int, error) { // 0x9d
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6614,10 +6863,9 @@ func (o *SBC_A_L) cycles() []uint8 { // 0x9d
 }
 
 func (o *SBC_A_L) String() string { // 0x9d
-
-	return fmt.Sprintf("SBC %v %v", o.operand1, o.operand2)
-
+	return "SBC" + " " + "A" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *SBC_A_L) SymbolicString() string { // 0x9d
 	return "SBC A,L"
 }
@@ -6645,6 +6893,9 @@ func (o *SBC_A_HLPtr) Write(w io.Writer) (int, error) { // 0x9e
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6657,10 +6908,9 @@ func (o *SBC_A_HLPtr) cycles() []uint8 { // 0x9e
 }
 
 func (o *SBC_A_HLPtr) String() string { // 0x9e
-
-	return fmt.Sprintf("SBC %v %v", o.operand1, o.operand2)
-
+	return "SBC" + " " + "A" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *SBC_A_HLPtr) SymbolicString() string { // 0x9e
 	return "SBC A,(HL)"
 }
@@ -6688,6 +6938,9 @@ func (o *SBC_A_A) Write(w io.Writer) (int, error) { // 0x9f
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6700,10 +6953,9 @@ func (o *SBC_A_A) cycles() []uint8 { // 0x9f
 }
 
 func (o *SBC_A_A) String() string { // 0x9f
-
-	return fmt.Sprintf("SBC %v %v", o.operand1, o.operand2)
-
+	return "SBC" + " " + "A" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *SBC_A_A) SymbolicString() string { // 0x9f
 	return "SBC A,A"
 }
@@ -6731,6 +6983,9 @@ func (o *LD_A_BCDeref) Write(w io.Writer) (int, error) { // 0xa
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// (BC) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6743,10 +6998,9 @@ func (o *LD_A_BCDeref) cycles() []uint8 { // 0xa
 }
 
 func (o *LD_A_BCDeref) String() string { // 0xa
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "(BC)" /* operand2 */
 }
+
 func (o *LD_A_BCDeref) SymbolicString() string { // 0xa
 	return "LD A,(BC)"
 }
@@ -6774,6 +7028,9 @@ func (o *AND_B) Write(w io.Writer) (int, error) { // 0xa0
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6786,10 +7043,9 @@ func (o *AND_B) cycles() []uint8 { // 0xa0
 }
 
 func (o *AND_B) String() string { // 0xa0
-
-	return fmt.Sprintf("AND %v", o.operand1)
-
+	return "AND" + " " + "B" /* operand1 */
 }
+
 func (o *AND_B) SymbolicString() string { // 0xa0
 	return "AND B"
 }
@@ -6817,6 +7073,9 @@ func (o *AND_C) Write(w io.Writer) (int, error) { // 0xa1
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6829,10 +7088,9 @@ func (o *AND_C) cycles() []uint8 { // 0xa1
 }
 
 func (o *AND_C) String() string { // 0xa1
-
-	return fmt.Sprintf("AND %v", o.operand1)
-
+	return "AND" + " " + "C" /* operand1 */
 }
+
 func (o *AND_C) SymbolicString() string { // 0xa1
 	return "AND C"
 }
@@ -6860,6 +7118,9 @@ func (o *AND_D) Write(w io.Writer) (int, error) { // 0xa2
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6872,10 +7133,9 @@ func (o *AND_D) cycles() []uint8 { // 0xa2
 }
 
 func (o *AND_D) String() string { // 0xa2
-
-	return fmt.Sprintf("AND %v", o.operand1)
-
+	return "AND" + " " + "D" /* operand1 */
 }
+
 func (o *AND_D) SymbolicString() string { // 0xa2
 	return "AND D"
 }
@@ -6903,6 +7163,9 @@ func (o *AND_E) Write(w io.Writer) (int, error) { // 0xa3
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6915,10 +7178,9 @@ func (o *AND_E) cycles() []uint8 { // 0xa3
 }
 
 func (o *AND_E) String() string { // 0xa3
-
-	return fmt.Sprintf("AND %v", o.operand1)
-
+	return "AND" + " " + "E" /* operand1 */
 }
+
 func (o *AND_E) SymbolicString() string { // 0xa3
 	return "AND E"
 }
@@ -6946,6 +7208,9 @@ func (o *AND_H) Write(w io.Writer) (int, error) { // 0xa4
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -6958,10 +7223,9 @@ func (o *AND_H) cycles() []uint8 { // 0xa4
 }
 
 func (o *AND_H) String() string { // 0xa4
-
-	return fmt.Sprintf("AND %v", o.operand1)
-
+	return "AND" + " " + "H" /* operand1 */
 }
+
 func (o *AND_H) SymbolicString() string { // 0xa4
 	return "AND H"
 }
@@ -6989,6 +7253,9 @@ func (o *AND_L) Write(w io.Writer) (int, error) { // 0xa5
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7001,10 +7268,9 @@ func (o *AND_L) cycles() []uint8 { // 0xa5
 }
 
 func (o *AND_L) String() string { // 0xa5
-
-	return fmt.Sprintf("AND %v", o.operand1)
-
+	return "AND" + " " + "L" /* operand1 */
 }
+
 func (o *AND_L) SymbolicString() string { // 0xa5
 	return "AND L"
 }
@@ -7032,6 +7298,9 @@ func (o *AND_HLPtr) Write(w io.Writer) (int, error) { // 0xa6
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7044,10 +7313,9 @@ func (o *AND_HLPtr) cycles() []uint8 { // 0xa6
 }
 
 func (o *AND_HLPtr) String() string { // 0xa6
-
-	return fmt.Sprintf("AND %v", o.operand1)
-
+	return "AND" + " " + "(HL)" /* operand1 */
 }
+
 func (o *AND_HLPtr) SymbolicString() string { // 0xa6
 	return "AND (HL)"
 }
@@ -7075,6 +7343,9 @@ func (o *AND_A) Write(w io.Writer) (int, error) { // 0xa7
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7087,10 +7358,9 @@ func (o *AND_A) cycles() []uint8 { // 0xa7
 }
 
 func (o *AND_A) String() string { // 0xa7
-
-	return fmt.Sprintf("AND %v", o.operand1)
-
+	return "AND" + " " + "A" /* operand1 */
 }
+
 func (o *AND_A) SymbolicString() string { // 0xa7
 	return "AND A"
 }
@@ -7118,6 +7388,9 @@ func (o *XOR_B) Write(w io.Writer) (int, error) { // 0xa8
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7130,10 +7403,9 @@ func (o *XOR_B) cycles() []uint8 { // 0xa8
 }
 
 func (o *XOR_B) String() string { // 0xa8
-
-	return fmt.Sprintf("XOR %v", o.operand1)
-
+	return "XOR" + " " + "B" /* operand1 */
 }
+
 func (o *XOR_B) SymbolicString() string { // 0xa8
 	return "XOR B"
 }
@@ -7161,6 +7433,9 @@ func (o *XOR_C) Write(w io.Writer) (int, error) { // 0xa9
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7173,10 +7448,9 @@ func (o *XOR_C) cycles() []uint8 { // 0xa9
 }
 
 func (o *XOR_C) String() string { // 0xa9
-
-	return fmt.Sprintf("XOR %v", o.operand1)
-
+	return "XOR" + " " + "C" /* operand1 */
 }
+
 func (o *XOR_C) SymbolicString() string { // 0xa9
 	return "XOR C"
 }
@@ -7204,6 +7478,9 @@ func (o *XOR_D) Write(w io.Writer) (int, error) { // 0xaa
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7216,10 +7493,9 @@ func (o *XOR_D) cycles() []uint8 { // 0xaa
 }
 
 func (o *XOR_D) String() string { // 0xaa
-
-	return fmt.Sprintf("XOR %v", o.operand1)
-
+	return "XOR" + " " + "D" /* operand1 */
 }
+
 func (o *XOR_D) SymbolicString() string { // 0xaa
 	return "XOR D"
 }
@@ -7247,6 +7523,9 @@ func (o *XOR_E) Write(w io.Writer) (int, error) { // 0xab
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7259,10 +7538,9 @@ func (o *XOR_E) cycles() []uint8 { // 0xab
 }
 
 func (o *XOR_E) String() string { // 0xab
-
-	return fmt.Sprintf("XOR %v", o.operand1)
-
+	return "XOR" + " " + "E" /* operand1 */
 }
+
 func (o *XOR_E) SymbolicString() string { // 0xab
 	return "XOR E"
 }
@@ -7290,6 +7568,9 @@ func (o *XOR_H) Write(w io.Writer) (int, error) { // 0xac
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7302,10 +7583,9 @@ func (o *XOR_H) cycles() []uint8 { // 0xac
 }
 
 func (o *XOR_H) String() string { // 0xac
-
-	return fmt.Sprintf("XOR %v", o.operand1)
-
+	return "XOR" + " " + "H" /* operand1 */
 }
+
 func (o *XOR_H) SymbolicString() string { // 0xac
 	return "XOR H"
 }
@@ -7333,6 +7613,9 @@ func (o *XOR_L) Write(w io.Writer) (int, error) { // 0xad
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7345,10 +7628,9 @@ func (o *XOR_L) cycles() []uint8 { // 0xad
 }
 
 func (o *XOR_L) String() string { // 0xad
-
-	return fmt.Sprintf("XOR %v", o.operand1)
-
+	return "XOR" + " " + "L" /* operand1 */
 }
+
 func (o *XOR_L) SymbolicString() string { // 0xad
 	return "XOR L"
 }
@@ -7376,6 +7658,9 @@ func (o *XOR_HLPtr) Write(w io.Writer) (int, error) { // 0xae
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7388,10 +7673,9 @@ func (o *XOR_HLPtr) cycles() []uint8 { // 0xae
 }
 
 func (o *XOR_HLPtr) String() string { // 0xae
-
-	return fmt.Sprintf("XOR %v", o.operand1)
-
+	return "XOR" + " " + "(HL)" /* operand1 */
 }
+
 func (o *XOR_HLPtr) SymbolicString() string { // 0xae
 	return "XOR (HL)"
 }
@@ -7419,6 +7703,9 @@ func (o *XOR_A) Write(w io.Writer) (int, error) { // 0xaf
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7431,10 +7718,9 @@ func (o *XOR_A) cycles() []uint8 { // 0xaf
 }
 
 func (o *XOR_A) String() string { // 0xaf
-
-	return fmt.Sprintf("XOR %v", o.operand1)
-
+	return "XOR" + " " + "A" /* operand1 */
 }
+
 func (o *XOR_A) SymbolicString() string { // 0xaf
 	return "XOR A"
 }
@@ -7462,6 +7748,9 @@ func (o *DEC_BC) Write(w io.Writer) (int, error) { // 0xb
 		return written, err
 	}
 
+	// BC is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7474,10 +7763,9 @@ func (o *DEC_BC) cycles() []uint8 { // 0xb
 }
 
 func (o *DEC_BC) String() string { // 0xb
-
-	return fmt.Sprintf("DEC %v", o.operand1)
-
+	return "DEC" + " " + "BC" /* operand1 */
 }
+
 func (o *DEC_BC) SymbolicString() string { // 0xb
 	return "DEC BC"
 }
@@ -7505,6 +7793,9 @@ func (o *OR_B) Write(w io.Writer) (int, error) { // 0xb0
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7517,10 +7808,9 @@ func (o *OR_B) cycles() []uint8 { // 0xb0
 }
 
 func (o *OR_B) String() string { // 0xb0
-
-	return fmt.Sprintf("OR %v", o.operand1)
-
+	return "OR" + " " + "B" /* operand1 */
 }
+
 func (o *OR_B) SymbolicString() string { // 0xb0
 	return "OR B"
 }
@@ -7548,6 +7838,9 @@ func (o *OR_C) Write(w io.Writer) (int, error) { // 0xb1
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7560,10 +7853,9 @@ func (o *OR_C) cycles() []uint8 { // 0xb1
 }
 
 func (o *OR_C) String() string { // 0xb1
-
-	return fmt.Sprintf("OR %v", o.operand1)
-
+	return "OR" + " " + "C" /* operand1 */
 }
+
 func (o *OR_C) SymbolicString() string { // 0xb1
 	return "OR C"
 }
@@ -7591,6 +7883,9 @@ func (o *OR_D) Write(w io.Writer) (int, error) { // 0xb2
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7603,10 +7898,9 @@ func (o *OR_D) cycles() []uint8 { // 0xb2
 }
 
 func (o *OR_D) String() string { // 0xb2
-
-	return fmt.Sprintf("OR %v", o.operand1)
-
+	return "OR" + " " + "D" /* operand1 */
 }
+
 func (o *OR_D) SymbolicString() string { // 0xb2
 	return "OR D"
 }
@@ -7634,6 +7928,9 @@ func (o *OR_E) Write(w io.Writer) (int, error) { // 0xb3
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7646,10 +7943,9 @@ func (o *OR_E) cycles() []uint8 { // 0xb3
 }
 
 func (o *OR_E) String() string { // 0xb3
-
-	return fmt.Sprintf("OR %v", o.operand1)
-
+	return "OR" + " " + "E" /* operand1 */
 }
+
 func (o *OR_E) SymbolicString() string { // 0xb3
 	return "OR E"
 }
@@ -7677,6 +7973,9 @@ func (o *OR_H) Write(w io.Writer) (int, error) { // 0xb4
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7689,10 +7988,9 @@ func (o *OR_H) cycles() []uint8 { // 0xb4
 }
 
 func (o *OR_H) String() string { // 0xb4
-
-	return fmt.Sprintf("OR %v", o.operand1)
-
+	return "OR" + " " + "H" /* operand1 */
 }
+
 func (o *OR_H) SymbolicString() string { // 0xb4
 	return "OR H"
 }
@@ -7720,6 +8018,9 @@ func (o *OR_L) Write(w io.Writer) (int, error) { // 0xb5
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7732,10 +8033,9 @@ func (o *OR_L) cycles() []uint8 { // 0xb5
 }
 
 func (o *OR_L) String() string { // 0xb5
-
-	return fmt.Sprintf("OR %v", o.operand1)
-
+	return "OR" + " " + "L" /* operand1 */
 }
+
 func (o *OR_L) SymbolicString() string { // 0xb5
 	return "OR L"
 }
@@ -7763,6 +8063,9 @@ func (o *OR_HLPtr) Write(w io.Writer) (int, error) { // 0xb6
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7775,10 +8078,9 @@ func (o *OR_HLPtr) cycles() []uint8 { // 0xb6
 }
 
 func (o *OR_HLPtr) String() string { // 0xb6
-
-	return fmt.Sprintf("OR %v", o.operand1)
-
+	return "OR" + " " + "(HL)" /* operand1 */
 }
+
 func (o *OR_HLPtr) SymbolicString() string { // 0xb6
 	return "OR (HL)"
 }
@@ -7806,6 +8108,9 @@ func (o *OR_A) Write(w io.Writer) (int, error) { // 0xb7
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7818,10 +8123,9 @@ func (o *OR_A) cycles() []uint8 { // 0xb7
 }
 
 func (o *OR_A) String() string { // 0xb7
-
-	return fmt.Sprintf("OR %v", o.operand1)
-
+	return "OR" + " " + "A" /* operand1 */
 }
+
 func (o *OR_A) SymbolicString() string { // 0xb7
 	return "OR A"
 }
@@ -7849,6 +8153,9 @@ func (o *CP_B) Write(w io.Writer) (int, error) { // 0xb8
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7861,10 +8168,9 @@ func (o *CP_B) cycles() []uint8 { // 0xb8
 }
 
 func (o *CP_B) String() string { // 0xb8
-
-	return fmt.Sprintf("CP %v", o.operand1)
-
+	return "CP" + " " + "B" /* operand1 */
 }
+
 func (o *CP_B) SymbolicString() string { // 0xb8
 	return "CP B"
 }
@@ -7892,6 +8198,9 @@ func (o *CP_C) Write(w io.Writer) (int, error) { // 0xb9
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7904,10 +8213,9 @@ func (o *CP_C) cycles() []uint8 { // 0xb9
 }
 
 func (o *CP_C) String() string { // 0xb9
-
-	return fmt.Sprintf("CP %v", o.operand1)
-
+	return "CP" + " " + "C" /* operand1 */
 }
+
 func (o *CP_C) SymbolicString() string { // 0xb9
 	return "CP C"
 }
@@ -7935,6 +8243,9 @@ func (o *CP_D) Write(w io.Writer) (int, error) { // 0xba
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7947,10 +8258,9 @@ func (o *CP_D) cycles() []uint8 { // 0xba
 }
 
 func (o *CP_D) String() string { // 0xba
-
-	return fmt.Sprintf("CP %v", o.operand1)
-
+	return "CP" + " " + "D" /* operand1 */
 }
+
 func (o *CP_D) SymbolicString() string { // 0xba
 	return "CP D"
 }
@@ -7978,6 +8288,9 @@ func (o *CP_E) Write(w io.Writer) (int, error) { // 0xbb
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -7990,10 +8303,9 @@ func (o *CP_E) cycles() []uint8 { // 0xbb
 }
 
 func (o *CP_E) String() string { // 0xbb
-
-	return fmt.Sprintf("CP %v", o.operand1)
-
+	return "CP" + " " + "E" /* operand1 */
 }
+
 func (o *CP_E) SymbolicString() string { // 0xbb
 	return "CP E"
 }
@@ -8021,6 +8333,9 @@ func (o *CP_H) Write(w io.Writer) (int, error) { // 0xbc
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8033,10 +8348,9 @@ func (o *CP_H) cycles() []uint8 { // 0xbc
 }
 
 func (o *CP_H) String() string { // 0xbc
-
-	return fmt.Sprintf("CP %v", o.operand1)
-
+	return "CP" + " " + "H" /* operand1 */
 }
+
 func (o *CP_H) SymbolicString() string { // 0xbc
 	return "CP H"
 }
@@ -8064,6 +8378,9 @@ func (o *CP_L) Write(w io.Writer) (int, error) { // 0xbd
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8076,10 +8393,9 @@ func (o *CP_L) cycles() []uint8 { // 0xbd
 }
 
 func (o *CP_L) String() string { // 0xbd
-
-	return fmt.Sprintf("CP %v", o.operand1)
-
+	return "CP" + " " + "L" /* operand1 */
 }
+
 func (o *CP_L) SymbolicString() string { // 0xbd
 	return "CP L"
 }
@@ -8107,6 +8423,9 @@ func (o *CP_HLPtr) Write(w io.Writer) (int, error) { // 0xbe
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8119,10 +8438,9 @@ func (o *CP_HLPtr) cycles() []uint8 { // 0xbe
 }
 
 func (o *CP_HLPtr) String() string { // 0xbe
-
-	return fmt.Sprintf("CP %v", o.operand1)
-
+	return "CP" + " " + "(HL)" /* operand1 */
 }
+
 func (o *CP_HLPtr) SymbolicString() string { // 0xbe
 	return "CP (HL)"
 }
@@ -8150,6 +8468,9 @@ func (o *CP_A) Write(w io.Writer) (int, error) { // 0xbf
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8162,10 +8483,9 @@ func (o *CP_A) cycles() []uint8 { // 0xbf
 }
 
 func (o *CP_A) String() string { // 0xbf
-
-	return fmt.Sprintf("CP %v", o.operand1)
-
+	return "CP" + " " + "A" /* operand1 */
 }
+
 func (o *CP_A) SymbolicString() string { // 0xbf
 	return "CP A"
 }
@@ -8193,6 +8513,9 @@ func (o *INC_C) Write(w io.Writer) (int, error) { // 0xc
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8205,10 +8528,9 @@ func (o *INC_C) cycles() []uint8 { // 0xc
 }
 
 func (o *INC_C) String() string { // 0xc
-
-	return fmt.Sprintf("INC %v", o.operand1)
-
+	return "INC" + " " + "C" /* operand1 */
 }
+
 func (o *INC_C) SymbolicString() string { // 0xc
 	return "INC C"
 }
@@ -8236,6 +8558,9 @@ func (o *RET_NZ) Write(w io.Writer) (int, error) { // 0xc0
 		return written, err
 	}
 
+	// NZ is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8248,10 +8573,9 @@ func (o *RET_NZ) cycles() []uint8 { // 0xc0
 }
 
 func (o *RET_NZ) String() string { // 0xc0
-
-	return fmt.Sprintf("RET %v", o.operand1)
-
+	return "RET" + " " + "NZ" /* operand1 */
 }
+
 func (o *RET_NZ) SymbolicString() string { // 0xc0
 	return "RET NZ"
 }
@@ -8279,6 +8603,9 @@ func (o *POP_BC) Write(w io.Writer) (int, error) { // 0xc1
 		return written, err
 	}
 
+	// BC is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8291,10 +8618,9 @@ func (o *POP_BC) cycles() []uint8 { // 0xc1
 }
 
 func (o *POP_BC) String() string { // 0xc1
-
-	return fmt.Sprintf("POP %v", o.operand1)
-
+	return "POP" + " " + "BC" /* operand1 */
 }
+
 func (o *POP_BC) SymbolicString() string { // 0xc1
 	return "POP BC"
 }
@@ -8322,10 +8648,8 @@ func (o *JP_NZ_a16) Write(w io.Writer) (int, error) { // 0xc2
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// NZ is implicit in this instruction.
+	err = writeImmediate16BitAddress(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -8340,10 +8664,9 @@ func (o *JP_NZ_a16) cycles() []uint8 { // 0xc2
 }
 
 func (o *JP_NZ_a16) String() string { // 0xc2
-
-	return fmt.Sprintf("JP %v %v", o.operand1, o.operand2)
-
+	return "JP" + " " + "NZ" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *JP_NZ_a16) SymbolicString() string { // 0xc2
 	return "JP NZ,a16"
 }
@@ -8371,11 +8694,9 @@ func (o *JP_a16) Write(w io.Writer) (int, error) { // 0xc3
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand1.(int16))
-	if err != nil {
-		return written, err
-	}
+	err = writeImmediate16BitAddress(w, o.operand1)
 	written += 2
+	//  is implicit in this instruction.
 
 	return written, err
 }
@@ -8389,10 +8710,9 @@ func (o *JP_a16) cycles() []uint8 { // 0xc3
 }
 
 func (o *JP_a16) String() string { // 0xc3
-
-	return fmt.Sprintf("JP %v", o.operand1)
-
+	return "JP" + " " + fmt.Sprintf("%X", o.operand1)
 }
+
 func (o *JP_a16) SymbolicString() string { // 0xc3
 	return "JP a16"
 }
@@ -8420,10 +8740,8 @@ func (o *CALL_NZ_a16) Write(w io.Writer) (int, error) { // 0xc4
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// NZ is implicit in this instruction.
+	err = writeImmediate16BitAddress(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -8438,10 +8756,9 @@ func (o *CALL_NZ_a16) cycles() []uint8 { // 0xc4
 }
 
 func (o *CALL_NZ_a16) String() string { // 0xc4
-
-	return fmt.Sprintf("CALL %v %v", o.operand1, o.operand2)
-
+	return "CALL" + " " + "NZ" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *CALL_NZ_a16) SymbolicString() string { // 0xc4
 	return "CALL NZ,a16"
 }
@@ -8469,6 +8786,9 @@ func (o *PUSH_BC) Write(w io.Writer) (int, error) { // 0xc5
 		return written, err
 	}
 
+	// BC is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8481,10 +8801,9 @@ func (o *PUSH_BC) cycles() []uint8 { // 0xc5
 }
 
 func (o *PUSH_BC) String() string { // 0xc5
-
-	return fmt.Sprintf("PUSH %v", o.operand1)
-
+	return "PUSH" + " " + "BC" /* operand1 */
 }
+
 func (o *PUSH_BC) SymbolicString() string { // 0xc5
 	return "PUSH BC"
 }
@@ -8512,10 +8831,8 @@ func (o *ADD_A_d8) Write(w io.Writer) (int, error) { // 0xc6
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// A is implicit in this instruction.
+	err = writeImmediate8BitData(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -8530,10 +8847,9 @@ func (o *ADD_A_d8) cycles() []uint8 { // 0xc6
 }
 
 func (o *ADD_A_d8) String() string { // 0xc6
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "A" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *ADD_A_d8) SymbolicString() string { // 0xc6
 	return "ADD A,d8"
 }
@@ -8561,6 +8877,9 @@ func (o *RST_00H) Write(w io.Writer) (int, error) { // 0xc7
 		return written, err
 	}
 
+	// 00H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8573,10 +8892,9 @@ func (o *RST_00H) cycles() []uint8 { // 0xc7
 }
 
 func (o *RST_00H) String() string { // 0xc7
-
-	return fmt.Sprintf("RST %v", o.operand1)
-
+	return "RST" + " " + "00H" /* operand1 */
 }
+
 func (o *RST_00H) SymbolicString() string { // 0xc7
 	return "RST 00H"
 }
@@ -8604,6 +8922,9 @@ func (o *RET_Z) Write(w io.Writer) (int, error) { // 0xc8
 		return written, err
 	}
 
+	// Z is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8616,10 +8937,9 @@ func (o *RET_Z) cycles() []uint8 { // 0xc8
 }
 
 func (o *RET_Z) String() string { // 0xc8
-
-	return fmt.Sprintf("RET %v", o.operand1)
-
+	return "RET" + " " + "Z" /* operand1 */
 }
+
 func (o *RET_Z) SymbolicString() string { // 0xc8
 	return "RET Z"
 }
@@ -8647,6 +8967,9 @@ func (o *RET) Write(w io.Writer) (int, error) { // 0xc9
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8659,10 +8982,9 @@ func (o *RET) cycles() []uint8 { // 0xc9
 }
 
 func (o *RET) String() string { // 0xc9
-
-	return fmt.Sprintf("RET %v", o.operand1)
-
+	return "RET"
 }
+
 func (o *RET) SymbolicString() string { // 0xc9
 	return "RET"
 }
@@ -8690,10 +9012,8 @@ func (o *JP_Z_a16) Write(w io.Writer) (int, error) { // 0xca
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// Z is implicit in this instruction.
+	err = writeImmediate16BitAddress(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -8708,10 +9028,9 @@ func (o *JP_Z_a16) cycles() []uint8 { // 0xca
 }
 
 func (o *JP_Z_a16) String() string { // 0xca
-
-	return fmt.Sprintf("JP %v %v", o.operand1, o.operand2)
-
+	return "JP" + " " + "Z" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *JP_Z_a16) SymbolicString() string { // 0xca
 	return "JP Z,a16"
 }
@@ -8739,6 +9058,9 @@ func (o *PREFIX_CB) Write(w io.Writer) (int, error) { // 0xcb
 		return written, err
 	}
 
+	// CB is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8751,10 +9073,9 @@ func (o *PREFIX_CB) cycles() []uint8 { // 0xcb
 }
 
 func (o *PREFIX_CB) String() string { // 0xcb
-
-	return fmt.Sprintf("PREFIX %v", o.operand1)
-
+	return "PREFIX" + " " + "CB" /* operand1 */
 }
+
 func (o *PREFIX_CB) SymbolicString() string { // 0xcb
 	return "PREFIX CB"
 }
@@ -8782,10 +9103,8 @@ func (o *CALL_Z_a16) Write(w io.Writer) (int, error) { // 0xcc
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// Z is implicit in this instruction.
+	err = writeImmediate16BitAddress(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -8800,10 +9119,9 @@ func (o *CALL_Z_a16) cycles() []uint8 { // 0xcc
 }
 
 func (o *CALL_Z_a16) String() string { // 0xcc
-
-	return fmt.Sprintf("CALL %v %v", o.operand1, o.operand2)
-
+	return "CALL" + " " + "Z" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *CALL_Z_a16) SymbolicString() string { // 0xcc
 	return "CALL Z,a16"
 }
@@ -8831,11 +9149,9 @@ func (o *CALL_a16) Write(w io.Writer) (int, error) { // 0xcd
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand1.(int16))
-	if err != nil {
-		return written, err
-	}
+	err = writeImmediate16BitAddress(w, o.operand1)
 	written += 2
+	//  is implicit in this instruction.
 
 	return written, err
 }
@@ -8849,10 +9165,9 @@ func (o *CALL_a16) cycles() []uint8 { // 0xcd
 }
 
 func (o *CALL_a16) String() string { // 0xcd
-
-	return fmt.Sprintf("CALL %v", o.operand1)
-
+	return "CALL" + " " + fmt.Sprintf("%X", o.operand1)
 }
+
 func (o *CALL_a16) SymbolicString() string { // 0xcd
 	return "CALL a16"
 }
@@ -8880,10 +9195,8 @@ func (o *ADC_A_d8) Write(w io.Writer) (int, error) { // 0xce
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// A is implicit in this instruction.
+	err = writeImmediate8BitData(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -8898,10 +9211,9 @@ func (o *ADC_A_d8) cycles() []uint8 { // 0xce
 }
 
 func (o *ADC_A_d8) String() string { // 0xce
-
-	return fmt.Sprintf("ADC %v %v", o.operand1, o.operand2)
-
+	return "ADC" + " " + "A" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *ADC_A_d8) SymbolicString() string { // 0xce
 	return "ADC A,d8"
 }
@@ -8929,6 +9241,9 @@ func (o *RST_08H) Write(w io.Writer) (int, error) { // 0xcf
 		return written, err
 	}
 
+	// 08H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8941,10 +9256,9 @@ func (o *RST_08H) cycles() []uint8 { // 0xcf
 }
 
 func (o *RST_08H) String() string { // 0xcf
-
-	return fmt.Sprintf("RST %v", o.operand1)
-
+	return "RST" + " " + "08H" /* operand1 */
 }
+
 func (o *RST_08H) SymbolicString() string { // 0xcf
 	return "RST 08H"
 }
@@ -8972,6 +9286,9 @@ func (o *DEC_C) Write(w io.Writer) (int, error) { // 0xd
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -8984,10 +9301,9 @@ func (o *DEC_C) cycles() []uint8 { // 0xd
 }
 
 func (o *DEC_C) String() string { // 0xd
-
-	return fmt.Sprintf("DEC %v", o.operand1)
-
+	return "DEC" + " " + "C" /* operand1 */
 }
+
 func (o *DEC_C) SymbolicString() string { // 0xd
 	return "DEC C"
 }
@@ -9015,6 +9331,9 @@ func (o *RET_NC) Write(w io.Writer) (int, error) { // 0xd0
 		return written, err
 	}
 
+	// NC is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -9027,10 +9346,9 @@ func (o *RET_NC) cycles() []uint8 { // 0xd0
 }
 
 func (o *RET_NC) String() string { // 0xd0
-
-	return fmt.Sprintf("RET %v", o.operand1)
-
+	return "RET" + " " + "NC" /* operand1 */
 }
+
 func (o *RET_NC) SymbolicString() string { // 0xd0
 	return "RET NC"
 }
@@ -9058,6 +9376,9 @@ func (o *POP_DE) Write(w io.Writer) (int, error) { // 0xd1
 		return written, err
 	}
 
+	// DE is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -9070,10 +9391,9 @@ func (o *POP_DE) cycles() []uint8 { // 0xd1
 }
 
 func (o *POP_DE) String() string { // 0xd1
-
-	return fmt.Sprintf("POP %v", o.operand1)
-
+	return "POP" + " " + "DE" /* operand1 */
 }
+
 func (o *POP_DE) SymbolicString() string { // 0xd1
 	return "POP DE"
 }
@@ -9101,10 +9421,8 @@ func (o *JP_NC_a16) Write(w io.Writer) (int, error) { // 0xd2
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// NC is implicit in this instruction.
+	err = writeImmediate16BitAddress(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -9119,10 +9437,9 @@ func (o *JP_NC_a16) cycles() []uint8 { // 0xd2
 }
 
 func (o *JP_NC_a16) String() string { // 0xd2
-
-	return fmt.Sprintf("JP %v %v", o.operand1, o.operand2)
-
+	return "JP" + " " + "NC" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *JP_NC_a16) SymbolicString() string { // 0xd2
 	return "JP NC,a16"
 }
@@ -9150,10 +9467,8 @@ func (o *CALL_NC_a16) Write(w io.Writer) (int, error) { // 0xd4
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// NC is implicit in this instruction.
+	err = writeImmediate16BitAddress(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -9168,10 +9483,9 @@ func (o *CALL_NC_a16) cycles() []uint8 { // 0xd4
 }
 
 func (o *CALL_NC_a16) String() string { // 0xd4
-
-	return fmt.Sprintf("CALL %v %v", o.operand1, o.operand2)
-
+	return "CALL" + " " + "NC" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *CALL_NC_a16) SymbolicString() string { // 0xd4
 	return "CALL NC,a16"
 }
@@ -9199,6 +9513,9 @@ func (o *PUSH_DE) Write(w io.Writer) (int, error) { // 0xd5
 		return written, err
 	}
 
+	// DE is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -9211,10 +9528,9 @@ func (o *PUSH_DE) cycles() []uint8 { // 0xd5
 }
 
 func (o *PUSH_DE) String() string { // 0xd5
-
-	return fmt.Sprintf("PUSH %v", o.operand1)
-
+	return "PUSH" + " " + "DE" /* operand1 */
 }
+
 func (o *PUSH_DE) SymbolicString() string { // 0xd5
 	return "PUSH DE"
 }
@@ -9242,11 +9558,9 @@ func (o *SUB_d8) Write(w io.Writer) (int, error) { // 0xd6
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand1.(int8))
-	if err != nil {
-		return written, err
-	}
+	err = writeImmediate8BitData(w, o.operand1)
 	written += 1
+	//  is implicit in this instruction.
 
 	return written, err
 }
@@ -9260,10 +9574,9 @@ func (o *SUB_d8) cycles() []uint8 { // 0xd6
 }
 
 func (o *SUB_d8) String() string { // 0xd6
-
-	return fmt.Sprintf("SUB %v", o.operand1)
-
+	return "SUB" + " " + fmt.Sprintf("%X", o.operand1)
 }
+
 func (o *SUB_d8) SymbolicString() string { // 0xd6
 	return "SUB d8"
 }
@@ -9291,6 +9604,9 @@ func (o *RST_10H) Write(w io.Writer) (int, error) { // 0xd7
 		return written, err
 	}
 
+	// 10H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -9303,10 +9619,9 @@ func (o *RST_10H) cycles() []uint8 { // 0xd7
 }
 
 func (o *RST_10H) String() string { // 0xd7
-
-	return fmt.Sprintf("RST %v", o.operand1)
-
+	return "RST" + " " + "10H" /* operand1 */
 }
+
 func (o *RST_10H) SymbolicString() string { // 0xd7
 	return "RST 10H"
 }
@@ -9334,6 +9649,9 @@ func (o *RET_C) Write(w io.Writer) (int, error) { // 0xd8
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -9346,10 +9664,9 @@ func (o *RET_C) cycles() []uint8 { // 0xd8
 }
 
 func (o *RET_C) String() string { // 0xd8
-
-	return fmt.Sprintf("RET %v", o.operand1)
-
+	return "RET" + " " + "C" /* operand1 */
 }
+
 func (o *RET_C) SymbolicString() string { // 0xd8
 	return "RET C"
 }
@@ -9377,6 +9694,9 @@ func (o *RETI) Write(w io.Writer) (int, error) { // 0xd9
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -9389,10 +9709,9 @@ func (o *RETI) cycles() []uint8 { // 0xd9
 }
 
 func (o *RETI) String() string { // 0xd9
-
-	return fmt.Sprintf("RETI %v", o.operand1)
-
+	return "RETI"
 }
+
 func (o *RETI) SymbolicString() string { // 0xd9
 	return "RETI"
 }
@@ -9420,10 +9739,8 @@ func (o *JP_C_a16) Write(w io.Writer) (int, error) { // 0xda
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// C is implicit in this instruction.
+	err = writeImmediate16BitAddress(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -9438,10 +9755,9 @@ func (o *JP_C_a16) cycles() []uint8 { // 0xda
 }
 
 func (o *JP_C_a16) String() string { // 0xda
-
-	return fmt.Sprintf("JP %v %v", o.operand1, o.operand2)
-
+	return "JP" + " " + "C" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *JP_C_a16) SymbolicString() string { // 0xda
 	return "JP C,a16"
 }
@@ -9469,10 +9785,8 @@ func (o *CALL_C_a16) Write(w io.Writer) (int, error) { // 0xdc
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// C is implicit in this instruction.
+	err = writeImmediate16BitAddress(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -9487,10 +9801,9 @@ func (o *CALL_C_a16) cycles() []uint8 { // 0xdc
 }
 
 func (o *CALL_C_a16) String() string { // 0xdc
-
-	return fmt.Sprintf("CALL %v %v", o.operand1, o.operand2)
-
+	return "CALL" + " " + "C" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *CALL_C_a16) SymbolicString() string { // 0xdc
 	return "CALL C,a16"
 }
@@ -9518,10 +9831,8 @@ func (o *SBC_A_d8) Write(w io.Writer) (int, error) { // 0xde
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// A is implicit in this instruction.
+	err = writeImmediate8BitData(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -9536,10 +9847,9 @@ func (o *SBC_A_d8) cycles() []uint8 { // 0xde
 }
 
 func (o *SBC_A_d8) String() string { // 0xde
-
-	return fmt.Sprintf("SBC %v %v", o.operand1, o.operand2)
-
+	return "SBC" + " " + "A" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *SBC_A_d8) SymbolicString() string { // 0xde
 	return "SBC A,d8"
 }
@@ -9567,6 +9877,9 @@ func (o *RST_18H) Write(w io.Writer) (int, error) { // 0xdf
 		return written, err
 	}
 
+	// 18H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -9579,10 +9892,9 @@ func (o *RST_18H) cycles() []uint8 { // 0xdf
 }
 
 func (o *RST_18H) String() string { // 0xdf
-
-	return fmt.Sprintf("RST %v", o.operand1)
-
+	return "RST" + " " + "18H" /* operand1 */
 }
+
 func (o *RST_18H) SymbolicString() string { // 0xdf
 	return "RST 18H"
 }
@@ -9610,10 +9922,8 @@ func (o *LD_C_d8) Write(w io.Writer) (int, error) { // 0xe
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// C is implicit in this instruction.
+	err = writeImmediate8BitData(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -9628,10 +9938,9 @@ func (o *LD_C_d8) cycles() []uint8 { // 0xe
 }
 
 func (o *LD_C_d8) String() string { // 0xe
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "C" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_C_d8) SymbolicString() string { // 0xe
 	return "LD C,d8"
 }
@@ -9659,11 +9968,9 @@ func (o *LDH_a8Deref_A) Write(w io.Writer) (int, error) { // 0xe0
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand1.(int8))
-	if err != nil {
-		return written, err
-	}
+	err = writeImmediate8BitAddress(w, o.operand1)
 	written += 1
+	// A is implicit in this instruction.
 
 	return written, err
 }
@@ -9677,10 +9984,9 @@ func (o *LDH_a8Deref_A) cycles() []uint8 { // 0xe0
 }
 
 func (o *LDH_a8Deref_A) String() string { // 0xe0
-
-	return fmt.Sprintf("LDH %v %v", o.operand1, o.operand2)
-
+	return "LDH" + " " + fmt.Sprintf("(%X)", o.operand1) + " " + "A" /* operand2 */
 }
+
 func (o *LDH_a8Deref_A) SymbolicString() string { // 0xe0
 	return "LDH (a8),A"
 }
@@ -9708,6 +10014,9 @@ func (o *POP_HL) Write(w io.Writer) (int, error) { // 0xe1
 		return written, err
 	}
 
+	// HL is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -9720,10 +10029,9 @@ func (o *POP_HL) cycles() []uint8 { // 0xe1
 }
 
 func (o *POP_HL) String() string { // 0xe1
-
-	return fmt.Sprintf("POP %v", o.operand1)
-
+	return "POP" + " " + "HL" /* operand1 */
 }
+
 func (o *POP_HL) SymbolicString() string { // 0xe1
 	return "POP HL"
 }
@@ -9751,6 +10059,9 @@ func (o *LD_CDeref_A) Write(w io.Writer) (int, error) { // 0xe2
 		return written, err
 	}
 
+	// (C) is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -9763,10 +10074,9 @@ func (o *LD_CDeref_A) cycles() []uint8 { // 0xe2
 }
 
 func (o *LD_CDeref_A) String() string { // 0xe2
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "(C)" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *LD_CDeref_A) SymbolicString() string { // 0xe2
 	return "LD (C),A"
 }
@@ -9794,6 +10104,9 @@ func (o *PUSH_HL) Write(w io.Writer) (int, error) { // 0xe5
 		return written, err
 	}
 
+	// HL is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -9806,10 +10119,9 @@ func (o *PUSH_HL) cycles() []uint8 { // 0xe5
 }
 
 func (o *PUSH_HL) String() string { // 0xe5
-
-	return fmt.Sprintf("PUSH %v", o.operand1)
-
+	return "PUSH" + " " + "HL" /* operand1 */
 }
+
 func (o *PUSH_HL) SymbolicString() string { // 0xe5
 	return "PUSH HL"
 }
@@ -9837,11 +10149,9 @@ func (o *AND_d8) Write(w io.Writer) (int, error) { // 0xe6
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand1.(int8))
-	if err != nil {
-		return written, err
-	}
+	err = writeImmediate8BitData(w, o.operand1)
 	written += 1
+	//  is implicit in this instruction.
 
 	return written, err
 }
@@ -9855,10 +10165,9 @@ func (o *AND_d8) cycles() []uint8 { // 0xe6
 }
 
 func (o *AND_d8) String() string { // 0xe6
-
-	return fmt.Sprintf("AND %v", o.operand1)
-
+	return "AND" + " " + fmt.Sprintf("%X", o.operand1)
 }
+
 func (o *AND_d8) SymbolicString() string { // 0xe6
 	return "AND d8"
 }
@@ -9886,6 +10195,9 @@ func (o *RST_20H) Write(w io.Writer) (int, error) { // 0xe7
 		return written, err
 	}
 
+	// 20H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -9898,10 +10210,9 @@ func (o *RST_20H) cycles() []uint8 { // 0xe7
 }
 
 func (o *RST_20H) String() string { // 0xe7
-
-	return fmt.Sprintf("RST %v", o.operand1)
-
+	return "RST" + " " + "20H" /* operand1 */
 }
+
 func (o *RST_20H) SymbolicString() string { // 0xe7
 	return "RST 20H"
 }
@@ -9929,6 +10240,10 @@ func (o *ADD_SP_r8) Write(w io.Writer) (int, error) { // 0xe8
 		return written, err
 	}
 
+	// SP is implicit in this instruction.
+	err = writeImmediateSigned8BitData(w, o.operand2)
+	written += 1
+
 	return written, err
 }
 
@@ -9941,10 +10256,9 @@ func (o *ADD_SP_r8) cycles() []uint8 { // 0xe8
 }
 
 func (o *ADD_SP_r8) String() string { // 0xe8
-
-	return fmt.Sprintf("ADD %v %v", o.operand1, o.operand2)
-
+	return "ADD" + " " + "SP" /* operand1 */ + " " + fmt.Sprintf("SP+%X", o.operand2)
 }
+
 func (o *ADD_SP_r8) SymbolicString() string { // 0xe8
 	return "ADD SP,r8"
 }
@@ -9972,6 +10286,9 @@ func (o *JP_HLPtr) Write(w io.Writer) (int, error) { // 0xe9
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -9984,10 +10301,9 @@ func (o *JP_HLPtr) cycles() []uint8 { // 0xe9
 }
 
 func (o *JP_HLPtr) String() string { // 0xe9
-
-	return fmt.Sprintf("JP %v", o.operand1)
-
+	return "JP" + " " + "(HL)" /* operand1 */
 }
+
 func (o *JP_HLPtr) SymbolicString() string { // 0xe9
 	return "JP (HL)"
 }
@@ -10015,11 +10331,9 @@ func (o *LD_a16Deref_A) Write(w io.Writer) (int, error) { // 0xea
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand1.(int16))
-	if err != nil {
-		return written, err
-	}
+	err = writeImmediate16BitAddress(w, o.operand1)
 	written += 2
+	// A is implicit in this instruction.
 
 	return written, err
 }
@@ -10033,10 +10347,9 @@ func (o *LD_a16Deref_A) cycles() []uint8 { // 0xea
 }
 
 func (o *LD_a16Deref_A) String() string { // 0xea
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + fmt.Sprintf("%X", o.operand1) + " " + "A" /* operand2 */
 }
+
 func (o *LD_a16Deref_A) SymbolicString() string { // 0xea
 	return "LD (a16),A"
 }
@@ -10064,11 +10377,9 @@ func (o *XOR_d8) Write(w io.Writer) (int, error) { // 0xee
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand1.(int8))
-	if err != nil {
-		return written, err
-	}
+	err = writeImmediate8BitData(w, o.operand1)
 	written += 1
+	//  is implicit in this instruction.
 
 	return written, err
 }
@@ -10082,10 +10393,9 @@ func (o *XOR_d8) cycles() []uint8 { // 0xee
 }
 
 func (o *XOR_d8) String() string { // 0xee
-
-	return fmt.Sprintf("XOR %v", o.operand1)
-
+	return "XOR" + " " + fmt.Sprintf("%X", o.operand1)
 }
+
 func (o *XOR_d8) SymbolicString() string { // 0xee
 	return "XOR d8"
 }
@@ -10113,6 +10423,9 @@ func (o *RST_28H) Write(w io.Writer) (int, error) { // 0xef
 		return written, err
 	}
 
+	// 28H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10125,10 +10438,9 @@ func (o *RST_28H) cycles() []uint8 { // 0xef
 }
 
 func (o *RST_28H) String() string { // 0xef
-
-	return fmt.Sprintf("RST %v", o.operand1)
-
+	return "RST" + " " + "28H" /* operand1 */
 }
+
 func (o *RST_28H) SymbolicString() string { // 0xef
 	return "RST 28H"
 }
@@ -10156,6 +10468,9 @@ func (o *RRCA) Write(w io.Writer) (int, error) { // 0xf
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10168,10 +10483,9 @@ func (o *RRCA) cycles() []uint8 { // 0xf
 }
 
 func (o *RRCA) String() string { // 0xf
-
-	return fmt.Sprintf("RRCA %v", o.operand1)
-
+	return "RRCA"
 }
+
 func (o *RRCA) SymbolicString() string { // 0xf
 	return "RRCA"
 }
@@ -10199,10 +10513,8 @@ func (o *LDH_A_a8Deref) Write(w io.Writer) (int, error) { // 0xf0
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// A is implicit in this instruction.
+	err = writeImmediate8BitAddress(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -10217,10 +10529,9 @@ func (o *LDH_A_a8Deref) cycles() []uint8 { // 0xf0
 }
 
 func (o *LDH_A_a8Deref) String() string { // 0xf0
-
-	return fmt.Sprintf("LDH %v %v", o.operand1, o.operand2)
-
+	return "LDH" + " " + "A" /* operand1 */ + " " + fmt.Sprintf("(%X)", o.operand2)
 }
+
 func (o *LDH_A_a8Deref) SymbolicString() string { // 0xf0
 	return "LDH A,(a8)"
 }
@@ -10248,6 +10559,9 @@ func (o *POP_AF) Write(w io.Writer) (int, error) { // 0xf1
 		return written, err
 	}
 
+	// AF is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10260,10 +10574,9 @@ func (o *POP_AF) cycles() []uint8 { // 0xf1
 }
 
 func (o *POP_AF) String() string { // 0xf1
-
-	return fmt.Sprintf("POP %v", o.operand1)
-
+	return "POP" + " " + "AF" /* operand1 */
 }
+
 func (o *POP_AF) SymbolicString() string { // 0xf1
 	return "POP AF"
 }
@@ -10291,6 +10604,9 @@ func (o *LD_A_CDeref) Write(w io.Writer) (int, error) { // 0xf2
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	// (C) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10303,10 +10619,9 @@ func (o *LD_A_CDeref) cycles() []uint8 { // 0xf2
 }
 
 func (o *LD_A_CDeref) String() string { // 0xf2
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + "(C)" /* operand2 */
 }
+
 func (o *LD_A_CDeref) SymbolicString() string { // 0xf2
 	return "LD A,(C)"
 }
@@ -10334,6 +10649,9 @@ func (o *DI) Write(w io.Writer) (int, error) { // 0xf3
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10346,10 +10664,9 @@ func (o *DI) cycles() []uint8 { // 0xf3
 }
 
 func (o *DI) String() string { // 0xf3
-
-	return fmt.Sprintf("DI %v", o.operand1)
-
+	return "DI"
 }
+
 func (o *DI) SymbolicString() string { // 0xf3
 	return "DI"
 }
@@ -10377,6 +10694,9 @@ func (o *PUSH_AF) Write(w io.Writer) (int, error) { // 0xf5
 		return written, err
 	}
 
+	// AF is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10389,10 +10709,9 @@ func (o *PUSH_AF) cycles() []uint8 { // 0xf5
 }
 
 func (o *PUSH_AF) String() string { // 0xf5
-
-	return fmt.Sprintf("PUSH %v", o.operand1)
-
+	return "PUSH" + " " + "AF" /* operand1 */
 }
+
 func (o *PUSH_AF) SymbolicString() string { // 0xf5
 	return "PUSH AF"
 }
@@ -10420,11 +10739,9 @@ func (o *OR_d8) Write(w io.Writer) (int, error) { // 0xf6
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand1.(int8))
-	if err != nil {
-		return written, err
-	}
+	err = writeImmediate8BitData(w, o.operand1)
 	written += 1
+	//  is implicit in this instruction.
 
 	return written, err
 }
@@ -10438,10 +10755,9 @@ func (o *OR_d8) cycles() []uint8 { // 0xf6
 }
 
 func (o *OR_d8) String() string { // 0xf6
-
-	return fmt.Sprintf("OR %v", o.operand1)
-
+	return "OR" + " " + fmt.Sprintf("%X", o.operand1)
 }
+
 func (o *OR_d8) SymbolicString() string { // 0xf6
 	return "OR d8"
 }
@@ -10469,6 +10785,9 @@ func (o *RST_30H) Write(w io.Writer) (int, error) { // 0xf7
 		return written, err
 	}
 
+	// 30H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10481,10 +10800,9 @@ func (o *RST_30H) cycles() []uint8 { // 0xf7
 }
 
 func (o *RST_30H) String() string { // 0xf7
-
-	return fmt.Sprintf("RST %v", o.operand1)
-
+	return "RST" + " " + "30H" /* operand1 */
 }
+
 func (o *RST_30H) SymbolicString() string { // 0xf7
 	return "RST 30H"
 }
@@ -10512,10 +10830,8 @@ func (o *LD_HL_SP_plus_r8) Write(w io.Writer) (int, error) { // 0xf8
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int8))
-	if err != nil {
-		return written, err
-	}
+	// HL is implicit in this instruction.
+	err = writeImmediateSigned8BitData(w, o.operand2)
 	written += 1
 
 	return written, err
@@ -10530,10 +10846,9 @@ func (o *LD_HL_SP_plus_r8) cycles() []uint8 { // 0xf8
 }
 
 func (o *LD_HL_SP_plus_r8) String() string { // 0xf8
-
-	return fmt.Sprintf("LD %v SP+%d", o.operand1, o.operand2)
-
+	return "LD" + " " + "HL" /* operand1 */ + " " + fmt.Sprintf("SP+%X", o.operand2)
 }
+
 func (o *LD_HL_SP_plus_r8) SymbolicString() string { // 0xf8
 	return "LD HL,SP+r8"
 }
@@ -10561,6 +10876,9 @@ func (o *LD_SP_HL) Write(w io.Writer) (int, error) { // 0xf9
 		return written, err
 	}
 
+	// SP is implicit in this instruction.
+	// HL is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10573,10 +10891,9 @@ func (o *LD_SP_HL) cycles() []uint8 { // 0xf9
 }
 
 func (o *LD_SP_HL) String() string { // 0xf9
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "SP" /* operand1 */ + " " + "HL" /* operand2 */
 }
+
 func (o *LD_SP_HL) SymbolicString() string { // 0xf9
 	return "LD SP,HL"
 }
@@ -10604,10 +10921,8 @@ func (o *LD_A_a16Deref) Write(w io.Writer) (int, error) { // 0xfa
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand2.(int16))
-	if err != nil {
-		return written, err
-	}
+	// A is implicit in this instruction.
+	err = writeImmediate16BitAddress(w, o.operand2)
 	written += 2
 
 	return written, err
@@ -10622,10 +10937,9 @@ func (o *LD_A_a16Deref) cycles() []uint8 { // 0xfa
 }
 
 func (o *LD_A_a16Deref) String() string { // 0xfa
-
-	return fmt.Sprintf("LD %v %v", o.operand1, o.operand2)
-
+	return "LD" + " " + "A" /* operand1 */ + " " + fmt.Sprintf("%X", o.operand2)
 }
+
 func (o *LD_A_a16Deref) SymbolicString() string { // 0xfa
 	return "LD A,(a16)"
 }
@@ -10653,6 +10967,9 @@ func (o *EI) Write(w io.Writer) (int, error) { // 0xfb
 		return written, err
 	}
 
+	//  is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10665,10 +10982,9 @@ func (o *EI) cycles() []uint8 { // 0xfb
 }
 
 func (o *EI) String() string { // 0xfb
-
-	return fmt.Sprintf("EI %v", o.operand1)
-
+	return "EI"
 }
+
 func (o *EI) SymbolicString() string { // 0xfb
 	return "EI"
 }
@@ -10696,11 +11012,9 @@ func (o *CP_d8) Write(w io.Writer) (int, error) { // 0xfe
 		return written, err
 	}
 
-	err = binary.Write(w, endianness, o.operand1.(int8))
-	if err != nil {
-		return written, err
-	}
+	err = writeImmediate8BitData(w, o.operand1)
 	written += 1
+	//  is implicit in this instruction.
 
 	return written, err
 }
@@ -10714,10 +11028,9 @@ func (o *CP_d8) cycles() []uint8 { // 0xfe
 }
 
 func (o *CP_d8) String() string { // 0xfe
-
-	return fmt.Sprintf("CP %v", o.operand1)
-
+	return "CP" + " " + fmt.Sprintf("%X", o.operand1)
 }
+
 func (o *CP_d8) SymbolicString() string { // 0xfe
 	return "CP d8"
 }
@@ -10745,6 +11058,9 @@ func (o *RST_38H) Write(w io.Writer) (int, error) { // 0xff
 		return written, err
 	}
 
+	// 38H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10757,10 +11073,9 @@ func (o *RST_38H) cycles() []uint8 { // 0xff
 }
 
 func (o *RST_38H) String() string { // 0xff
-
-	return fmt.Sprintf("RST %v", o.operand1)
-
+	return "RST" + " " + "38H" /* operand1 */
 }
+
 func (o *RST_38H) SymbolicString() string { // 0xff
 	return "RST 38H"
 }
@@ -10788,6 +11103,9 @@ func (o *RLC_B) Write(w io.Writer) (int, error) { // 0x0
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10800,10 +11118,9 @@ func (o *RLC_B) cycles() []uint8 { // 0x0
 }
 
 func (o *RLC_B) String() string { // 0x0
-
-	return fmt.Sprintf("RLC %v", o.operand1)
-
+	return "RLC" + " " + "B" /* operand1 */
 }
+
 func (o *RLC_B) SymbolicString() string { // 0x0
 	return "RLC B"
 }
@@ -10831,6 +11148,9 @@ func (o *RLC_C) Write(w io.Writer) (int, error) { // 0x1
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10843,10 +11163,9 @@ func (o *RLC_C) cycles() []uint8 { // 0x1
 }
 
 func (o *RLC_C) String() string { // 0x1
-
-	return fmt.Sprintf("RLC %v", o.operand1)
-
+	return "RLC" + " " + "C" /* operand1 */
 }
+
 func (o *RLC_C) SymbolicString() string { // 0x1
 	return "RLC C"
 }
@@ -10874,6 +11193,9 @@ func (o *RL_B) Write(w io.Writer) (int, error) { // 0x10
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10886,10 +11208,9 @@ func (o *RL_B) cycles() []uint8 { // 0x10
 }
 
 func (o *RL_B) String() string { // 0x10
-
-	return fmt.Sprintf("RL %v", o.operand1)
-
+	return "RL" + " " + "B" /* operand1 */
 }
+
 func (o *RL_B) SymbolicString() string { // 0x10
 	return "RL B"
 }
@@ -10917,6 +11238,9 @@ func (o *RL_C) Write(w io.Writer) (int, error) { // 0x11
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10929,10 +11253,9 @@ func (o *RL_C) cycles() []uint8 { // 0x11
 }
 
 func (o *RL_C) String() string { // 0x11
-
-	return fmt.Sprintf("RL %v", o.operand1)
-
+	return "RL" + " " + "C" /* operand1 */
 }
+
 func (o *RL_C) SymbolicString() string { // 0x11
 	return "RL C"
 }
@@ -10960,6 +11283,9 @@ func (o *RL_D) Write(w io.Writer) (int, error) { // 0x12
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -10972,10 +11298,9 @@ func (o *RL_D) cycles() []uint8 { // 0x12
 }
 
 func (o *RL_D) String() string { // 0x12
-
-	return fmt.Sprintf("RL %v", o.operand1)
-
+	return "RL" + " " + "D" /* operand1 */
 }
+
 func (o *RL_D) SymbolicString() string { // 0x12
 	return "RL D"
 }
@@ -11003,6 +11328,9 @@ func (o *RL_E) Write(w io.Writer) (int, error) { // 0x13
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11015,10 +11343,9 @@ func (o *RL_E) cycles() []uint8 { // 0x13
 }
 
 func (o *RL_E) String() string { // 0x13
-
-	return fmt.Sprintf("RL %v", o.operand1)
-
+	return "RL" + " " + "E" /* operand1 */
 }
+
 func (o *RL_E) SymbolicString() string { // 0x13
 	return "RL E"
 }
@@ -11046,6 +11373,9 @@ func (o *RL_H) Write(w io.Writer) (int, error) { // 0x14
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11058,10 +11388,9 @@ func (o *RL_H) cycles() []uint8 { // 0x14
 }
 
 func (o *RL_H) String() string { // 0x14
-
-	return fmt.Sprintf("RL %v", o.operand1)
-
+	return "RL" + " " + "H" /* operand1 */
 }
+
 func (o *RL_H) SymbolicString() string { // 0x14
 	return "RL H"
 }
@@ -11089,6 +11418,9 @@ func (o *RL_L) Write(w io.Writer) (int, error) { // 0x15
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11101,10 +11433,9 @@ func (o *RL_L) cycles() []uint8 { // 0x15
 }
 
 func (o *RL_L) String() string { // 0x15
-
-	return fmt.Sprintf("RL %v", o.operand1)
-
+	return "RL" + " " + "L" /* operand1 */
 }
+
 func (o *RL_L) SymbolicString() string { // 0x15
 	return "RL L"
 }
@@ -11132,6 +11463,9 @@ func (o *RL_HLPtr) Write(w io.Writer) (int, error) { // 0x16
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11144,10 +11478,9 @@ func (o *RL_HLPtr) cycles() []uint8 { // 0x16
 }
 
 func (o *RL_HLPtr) String() string { // 0x16
-
-	return fmt.Sprintf("RL %v", o.operand1)
-
+	return "RL" + " " + "(HL)" /* operand1 */
 }
+
 func (o *RL_HLPtr) SymbolicString() string { // 0x16
 	return "RL (HL)"
 }
@@ -11175,6 +11508,9 @@ func (o *RL_A) Write(w io.Writer) (int, error) { // 0x17
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11187,10 +11523,9 @@ func (o *RL_A) cycles() []uint8 { // 0x17
 }
 
 func (o *RL_A) String() string { // 0x17
-
-	return fmt.Sprintf("RL %v", o.operand1)
-
+	return "RL" + " " + "A" /* operand1 */
 }
+
 func (o *RL_A) SymbolicString() string { // 0x17
 	return "RL A"
 }
@@ -11218,6 +11553,9 @@ func (o *RR_B) Write(w io.Writer) (int, error) { // 0x18
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11230,10 +11568,9 @@ func (o *RR_B) cycles() []uint8 { // 0x18
 }
 
 func (o *RR_B) String() string { // 0x18
-
-	return fmt.Sprintf("RR %v", o.operand1)
-
+	return "RR" + " " + "B" /* operand1 */
 }
+
 func (o *RR_B) SymbolicString() string { // 0x18
 	return "RR B"
 }
@@ -11261,6 +11598,9 @@ func (o *RR_C) Write(w io.Writer) (int, error) { // 0x19
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11273,10 +11613,9 @@ func (o *RR_C) cycles() []uint8 { // 0x19
 }
 
 func (o *RR_C) String() string { // 0x19
-
-	return fmt.Sprintf("RR %v", o.operand1)
-
+	return "RR" + " " + "C" /* operand1 */
 }
+
 func (o *RR_C) SymbolicString() string { // 0x19
 	return "RR C"
 }
@@ -11304,6 +11643,9 @@ func (o *RR_D) Write(w io.Writer) (int, error) { // 0x1a
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11316,10 +11658,9 @@ func (o *RR_D) cycles() []uint8 { // 0x1a
 }
 
 func (o *RR_D) String() string { // 0x1a
-
-	return fmt.Sprintf("RR %v", o.operand1)
-
+	return "RR" + " " + "D" /* operand1 */
 }
+
 func (o *RR_D) SymbolicString() string { // 0x1a
 	return "RR D"
 }
@@ -11347,6 +11688,9 @@ func (o *RR_E) Write(w io.Writer) (int, error) { // 0x1b
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11359,10 +11703,9 @@ func (o *RR_E) cycles() []uint8 { // 0x1b
 }
 
 func (o *RR_E) String() string { // 0x1b
-
-	return fmt.Sprintf("RR %v", o.operand1)
-
+	return "RR" + " " + "E" /* operand1 */
 }
+
 func (o *RR_E) SymbolicString() string { // 0x1b
 	return "RR E"
 }
@@ -11390,6 +11733,9 @@ func (o *RR_H) Write(w io.Writer) (int, error) { // 0x1c
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11402,10 +11748,9 @@ func (o *RR_H) cycles() []uint8 { // 0x1c
 }
 
 func (o *RR_H) String() string { // 0x1c
-
-	return fmt.Sprintf("RR %v", o.operand1)
-
+	return "RR" + " " + "H" /* operand1 */
 }
+
 func (o *RR_H) SymbolicString() string { // 0x1c
 	return "RR H"
 }
@@ -11433,6 +11778,9 @@ func (o *RR_L) Write(w io.Writer) (int, error) { // 0x1d
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11445,10 +11793,9 @@ func (o *RR_L) cycles() []uint8 { // 0x1d
 }
 
 func (o *RR_L) String() string { // 0x1d
-
-	return fmt.Sprintf("RR %v", o.operand1)
-
+	return "RR" + " " + "L" /* operand1 */
 }
+
 func (o *RR_L) SymbolicString() string { // 0x1d
 	return "RR L"
 }
@@ -11476,6 +11823,9 @@ func (o *RR_HLPtr) Write(w io.Writer) (int, error) { // 0x1e
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11488,10 +11838,9 @@ func (o *RR_HLPtr) cycles() []uint8 { // 0x1e
 }
 
 func (o *RR_HLPtr) String() string { // 0x1e
-
-	return fmt.Sprintf("RR %v", o.operand1)
-
+	return "RR" + " " + "(HL)" /* operand1 */
 }
+
 func (o *RR_HLPtr) SymbolicString() string { // 0x1e
 	return "RR (HL)"
 }
@@ -11519,6 +11868,9 @@ func (o *RR_A) Write(w io.Writer) (int, error) { // 0x1f
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11531,10 +11883,9 @@ func (o *RR_A) cycles() []uint8 { // 0x1f
 }
 
 func (o *RR_A) String() string { // 0x1f
-
-	return fmt.Sprintf("RR %v", o.operand1)
-
+	return "RR" + " " + "A" /* operand1 */
 }
+
 func (o *RR_A) SymbolicString() string { // 0x1f
 	return "RR A"
 }
@@ -11562,6 +11913,9 @@ func (o *RLC_D) Write(w io.Writer) (int, error) { // 0x2
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11574,10 +11928,9 @@ func (o *RLC_D) cycles() []uint8 { // 0x2
 }
 
 func (o *RLC_D) String() string { // 0x2
-
-	return fmt.Sprintf("RLC %v", o.operand1)
-
+	return "RLC" + " " + "D" /* operand1 */
 }
+
 func (o *RLC_D) SymbolicString() string { // 0x2
 	return "RLC D"
 }
@@ -11605,6 +11958,9 @@ func (o *SLA_B) Write(w io.Writer) (int, error) { // 0x20
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11617,10 +11973,9 @@ func (o *SLA_B) cycles() []uint8 { // 0x20
 }
 
 func (o *SLA_B) String() string { // 0x20
-
-	return fmt.Sprintf("SLA %v", o.operand1)
-
+	return "SLA" + " " + "B" /* operand1 */
 }
+
 func (o *SLA_B) SymbolicString() string { // 0x20
 	return "SLA B"
 }
@@ -11648,6 +12003,9 @@ func (o *SLA_C) Write(w io.Writer) (int, error) { // 0x21
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11660,10 +12018,9 @@ func (o *SLA_C) cycles() []uint8 { // 0x21
 }
 
 func (o *SLA_C) String() string { // 0x21
-
-	return fmt.Sprintf("SLA %v", o.operand1)
-
+	return "SLA" + " " + "C" /* operand1 */
 }
+
 func (o *SLA_C) SymbolicString() string { // 0x21
 	return "SLA C"
 }
@@ -11691,6 +12048,9 @@ func (o *SLA_D) Write(w io.Writer) (int, error) { // 0x22
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11703,10 +12063,9 @@ func (o *SLA_D) cycles() []uint8 { // 0x22
 }
 
 func (o *SLA_D) String() string { // 0x22
-
-	return fmt.Sprintf("SLA %v", o.operand1)
-
+	return "SLA" + " " + "D" /* operand1 */
 }
+
 func (o *SLA_D) SymbolicString() string { // 0x22
 	return "SLA D"
 }
@@ -11734,6 +12093,9 @@ func (o *SLA_E) Write(w io.Writer) (int, error) { // 0x23
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11746,10 +12108,9 @@ func (o *SLA_E) cycles() []uint8 { // 0x23
 }
 
 func (o *SLA_E) String() string { // 0x23
-
-	return fmt.Sprintf("SLA %v", o.operand1)
-
+	return "SLA" + " " + "E" /* operand1 */
 }
+
 func (o *SLA_E) SymbolicString() string { // 0x23
 	return "SLA E"
 }
@@ -11777,6 +12138,9 @@ func (o *SLA_H) Write(w io.Writer) (int, error) { // 0x24
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11789,10 +12153,9 @@ func (o *SLA_H) cycles() []uint8 { // 0x24
 }
 
 func (o *SLA_H) String() string { // 0x24
-
-	return fmt.Sprintf("SLA %v", o.operand1)
-
+	return "SLA" + " " + "H" /* operand1 */
 }
+
 func (o *SLA_H) SymbolicString() string { // 0x24
 	return "SLA H"
 }
@@ -11820,6 +12183,9 @@ func (o *SLA_L) Write(w io.Writer) (int, error) { // 0x25
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11832,10 +12198,9 @@ func (o *SLA_L) cycles() []uint8 { // 0x25
 }
 
 func (o *SLA_L) String() string { // 0x25
-
-	return fmt.Sprintf("SLA %v", o.operand1)
-
+	return "SLA" + " " + "L" /* operand1 */
 }
+
 func (o *SLA_L) SymbolicString() string { // 0x25
 	return "SLA L"
 }
@@ -11863,6 +12228,9 @@ func (o *SLA_HLPtr) Write(w io.Writer) (int, error) { // 0x26
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11875,10 +12243,9 @@ func (o *SLA_HLPtr) cycles() []uint8 { // 0x26
 }
 
 func (o *SLA_HLPtr) String() string { // 0x26
-
-	return fmt.Sprintf("SLA %v", o.operand1)
-
+	return "SLA" + " " + "(HL)" /* operand1 */
 }
+
 func (o *SLA_HLPtr) SymbolicString() string { // 0x26
 	return "SLA (HL)"
 }
@@ -11906,6 +12273,9 @@ func (o *SLA_A) Write(w io.Writer) (int, error) { // 0x27
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11918,10 +12288,9 @@ func (o *SLA_A) cycles() []uint8 { // 0x27
 }
 
 func (o *SLA_A) String() string { // 0x27
-
-	return fmt.Sprintf("SLA %v", o.operand1)
-
+	return "SLA" + " " + "A" /* operand1 */
 }
+
 func (o *SLA_A) SymbolicString() string { // 0x27
 	return "SLA A"
 }
@@ -11949,6 +12318,9 @@ func (o *SRA_B) Write(w io.Writer) (int, error) { // 0x28
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -11961,10 +12333,9 @@ func (o *SRA_B) cycles() []uint8 { // 0x28
 }
 
 func (o *SRA_B) String() string { // 0x28
-
-	return fmt.Sprintf("SRA %v", o.operand1)
-
+	return "SRA" + " " + "B" /* operand1 */
 }
+
 func (o *SRA_B) SymbolicString() string { // 0x28
 	return "SRA B"
 }
@@ -11992,6 +12363,9 @@ func (o *SRA_C) Write(w io.Writer) (int, error) { // 0x29
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12004,10 +12378,9 @@ func (o *SRA_C) cycles() []uint8 { // 0x29
 }
 
 func (o *SRA_C) String() string { // 0x29
-
-	return fmt.Sprintf("SRA %v", o.operand1)
-
+	return "SRA" + " " + "C" /* operand1 */
 }
+
 func (o *SRA_C) SymbolicString() string { // 0x29
 	return "SRA C"
 }
@@ -12035,6 +12408,9 @@ func (o *SRA_D) Write(w io.Writer) (int, error) { // 0x2a
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12047,10 +12423,9 @@ func (o *SRA_D) cycles() []uint8 { // 0x2a
 }
 
 func (o *SRA_D) String() string { // 0x2a
-
-	return fmt.Sprintf("SRA %v", o.operand1)
-
+	return "SRA" + " " + "D" /* operand1 */
 }
+
 func (o *SRA_D) SymbolicString() string { // 0x2a
 	return "SRA D"
 }
@@ -12078,6 +12453,9 @@ func (o *SRA_E) Write(w io.Writer) (int, error) { // 0x2b
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12090,10 +12468,9 @@ func (o *SRA_E) cycles() []uint8 { // 0x2b
 }
 
 func (o *SRA_E) String() string { // 0x2b
-
-	return fmt.Sprintf("SRA %v", o.operand1)
-
+	return "SRA" + " " + "E" /* operand1 */
 }
+
 func (o *SRA_E) SymbolicString() string { // 0x2b
 	return "SRA E"
 }
@@ -12121,6 +12498,9 @@ func (o *SRA_H) Write(w io.Writer) (int, error) { // 0x2c
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12133,10 +12513,9 @@ func (o *SRA_H) cycles() []uint8 { // 0x2c
 }
 
 func (o *SRA_H) String() string { // 0x2c
-
-	return fmt.Sprintf("SRA %v", o.operand1)
-
+	return "SRA" + " " + "H" /* operand1 */
 }
+
 func (o *SRA_H) SymbolicString() string { // 0x2c
 	return "SRA H"
 }
@@ -12164,6 +12543,9 @@ func (o *SRA_L) Write(w io.Writer) (int, error) { // 0x2d
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12176,10 +12558,9 @@ func (o *SRA_L) cycles() []uint8 { // 0x2d
 }
 
 func (o *SRA_L) String() string { // 0x2d
-
-	return fmt.Sprintf("SRA %v", o.operand1)
-
+	return "SRA" + " " + "L" /* operand1 */
 }
+
 func (o *SRA_L) SymbolicString() string { // 0x2d
 	return "SRA L"
 }
@@ -12207,6 +12588,9 @@ func (o *SRA_HLPtr) Write(w io.Writer) (int, error) { // 0x2e
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12219,10 +12603,9 @@ func (o *SRA_HLPtr) cycles() []uint8 { // 0x2e
 }
 
 func (o *SRA_HLPtr) String() string { // 0x2e
-
-	return fmt.Sprintf("SRA %v", o.operand1)
-
+	return "SRA" + " " + "(HL)" /* operand1 */
 }
+
 func (o *SRA_HLPtr) SymbolicString() string { // 0x2e
 	return "SRA (HL)"
 }
@@ -12250,6 +12633,9 @@ func (o *SRA_A) Write(w io.Writer) (int, error) { // 0x2f
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12262,10 +12648,9 @@ func (o *SRA_A) cycles() []uint8 { // 0x2f
 }
 
 func (o *SRA_A) String() string { // 0x2f
-
-	return fmt.Sprintf("SRA %v", o.operand1)
-
+	return "SRA" + " " + "A" /* operand1 */
 }
+
 func (o *SRA_A) SymbolicString() string { // 0x2f
 	return "SRA A"
 }
@@ -12293,6 +12678,9 @@ func (o *RLC_E) Write(w io.Writer) (int, error) { // 0x3
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12305,10 +12693,9 @@ func (o *RLC_E) cycles() []uint8 { // 0x3
 }
 
 func (o *RLC_E) String() string { // 0x3
-
-	return fmt.Sprintf("RLC %v", o.operand1)
-
+	return "RLC" + " " + "E" /* operand1 */
 }
+
 func (o *RLC_E) SymbolicString() string { // 0x3
 	return "RLC E"
 }
@@ -12336,6 +12723,9 @@ func (o *SWAP_B) Write(w io.Writer) (int, error) { // 0x30
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12348,10 +12738,9 @@ func (o *SWAP_B) cycles() []uint8 { // 0x30
 }
 
 func (o *SWAP_B) String() string { // 0x30
-
-	return fmt.Sprintf("SWAP %v", o.operand1)
-
+	return "SWAP" + " " + "B" /* operand1 */
 }
+
 func (o *SWAP_B) SymbolicString() string { // 0x30
 	return "SWAP B"
 }
@@ -12379,6 +12768,9 @@ func (o *SWAP_C) Write(w io.Writer) (int, error) { // 0x31
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12391,10 +12783,9 @@ func (o *SWAP_C) cycles() []uint8 { // 0x31
 }
 
 func (o *SWAP_C) String() string { // 0x31
-
-	return fmt.Sprintf("SWAP %v", o.operand1)
-
+	return "SWAP" + " " + "C" /* operand1 */
 }
+
 func (o *SWAP_C) SymbolicString() string { // 0x31
 	return "SWAP C"
 }
@@ -12422,6 +12813,9 @@ func (o *SWAP_D) Write(w io.Writer) (int, error) { // 0x32
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12434,10 +12828,9 @@ func (o *SWAP_D) cycles() []uint8 { // 0x32
 }
 
 func (o *SWAP_D) String() string { // 0x32
-
-	return fmt.Sprintf("SWAP %v", o.operand1)
-
+	return "SWAP" + " " + "D" /* operand1 */
 }
+
 func (o *SWAP_D) SymbolicString() string { // 0x32
 	return "SWAP D"
 }
@@ -12465,6 +12858,9 @@ func (o *SWAP_E) Write(w io.Writer) (int, error) { // 0x33
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12477,10 +12873,9 @@ func (o *SWAP_E) cycles() []uint8 { // 0x33
 }
 
 func (o *SWAP_E) String() string { // 0x33
-
-	return fmt.Sprintf("SWAP %v", o.operand1)
-
+	return "SWAP" + " " + "E" /* operand1 */
 }
+
 func (o *SWAP_E) SymbolicString() string { // 0x33
 	return "SWAP E"
 }
@@ -12508,6 +12903,9 @@ func (o *SWAP_H) Write(w io.Writer) (int, error) { // 0x34
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12520,10 +12918,9 @@ func (o *SWAP_H) cycles() []uint8 { // 0x34
 }
 
 func (o *SWAP_H) String() string { // 0x34
-
-	return fmt.Sprintf("SWAP %v", o.operand1)
-
+	return "SWAP" + " " + "H" /* operand1 */
 }
+
 func (o *SWAP_H) SymbolicString() string { // 0x34
 	return "SWAP H"
 }
@@ -12551,6 +12948,9 @@ func (o *SWAP_L) Write(w io.Writer) (int, error) { // 0x35
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12563,10 +12963,9 @@ func (o *SWAP_L) cycles() []uint8 { // 0x35
 }
 
 func (o *SWAP_L) String() string { // 0x35
-
-	return fmt.Sprintf("SWAP %v", o.operand1)
-
+	return "SWAP" + " " + "L" /* operand1 */
 }
+
 func (o *SWAP_L) SymbolicString() string { // 0x35
 	return "SWAP L"
 }
@@ -12594,6 +12993,9 @@ func (o *SWAP_HLPtr) Write(w io.Writer) (int, error) { // 0x36
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12606,10 +13008,9 @@ func (o *SWAP_HLPtr) cycles() []uint8 { // 0x36
 }
 
 func (o *SWAP_HLPtr) String() string { // 0x36
-
-	return fmt.Sprintf("SWAP %v", o.operand1)
-
+	return "SWAP" + " " + "(HL)" /* operand1 */
 }
+
 func (o *SWAP_HLPtr) SymbolicString() string { // 0x36
 	return "SWAP (HL)"
 }
@@ -12637,6 +13038,9 @@ func (o *SWAP_A) Write(w io.Writer) (int, error) { // 0x37
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12649,10 +13053,9 @@ func (o *SWAP_A) cycles() []uint8 { // 0x37
 }
 
 func (o *SWAP_A) String() string { // 0x37
-
-	return fmt.Sprintf("SWAP %v", o.operand1)
-
+	return "SWAP" + " " + "A" /* operand1 */
 }
+
 func (o *SWAP_A) SymbolicString() string { // 0x37
 	return "SWAP A"
 }
@@ -12680,6 +13083,9 @@ func (o *SRL_B) Write(w io.Writer) (int, error) { // 0x38
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12692,10 +13098,9 @@ func (o *SRL_B) cycles() []uint8 { // 0x38
 }
 
 func (o *SRL_B) String() string { // 0x38
-
-	return fmt.Sprintf("SRL %v", o.operand1)
-
+	return "SRL" + " " + "B" /* operand1 */
 }
+
 func (o *SRL_B) SymbolicString() string { // 0x38
 	return "SRL B"
 }
@@ -12723,6 +13128,9 @@ func (o *SRL_C) Write(w io.Writer) (int, error) { // 0x39
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12735,10 +13143,9 @@ func (o *SRL_C) cycles() []uint8 { // 0x39
 }
 
 func (o *SRL_C) String() string { // 0x39
-
-	return fmt.Sprintf("SRL %v", o.operand1)
-
+	return "SRL" + " " + "C" /* operand1 */
 }
+
 func (o *SRL_C) SymbolicString() string { // 0x39
 	return "SRL C"
 }
@@ -12766,6 +13173,9 @@ func (o *SRL_D) Write(w io.Writer) (int, error) { // 0x3a
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12778,10 +13188,9 @@ func (o *SRL_D) cycles() []uint8 { // 0x3a
 }
 
 func (o *SRL_D) String() string { // 0x3a
-
-	return fmt.Sprintf("SRL %v", o.operand1)
-
+	return "SRL" + " " + "D" /* operand1 */
 }
+
 func (o *SRL_D) SymbolicString() string { // 0x3a
 	return "SRL D"
 }
@@ -12809,6 +13218,9 @@ func (o *SRL_E) Write(w io.Writer) (int, error) { // 0x3b
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12821,10 +13233,9 @@ func (o *SRL_E) cycles() []uint8 { // 0x3b
 }
 
 func (o *SRL_E) String() string { // 0x3b
-
-	return fmt.Sprintf("SRL %v", o.operand1)
-
+	return "SRL" + " " + "E" /* operand1 */
 }
+
 func (o *SRL_E) SymbolicString() string { // 0x3b
 	return "SRL E"
 }
@@ -12852,6 +13263,9 @@ func (o *SRL_H) Write(w io.Writer) (int, error) { // 0x3c
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12864,10 +13278,9 @@ func (o *SRL_H) cycles() []uint8 { // 0x3c
 }
 
 func (o *SRL_H) String() string { // 0x3c
-
-	return fmt.Sprintf("SRL %v", o.operand1)
-
+	return "SRL" + " " + "H" /* operand1 */
 }
+
 func (o *SRL_H) SymbolicString() string { // 0x3c
 	return "SRL H"
 }
@@ -12895,6 +13308,9 @@ func (o *SRL_L) Write(w io.Writer) (int, error) { // 0x3d
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12907,10 +13323,9 @@ func (o *SRL_L) cycles() []uint8 { // 0x3d
 }
 
 func (o *SRL_L) String() string { // 0x3d
-
-	return fmt.Sprintf("SRL %v", o.operand1)
-
+	return "SRL" + " " + "L" /* operand1 */
 }
+
 func (o *SRL_L) SymbolicString() string { // 0x3d
 	return "SRL L"
 }
@@ -12938,6 +13353,9 @@ func (o *SRL_HLPtr) Write(w io.Writer) (int, error) { // 0x3e
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12950,10 +13368,9 @@ func (o *SRL_HLPtr) cycles() []uint8 { // 0x3e
 }
 
 func (o *SRL_HLPtr) String() string { // 0x3e
-
-	return fmt.Sprintf("SRL %v", o.operand1)
-
+	return "SRL" + " " + "(HL)" /* operand1 */
 }
+
 func (o *SRL_HLPtr) SymbolicString() string { // 0x3e
 	return "SRL (HL)"
 }
@@ -12981,6 +13398,9 @@ func (o *SRL_A) Write(w io.Writer) (int, error) { // 0x3f
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -12993,10 +13413,9 @@ func (o *SRL_A) cycles() []uint8 { // 0x3f
 }
 
 func (o *SRL_A) String() string { // 0x3f
-
-	return fmt.Sprintf("SRL %v", o.operand1)
-
+	return "SRL" + " " + "A" /* operand1 */
 }
+
 func (o *SRL_A) SymbolicString() string { // 0x3f
 	return "SRL A"
 }
@@ -13024,6 +13443,9 @@ func (o *RLC_H) Write(w io.Writer) (int, error) { // 0x4
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13036,10 +13458,9 @@ func (o *RLC_H) cycles() []uint8 { // 0x4
 }
 
 func (o *RLC_H) String() string { // 0x4
-
-	return fmt.Sprintf("RLC %v", o.operand1)
-
+	return "RLC" + " " + "H" /* operand1 */
 }
+
 func (o *RLC_H) SymbolicString() string { // 0x4
 	return "RLC H"
 }
@@ -13067,6 +13488,9 @@ func (o *BIT_0_B) Write(w io.Writer) (int, error) { // 0x40
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13079,10 +13503,9 @@ func (o *BIT_0_B) cycles() []uint8 { // 0x40
 }
 
 func (o *BIT_0_B) String() string { // 0x40
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "0" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *BIT_0_B) SymbolicString() string { // 0x40
 	return "BIT 0,B"
 }
@@ -13110,6 +13533,9 @@ func (o *BIT_0_C) Write(w io.Writer) (int, error) { // 0x41
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13122,10 +13548,9 @@ func (o *BIT_0_C) cycles() []uint8 { // 0x41
 }
 
 func (o *BIT_0_C) String() string { // 0x41
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "0" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *BIT_0_C) SymbolicString() string { // 0x41
 	return "BIT 0,C"
 }
@@ -13153,6 +13578,9 @@ func (o *BIT_0_D) Write(w io.Writer) (int, error) { // 0x42
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13165,10 +13593,9 @@ func (o *BIT_0_D) cycles() []uint8 { // 0x42
 }
 
 func (o *BIT_0_D) String() string { // 0x42
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "0" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *BIT_0_D) SymbolicString() string { // 0x42
 	return "BIT 0,D"
 }
@@ -13196,6 +13623,9 @@ func (o *BIT_0_E) Write(w io.Writer) (int, error) { // 0x43
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13208,10 +13638,9 @@ func (o *BIT_0_E) cycles() []uint8 { // 0x43
 }
 
 func (o *BIT_0_E) String() string { // 0x43
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "0" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *BIT_0_E) SymbolicString() string { // 0x43
 	return "BIT 0,E"
 }
@@ -13239,6 +13668,9 @@ func (o *BIT_0_H) Write(w io.Writer) (int, error) { // 0x44
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13251,10 +13683,9 @@ func (o *BIT_0_H) cycles() []uint8 { // 0x44
 }
 
 func (o *BIT_0_H) String() string { // 0x44
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "0" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *BIT_0_H) SymbolicString() string { // 0x44
 	return "BIT 0,H"
 }
@@ -13282,6 +13713,9 @@ func (o *BIT_0_L) Write(w io.Writer) (int, error) { // 0x45
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13294,10 +13728,9 @@ func (o *BIT_0_L) cycles() []uint8 { // 0x45
 }
 
 func (o *BIT_0_L) String() string { // 0x45
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "0" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *BIT_0_L) SymbolicString() string { // 0x45
 	return "BIT 0,L"
 }
@@ -13325,6 +13758,9 @@ func (o *BIT_0_HLPtr) Write(w io.Writer) (int, error) { // 0x46
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13337,10 +13773,9 @@ func (o *BIT_0_HLPtr) cycles() []uint8 { // 0x46
 }
 
 func (o *BIT_0_HLPtr) String() string { // 0x46
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "0" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *BIT_0_HLPtr) SymbolicString() string { // 0x46
 	return "BIT 0,(HL)"
 }
@@ -13368,6 +13803,9 @@ func (o *BIT_0_A) Write(w io.Writer) (int, error) { // 0x47
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13380,10 +13818,9 @@ func (o *BIT_0_A) cycles() []uint8 { // 0x47
 }
 
 func (o *BIT_0_A) String() string { // 0x47
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "0" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *BIT_0_A) SymbolicString() string { // 0x47
 	return "BIT 0,A"
 }
@@ -13411,6 +13848,9 @@ func (o *BIT_1_B) Write(w io.Writer) (int, error) { // 0x48
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13423,10 +13863,9 @@ func (o *BIT_1_B) cycles() []uint8 { // 0x48
 }
 
 func (o *BIT_1_B) String() string { // 0x48
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "1" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *BIT_1_B) SymbolicString() string { // 0x48
 	return "BIT 1,B"
 }
@@ -13454,6 +13893,9 @@ func (o *BIT_1_C) Write(w io.Writer) (int, error) { // 0x49
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13466,10 +13908,9 @@ func (o *BIT_1_C) cycles() []uint8 { // 0x49
 }
 
 func (o *BIT_1_C) String() string { // 0x49
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "1" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *BIT_1_C) SymbolicString() string { // 0x49
 	return "BIT 1,C"
 }
@@ -13497,6 +13938,9 @@ func (o *BIT_1_D) Write(w io.Writer) (int, error) { // 0x4a
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13509,10 +13953,9 @@ func (o *BIT_1_D) cycles() []uint8 { // 0x4a
 }
 
 func (o *BIT_1_D) String() string { // 0x4a
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "1" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *BIT_1_D) SymbolicString() string { // 0x4a
 	return "BIT 1,D"
 }
@@ -13540,6 +13983,9 @@ func (o *BIT_1_E) Write(w io.Writer) (int, error) { // 0x4b
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13552,10 +13998,9 @@ func (o *BIT_1_E) cycles() []uint8 { // 0x4b
 }
 
 func (o *BIT_1_E) String() string { // 0x4b
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "1" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *BIT_1_E) SymbolicString() string { // 0x4b
 	return "BIT 1,E"
 }
@@ -13583,6 +14028,9 @@ func (o *BIT_1_H) Write(w io.Writer) (int, error) { // 0x4c
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13595,10 +14043,9 @@ func (o *BIT_1_H) cycles() []uint8 { // 0x4c
 }
 
 func (o *BIT_1_H) String() string { // 0x4c
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "1" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *BIT_1_H) SymbolicString() string { // 0x4c
 	return "BIT 1,H"
 }
@@ -13626,6 +14073,9 @@ func (o *BIT_1_L) Write(w io.Writer) (int, error) { // 0x4d
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13638,10 +14088,9 @@ func (o *BIT_1_L) cycles() []uint8 { // 0x4d
 }
 
 func (o *BIT_1_L) String() string { // 0x4d
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "1" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *BIT_1_L) SymbolicString() string { // 0x4d
 	return "BIT 1,L"
 }
@@ -13669,6 +14118,9 @@ func (o *BIT_1_HLPtr) Write(w io.Writer) (int, error) { // 0x4e
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13681,10 +14133,9 @@ func (o *BIT_1_HLPtr) cycles() []uint8 { // 0x4e
 }
 
 func (o *BIT_1_HLPtr) String() string { // 0x4e
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "1" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *BIT_1_HLPtr) SymbolicString() string { // 0x4e
 	return "BIT 1,(HL)"
 }
@@ -13712,6 +14163,9 @@ func (o *BIT_1_A) Write(w io.Writer) (int, error) { // 0x4f
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13724,10 +14178,9 @@ func (o *BIT_1_A) cycles() []uint8 { // 0x4f
 }
 
 func (o *BIT_1_A) String() string { // 0x4f
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "1" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *BIT_1_A) SymbolicString() string { // 0x4f
 	return "BIT 1,A"
 }
@@ -13755,6 +14208,9 @@ func (o *RLC_L) Write(w io.Writer) (int, error) { // 0x5
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13767,10 +14223,9 @@ func (o *RLC_L) cycles() []uint8 { // 0x5
 }
 
 func (o *RLC_L) String() string { // 0x5
-
-	return fmt.Sprintf("RLC %v", o.operand1)
-
+	return "RLC" + " " + "L" /* operand1 */
 }
+
 func (o *RLC_L) SymbolicString() string { // 0x5
 	return "RLC L"
 }
@@ -13798,6 +14253,9 @@ func (o *BIT_2_B) Write(w io.Writer) (int, error) { // 0x50
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13810,10 +14268,9 @@ func (o *BIT_2_B) cycles() []uint8 { // 0x50
 }
 
 func (o *BIT_2_B) String() string { // 0x50
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "2" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *BIT_2_B) SymbolicString() string { // 0x50
 	return "BIT 2,B"
 }
@@ -13841,6 +14298,9 @@ func (o *BIT_2_C) Write(w io.Writer) (int, error) { // 0x51
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13853,10 +14313,9 @@ func (o *BIT_2_C) cycles() []uint8 { // 0x51
 }
 
 func (o *BIT_2_C) String() string { // 0x51
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "2" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *BIT_2_C) SymbolicString() string { // 0x51
 	return "BIT 2,C"
 }
@@ -13884,6 +14343,9 @@ func (o *BIT_2_D) Write(w io.Writer) (int, error) { // 0x52
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13896,10 +14358,9 @@ func (o *BIT_2_D) cycles() []uint8 { // 0x52
 }
 
 func (o *BIT_2_D) String() string { // 0x52
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "2" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *BIT_2_D) SymbolicString() string { // 0x52
 	return "BIT 2,D"
 }
@@ -13927,6 +14388,9 @@ func (o *BIT_2_E) Write(w io.Writer) (int, error) { // 0x53
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13939,10 +14403,9 @@ func (o *BIT_2_E) cycles() []uint8 { // 0x53
 }
 
 func (o *BIT_2_E) String() string { // 0x53
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "2" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *BIT_2_E) SymbolicString() string { // 0x53
 	return "BIT 2,E"
 }
@@ -13970,6 +14433,9 @@ func (o *BIT_2_H) Write(w io.Writer) (int, error) { // 0x54
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -13982,10 +14448,9 @@ func (o *BIT_2_H) cycles() []uint8 { // 0x54
 }
 
 func (o *BIT_2_H) String() string { // 0x54
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "2" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *BIT_2_H) SymbolicString() string { // 0x54
 	return "BIT 2,H"
 }
@@ -14013,6 +14478,9 @@ func (o *BIT_2_L) Write(w io.Writer) (int, error) { // 0x55
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14025,10 +14493,9 @@ func (o *BIT_2_L) cycles() []uint8 { // 0x55
 }
 
 func (o *BIT_2_L) String() string { // 0x55
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "2" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *BIT_2_L) SymbolicString() string { // 0x55
 	return "BIT 2,L"
 }
@@ -14056,6 +14523,9 @@ func (o *BIT_2_HLPtr) Write(w io.Writer) (int, error) { // 0x56
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14068,10 +14538,9 @@ func (o *BIT_2_HLPtr) cycles() []uint8 { // 0x56
 }
 
 func (o *BIT_2_HLPtr) String() string { // 0x56
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "2" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *BIT_2_HLPtr) SymbolicString() string { // 0x56
 	return "BIT 2,(HL)"
 }
@@ -14099,6 +14568,9 @@ func (o *BIT_2_A) Write(w io.Writer) (int, error) { // 0x57
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14111,10 +14583,9 @@ func (o *BIT_2_A) cycles() []uint8 { // 0x57
 }
 
 func (o *BIT_2_A) String() string { // 0x57
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "2" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *BIT_2_A) SymbolicString() string { // 0x57
 	return "BIT 2,A"
 }
@@ -14142,6 +14613,9 @@ func (o *BIT_3_B) Write(w io.Writer) (int, error) { // 0x58
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14154,10 +14628,9 @@ func (o *BIT_3_B) cycles() []uint8 { // 0x58
 }
 
 func (o *BIT_3_B) String() string { // 0x58
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "3" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *BIT_3_B) SymbolicString() string { // 0x58
 	return "BIT 3,B"
 }
@@ -14185,6 +14658,9 @@ func (o *BIT_3_C) Write(w io.Writer) (int, error) { // 0x59
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14197,10 +14673,9 @@ func (o *BIT_3_C) cycles() []uint8 { // 0x59
 }
 
 func (o *BIT_3_C) String() string { // 0x59
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "3" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *BIT_3_C) SymbolicString() string { // 0x59
 	return "BIT 3,C"
 }
@@ -14228,6 +14703,9 @@ func (o *BIT_3_D) Write(w io.Writer) (int, error) { // 0x5a
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14240,10 +14718,9 @@ func (o *BIT_3_D) cycles() []uint8 { // 0x5a
 }
 
 func (o *BIT_3_D) String() string { // 0x5a
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "3" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *BIT_3_D) SymbolicString() string { // 0x5a
 	return "BIT 3,D"
 }
@@ -14271,6 +14748,9 @@ func (o *BIT_3_E) Write(w io.Writer) (int, error) { // 0x5b
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14283,10 +14763,9 @@ func (o *BIT_3_E) cycles() []uint8 { // 0x5b
 }
 
 func (o *BIT_3_E) String() string { // 0x5b
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "3" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *BIT_3_E) SymbolicString() string { // 0x5b
 	return "BIT 3,E"
 }
@@ -14314,6 +14793,9 @@ func (o *BIT_3_H) Write(w io.Writer) (int, error) { // 0x5c
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14326,10 +14808,9 @@ func (o *BIT_3_H) cycles() []uint8 { // 0x5c
 }
 
 func (o *BIT_3_H) String() string { // 0x5c
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "3" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *BIT_3_H) SymbolicString() string { // 0x5c
 	return "BIT 3,H"
 }
@@ -14357,6 +14838,9 @@ func (o *BIT_3_L) Write(w io.Writer) (int, error) { // 0x5d
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14369,10 +14853,9 @@ func (o *BIT_3_L) cycles() []uint8 { // 0x5d
 }
 
 func (o *BIT_3_L) String() string { // 0x5d
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "3" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *BIT_3_L) SymbolicString() string { // 0x5d
 	return "BIT 3,L"
 }
@@ -14400,6 +14883,9 @@ func (o *BIT_3_HLPtr) Write(w io.Writer) (int, error) { // 0x5e
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14412,10 +14898,9 @@ func (o *BIT_3_HLPtr) cycles() []uint8 { // 0x5e
 }
 
 func (o *BIT_3_HLPtr) String() string { // 0x5e
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "3" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *BIT_3_HLPtr) SymbolicString() string { // 0x5e
 	return "BIT 3,(HL)"
 }
@@ -14443,6 +14928,9 @@ func (o *BIT_3_A) Write(w io.Writer) (int, error) { // 0x5f
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14455,10 +14943,9 @@ func (o *BIT_3_A) cycles() []uint8 { // 0x5f
 }
 
 func (o *BIT_3_A) String() string { // 0x5f
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "3" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *BIT_3_A) SymbolicString() string { // 0x5f
 	return "BIT 3,A"
 }
@@ -14486,6 +14973,9 @@ func (o *RLC_HLPtr) Write(w io.Writer) (int, error) { // 0x6
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14498,10 +14988,9 @@ func (o *RLC_HLPtr) cycles() []uint8 { // 0x6
 }
 
 func (o *RLC_HLPtr) String() string { // 0x6
-
-	return fmt.Sprintf("RLC %v", o.operand1)
-
+	return "RLC" + " " + "(HL)" /* operand1 */
 }
+
 func (o *RLC_HLPtr) SymbolicString() string { // 0x6
 	return "RLC (HL)"
 }
@@ -14529,6 +15018,9 @@ func (o *BIT_4_B) Write(w io.Writer) (int, error) { // 0x60
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14541,10 +15033,9 @@ func (o *BIT_4_B) cycles() []uint8 { // 0x60
 }
 
 func (o *BIT_4_B) String() string { // 0x60
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "4" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *BIT_4_B) SymbolicString() string { // 0x60
 	return "BIT 4,B"
 }
@@ -14572,6 +15063,9 @@ func (o *BIT_4_C) Write(w io.Writer) (int, error) { // 0x61
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14584,10 +15078,9 @@ func (o *BIT_4_C) cycles() []uint8 { // 0x61
 }
 
 func (o *BIT_4_C) String() string { // 0x61
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "4" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *BIT_4_C) SymbolicString() string { // 0x61
 	return "BIT 4,C"
 }
@@ -14615,6 +15108,9 @@ func (o *BIT_4_D) Write(w io.Writer) (int, error) { // 0x62
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14627,10 +15123,9 @@ func (o *BIT_4_D) cycles() []uint8 { // 0x62
 }
 
 func (o *BIT_4_D) String() string { // 0x62
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "4" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *BIT_4_D) SymbolicString() string { // 0x62
 	return "BIT 4,D"
 }
@@ -14658,6 +15153,9 @@ func (o *BIT_4_E) Write(w io.Writer) (int, error) { // 0x63
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14670,10 +15168,9 @@ func (o *BIT_4_E) cycles() []uint8 { // 0x63
 }
 
 func (o *BIT_4_E) String() string { // 0x63
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "4" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *BIT_4_E) SymbolicString() string { // 0x63
 	return "BIT 4,E"
 }
@@ -14701,6 +15198,9 @@ func (o *BIT_4_H) Write(w io.Writer) (int, error) { // 0x64
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14713,10 +15213,9 @@ func (o *BIT_4_H) cycles() []uint8 { // 0x64
 }
 
 func (o *BIT_4_H) String() string { // 0x64
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "4" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *BIT_4_H) SymbolicString() string { // 0x64
 	return "BIT 4,H"
 }
@@ -14744,6 +15243,9 @@ func (o *BIT_4_L) Write(w io.Writer) (int, error) { // 0x65
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14756,10 +15258,9 @@ func (o *BIT_4_L) cycles() []uint8 { // 0x65
 }
 
 func (o *BIT_4_L) String() string { // 0x65
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "4" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *BIT_4_L) SymbolicString() string { // 0x65
 	return "BIT 4,L"
 }
@@ -14787,6 +15288,9 @@ func (o *BIT_4_HLPtr) Write(w io.Writer) (int, error) { // 0x66
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14799,10 +15303,9 @@ func (o *BIT_4_HLPtr) cycles() []uint8 { // 0x66
 }
 
 func (o *BIT_4_HLPtr) String() string { // 0x66
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "4" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *BIT_4_HLPtr) SymbolicString() string { // 0x66
 	return "BIT 4,(HL)"
 }
@@ -14830,6 +15333,9 @@ func (o *BIT_4_A) Write(w io.Writer) (int, error) { // 0x67
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14842,10 +15348,9 @@ func (o *BIT_4_A) cycles() []uint8 { // 0x67
 }
 
 func (o *BIT_4_A) String() string { // 0x67
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "4" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *BIT_4_A) SymbolicString() string { // 0x67
 	return "BIT 4,A"
 }
@@ -14873,6 +15378,9 @@ func (o *BIT_5_B) Write(w io.Writer) (int, error) { // 0x68
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14885,10 +15393,9 @@ func (o *BIT_5_B) cycles() []uint8 { // 0x68
 }
 
 func (o *BIT_5_B) String() string { // 0x68
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "5" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *BIT_5_B) SymbolicString() string { // 0x68
 	return "BIT 5,B"
 }
@@ -14916,6 +15423,9 @@ func (o *BIT_5_C) Write(w io.Writer) (int, error) { // 0x69
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14928,10 +15438,9 @@ func (o *BIT_5_C) cycles() []uint8 { // 0x69
 }
 
 func (o *BIT_5_C) String() string { // 0x69
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "5" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *BIT_5_C) SymbolicString() string { // 0x69
 	return "BIT 5,C"
 }
@@ -14959,6 +15468,9 @@ func (o *BIT_5_D) Write(w io.Writer) (int, error) { // 0x6a
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -14971,10 +15483,9 @@ func (o *BIT_5_D) cycles() []uint8 { // 0x6a
 }
 
 func (o *BIT_5_D) String() string { // 0x6a
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "5" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *BIT_5_D) SymbolicString() string { // 0x6a
 	return "BIT 5,D"
 }
@@ -15002,6 +15513,9 @@ func (o *BIT_5_E) Write(w io.Writer) (int, error) { // 0x6b
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15014,10 +15528,9 @@ func (o *BIT_5_E) cycles() []uint8 { // 0x6b
 }
 
 func (o *BIT_5_E) String() string { // 0x6b
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "5" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *BIT_5_E) SymbolicString() string { // 0x6b
 	return "BIT 5,E"
 }
@@ -15045,6 +15558,9 @@ func (o *BIT_5_H) Write(w io.Writer) (int, error) { // 0x6c
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15057,10 +15573,9 @@ func (o *BIT_5_H) cycles() []uint8 { // 0x6c
 }
 
 func (o *BIT_5_H) String() string { // 0x6c
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "5" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *BIT_5_H) SymbolicString() string { // 0x6c
 	return "BIT 5,H"
 }
@@ -15088,6 +15603,9 @@ func (o *BIT_5_L) Write(w io.Writer) (int, error) { // 0x6d
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15100,10 +15618,9 @@ func (o *BIT_5_L) cycles() []uint8 { // 0x6d
 }
 
 func (o *BIT_5_L) String() string { // 0x6d
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "5" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *BIT_5_L) SymbolicString() string { // 0x6d
 	return "BIT 5,L"
 }
@@ -15131,6 +15648,9 @@ func (o *BIT_5_HLPtr) Write(w io.Writer) (int, error) { // 0x6e
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15143,10 +15663,9 @@ func (o *BIT_5_HLPtr) cycles() []uint8 { // 0x6e
 }
 
 func (o *BIT_5_HLPtr) String() string { // 0x6e
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "5" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *BIT_5_HLPtr) SymbolicString() string { // 0x6e
 	return "BIT 5,(HL)"
 }
@@ -15174,6 +15693,9 @@ func (o *BIT_5_A) Write(w io.Writer) (int, error) { // 0x6f
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15186,10 +15708,9 @@ func (o *BIT_5_A) cycles() []uint8 { // 0x6f
 }
 
 func (o *BIT_5_A) String() string { // 0x6f
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "5" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *BIT_5_A) SymbolicString() string { // 0x6f
 	return "BIT 5,A"
 }
@@ -15217,6 +15738,9 @@ func (o *RLC_A) Write(w io.Writer) (int, error) { // 0x7
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15229,10 +15753,9 @@ func (o *RLC_A) cycles() []uint8 { // 0x7
 }
 
 func (o *RLC_A) String() string { // 0x7
-
-	return fmt.Sprintf("RLC %v", o.operand1)
-
+	return "RLC" + " " + "A" /* operand1 */
 }
+
 func (o *RLC_A) SymbolicString() string { // 0x7
 	return "RLC A"
 }
@@ -15260,6 +15783,9 @@ func (o *BIT_6_B) Write(w io.Writer) (int, error) { // 0x70
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15272,10 +15798,9 @@ func (o *BIT_6_B) cycles() []uint8 { // 0x70
 }
 
 func (o *BIT_6_B) String() string { // 0x70
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "6" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *BIT_6_B) SymbolicString() string { // 0x70
 	return "BIT 6,B"
 }
@@ -15303,6 +15828,9 @@ func (o *BIT_6_C) Write(w io.Writer) (int, error) { // 0x71
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15315,10 +15843,9 @@ func (o *BIT_6_C) cycles() []uint8 { // 0x71
 }
 
 func (o *BIT_6_C) String() string { // 0x71
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "6" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *BIT_6_C) SymbolicString() string { // 0x71
 	return "BIT 6,C"
 }
@@ -15346,6 +15873,9 @@ func (o *BIT_6_D) Write(w io.Writer) (int, error) { // 0x72
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15358,10 +15888,9 @@ func (o *BIT_6_D) cycles() []uint8 { // 0x72
 }
 
 func (o *BIT_6_D) String() string { // 0x72
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "6" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *BIT_6_D) SymbolicString() string { // 0x72
 	return "BIT 6,D"
 }
@@ -15389,6 +15918,9 @@ func (o *BIT_6_E) Write(w io.Writer) (int, error) { // 0x73
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15401,10 +15933,9 @@ func (o *BIT_6_E) cycles() []uint8 { // 0x73
 }
 
 func (o *BIT_6_E) String() string { // 0x73
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "6" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *BIT_6_E) SymbolicString() string { // 0x73
 	return "BIT 6,E"
 }
@@ -15432,6 +15963,9 @@ func (o *BIT_6_H) Write(w io.Writer) (int, error) { // 0x74
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15444,10 +15978,9 @@ func (o *BIT_6_H) cycles() []uint8 { // 0x74
 }
 
 func (o *BIT_6_H) String() string { // 0x74
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "6" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *BIT_6_H) SymbolicString() string { // 0x74
 	return "BIT 6,H"
 }
@@ -15475,6 +16008,9 @@ func (o *BIT_6_L) Write(w io.Writer) (int, error) { // 0x75
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15487,10 +16023,9 @@ func (o *BIT_6_L) cycles() []uint8 { // 0x75
 }
 
 func (o *BIT_6_L) String() string { // 0x75
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "6" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *BIT_6_L) SymbolicString() string { // 0x75
 	return "BIT 6,L"
 }
@@ -15518,6 +16053,9 @@ func (o *BIT_6_HLPtr) Write(w io.Writer) (int, error) { // 0x76
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15530,10 +16068,9 @@ func (o *BIT_6_HLPtr) cycles() []uint8 { // 0x76
 }
 
 func (o *BIT_6_HLPtr) String() string { // 0x76
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "6" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *BIT_6_HLPtr) SymbolicString() string { // 0x76
 	return "BIT 6,(HL)"
 }
@@ -15561,6 +16098,9 @@ func (o *BIT_6_A) Write(w io.Writer) (int, error) { // 0x77
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15573,10 +16113,9 @@ func (o *BIT_6_A) cycles() []uint8 { // 0x77
 }
 
 func (o *BIT_6_A) String() string { // 0x77
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "6" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *BIT_6_A) SymbolicString() string { // 0x77
 	return "BIT 6,A"
 }
@@ -15604,6 +16143,9 @@ func (o *BIT_7_B) Write(w io.Writer) (int, error) { // 0x78
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15616,10 +16158,9 @@ func (o *BIT_7_B) cycles() []uint8 { // 0x78
 }
 
 func (o *BIT_7_B) String() string { // 0x78
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "7" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *BIT_7_B) SymbolicString() string { // 0x78
 	return "BIT 7,B"
 }
@@ -15647,6 +16188,9 @@ func (o *BIT_7_C) Write(w io.Writer) (int, error) { // 0x79
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15659,10 +16203,9 @@ func (o *BIT_7_C) cycles() []uint8 { // 0x79
 }
 
 func (o *BIT_7_C) String() string { // 0x79
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "7" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *BIT_7_C) SymbolicString() string { // 0x79
 	return "BIT 7,C"
 }
@@ -15690,6 +16233,9 @@ func (o *BIT_7_D) Write(w io.Writer) (int, error) { // 0x7a
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15702,10 +16248,9 @@ func (o *BIT_7_D) cycles() []uint8 { // 0x7a
 }
 
 func (o *BIT_7_D) String() string { // 0x7a
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "7" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *BIT_7_D) SymbolicString() string { // 0x7a
 	return "BIT 7,D"
 }
@@ -15733,6 +16278,9 @@ func (o *BIT_7_E) Write(w io.Writer) (int, error) { // 0x7b
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15745,10 +16293,9 @@ func (o *BIT_7_E) cycles() []uint8 { // 0x7b
 }
 
 func (o *BIT_7_E) String() string { // 0x7b
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "7" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *BIT_7_E) SymbolicString() string { // 0x7b
 	return "BIT 7,E"
 }
@@ -15776,6 +16323,9 @@ func (o *BIT_7_H) Write(w io.Writer) (int, error) { // 0x7c
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15788,10 +16338,9 @@ func (o *BIT_7_H) cycles() []uint8 { // 0x7c
 }
 
 func (o *BIT_7_H) String() string { // 0x7c
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "7" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *BIT_7_H) SymbolicString() string { // 0x7c
 	return "BIT 7,H"
 }
@@ -15819,6 +16368,9 @@ func (o *BIT_7_L) Write(w io.Writer) (int, error) { // 0x7d
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15831,10 +16383,9 @@ func (o *BIT_7_L) cycles() []uint8 { // 0x7d
 }
 
 func (o *BIT_7_L) String() string { // 0x7d
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "7" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *BIT_7_L) SymbolicString() string { // 0x7d
 	return "BIT 7,L"
 }
@@ -15862,6 +16413,9 @@ func (o *BIT_7_HLPtr) Write(w io.Writer) (int, error) { // 0x7e
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15874,10 +16428,9 @@ func (o *BIT_7_HLPtr) cycles() []uint8 { // 0x7e
 }
 
 func (o *BIT_7_HLPtr) String() string { // 0x7e
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "7" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *BIT_7_HLPtr) SymbolicString() string { // 0x7e
 	return "BIT 7,(HL)"
 }
@@ -15905,6 +16458,9 @@ func (o *BIT_7_A) Write(w io.Writer) (int, error) { // 0x7f
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15917,10 +16473,9 @@ func (o *BIT_7_A) cycles() []uint8 { // 0x7f
 }
 
 func (o *BIT_7_A) String() string { // 0x7f
-
-	return fmt.Sprintf("BIT %v %v", o.operand1, o.operand2)
-
+	return "BIT" + " " + "7" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *BIT_7_A) SymbolicString() string { // 0x7f
 	return "BIT 7,A"
 }
@@ -15948,6 +16503,9 @@ func (o *RRC_B) Write(w io.Writer) (int, error) { // 0x8
 		return written, err
 	}
 
+	// B is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -15960,10 +16518,9 @@ func (o *RRC_B) cycles() []uint8 { // 0x8
 }
 
 func (o *RRC_B) String() string { // 0x8
-
-	return fmt.Sprintf("RRC %v", o.operand1)
-
+	return "RRC" + " " + "B" /* operand1 */
 }
+
 func (o *RRC_B) SymbolicString() string { // 0x8
 	return "RRC B"
 }
@@ -15991,6 +16548,9 @@ func (o *RES_0_B) Write(w io.Writer) (int, error) { // 0x80
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16003,10 +16563,9 @@ func (o *RES_0_B) cycles() []uint8 { // 0x80
 }
 
 func (o *RES_0_B) String() string { // 0x80
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "0" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *RES_0_B) SymbolicString() string { // 0x80
 	return "RES 0,B"
 }
@@ -16034,6 +16593,9 @@ func (o *RES_0_C) Write(w io.Writer) (int, error) { // 0x81
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16046,10 +16608,9 @@ func (o *RES_0_C) cycles() []uint8 { // 0x81
 }
 
 func (o *RES_0_C) String() string { // 0x81
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "0" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *RES_0_C) SymbolicString() string { // 0x81
 	return "RES 0,C"
 }
@@ -16077,6 +16638,9 @@ func (o *RES_0_D) Write(w io.Writer) (int, error) { // 0x82
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16089,10 +16653,9 @@ func (o *RES_0_D) cycles() []uint8 { // 0x82
 }
 
 func (o *RES_0_D) String() string { // 0x82
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "0" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *RES_0_D) SymbolicString() string { // 0x82
 	return "RES 0,D"
 }
@@ -16120,6 +16683,9 @@ func (o *RES_0_E) Write(w io.Writer) (int, error) { // 0x83
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16132,10 +16698,9 @@ func (o *RES_0_E) cycles() []uint8 { // 0x83
 }
 
 func (o *RES_0_E) String() string { // 0x83
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "0" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *RES_0_E) SymbolicString() string { // 0x83
 	return "RES 0,E"
 }
@@ -16163,6 +16728,9 @@ func (o *RES_0_H) Write(w io.Writer) (int, error) { // 0x84
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16175,10 +16743,9 @@ func (o *RES_0_H) cycles() []uint8 { // 0x84
 }
 
 func (o *RES_0_H) String() string { // 0x84
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "0" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *RES_0_H) SymbolicString() string { // 0x84
 	return "RES 0,H"
 }
@@ -16206,6 +16773,9 @@ func (o *RES_0_L) Write(w io.Writer) (int, error) { // 0x85
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16218,10 +16788,9 @@ func (o *RES_0_L) cycles() []uint8 { // 0x85
 }
 
 func (o *RES_0_L) String() string { // 0x85
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "0" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *RES_0_L) SymbolicString() string { // 0x85
 	return "RES 0,L"
 }
@@ -16249,6 +16818,9 @@ func (o *RES_0_HLPtr) Write(w io.Writer) (int, error) { // 0x86
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16261,10 +16833,9 @@ func (o *RES_0_HLPtr) cycles() []uint8 { // 0x86
 }
 
 func (o *RES_0_HLPtr) String() string { // 0x86
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "0" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *RES_0_HLPtr) SymbolicString() string { // 0x86
 	return "RES 0,(HL)"
 }
@@ -16292,6 +16863,9 @@ func (o *RES_0_A) Write(w io.Writer) (int, error) { // 0x87
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16304,10 +16878,9 @@ func (o *RES_0_A) cycles() []uint8 { // 0x87
 }
 
 func (o *RES_0_A) String() string { // 0x87
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "0" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *RES_0_A) SymbolicString() string { // 0x87
 	return "RES 0,A"
 }
@@ -16335,6 +16908,9 @@ func (o *RES_1_B) Write(w io.Writer) (int, error) { // 0x88
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16347,10 +16923,9 @@ func (o *RES_1_B) cycles() []uint8 { // 0x88
 }
 
 func (o *RES_1_B) String() string { // 0x88
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "1" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *RES_1_B) SymbolicString() string { // 0x88
 	return "RES 1,B"
 }
@@ -16378,6 +16953,9 @@ func (o *RES_1_C) Write(w io.Writer) (int, error) { // 0x89
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16390,10 +16968,9 @@ func (o *RES_1_C) cycles() []uint8 { // 0x89
 }
 
 func (o *RES_1_C) String() string { // 0x89
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "1" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *RES_1_C) SymbolicString() string { // 0x89
 	return "RES 1,C"
 }
@@ -16421,6 +16998,9 @@ func (o *RES_1_D) Write(w io.Writer) (int, error) { // 0x8a
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16433,10 +17013,9 @@ func (o *RES_1_D) cycles() []uint8 { // 0x8a
 }
 
 func (o *RES_1_D) String() string { // 0x8a
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "1" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *RES_1_D) SymbolicString() string { // 0x8a
 	return "RES 1,D"
 }
@@ -16464,6 +17043,9 @@ func (o *RES_1_E) Write(w io.Writer) (int, error) { // 0x8b
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16476,10 +17058,9 @@ func (o *RES_1_E) cycles() []uint8 { // 0x8b
 }
 
 func (o *RES_1_E) String() string { // 0x8b
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "1" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *RES_1_E) SymbolicString() string { // 0x8b
 	return "RES 1,E"
 }
@@ -16507,6 +17088,9 @@ func (o *RES_1_H) Write(w io.Writer) (int, error) { // 0x8c
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16519,10 +17103,9 @@ func (o *RES_1_H) cycles() []uint8 { // 0x8c
 }
 
 func (o *RES_1_H) String() string { // 0x8c
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "1" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *RES_1_H) SymbolicString() string { // 0x8c
 	return "RES 1,H"
 }
@@ -16550,6 +17133,9 @@ func (o *RES_1_L) Write(w io.Writer) (int, error) { // 0x8d
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16562,10 +17148,9 @@ func (o *RES_1_L) cycles() []uint8 { // 0x8d
 }
 
 func (o *RES_1_L) String() string { // 0x8d
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "1" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *RES_1_L) SymbolicString() string { // 0x8d
 	return "RES 1,L"
 }
@@ -16593,6 +17178,9 @@ func (o *RES_1_HLPtr) Write(w io.Writer) (int, error) { // 0x8e
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16605,10 +17193,9 @@ func (o *RES_1_HLPtr) cycles() []uint8 { // 0x8e
 }
 
 func (o *RES_1_HLPtr) String() string { // 0x8e
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "1" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *RES_1_HLPtr) SymbolicString() string { // 0x8e
 	return "RES 1,(HL)"
 }
@@ -16636,6 +17223,9 @@ func (o *RES_1_A) Write(w io.Writer) (int, error) { // 0x8f
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16648,10 +17238,9 @@ func (o *RES_1_A) cycles() []uint8 { // 0x8f
 }
 
 func (o *RES_1_A) String() string { // 0x8f
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "1" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *RES_1_A) SymbolicString() string { // 0x8f
 	return "RES 1,A"
 }
@@ -16679,6 +17268,9 @@ func (o *RRC_C) Write(w io.Writer) (int, error) { // 0x9
 		return written, err
 	}
 
+	// C is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16691,10 +17283,9 @@ func (o *RRC_C) cycles() []uint8 { // 0x9
 }
 
 func (o *RRC_C) String() string { // 0x9
-
-	return fmt.Sprintf("RRC %v", o.operand1)
-
+	return "RRC" + " " + "C" /* operand1 */
 }
+
 func (o *RRC_C) SymbolicString() string { // 0x9
 	return "RRC C"
 }
@@ -16722,6 +17313,9 @@ func (o *RES_2_B) Write(w io.Writer) (int, error) { // 0x90
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16734,10 +17328,9 @@ func (o *RES_2_B) cycles() []uint8 { // 0x90
 }
 
 func (o *RES_2_B) String() string { // 0x90
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "2" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *RES_2_B) SymbolicString() string { // 0x90
 	return "RES 2,B"
 }
@@ -16765,6 +17358,9 @@ func (o *RES_2_C) Write(w io.Writer) (int, error) { // 0x91
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16777,10 +17373,9 @@ func (o *RES_2_C) cycles() []uint8 { // 0x91
 }
 
 func (o *RES_2_C) String() string { // 0x91
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "2" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *RES_2_C) SymbolicString() string { // 0x91
 	return "RES 2,C"
 }
@@ -16808,6 +17403,9 @@ func (o *RES_2_D) Write(w io.Writer) (int, error) { // 0x92
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16820,10 +17418,9 @@ func (o *RES_2_D) cycles() []uint8 { // 0x92
 }
 
 func (o *RES_2_D) String() string { // 0x92
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "2" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *RES_2_D) SymbolicString() string { // 0x92
 	return "RES 2,D"
 }
@@ -16851,6 +17448,9 @@ func (o *RES_2_E) Write(w io.Writer) (int, error) { // 0x93
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16863,10 +17463,9 @@ func (o *RES_2_E) cycles() []uint8 { // 0x93
 }
 
 func (o *RES_2_E) String() string { // 0x93
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "2" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *RES_2_E) SymbolicString() string { // 0x93
 	return "RES 2,E"
 }
@@ -16894,6 +17493,9 @@ func (o *RES_2_H) Write(w io.Writer) (int, error) { // 0x94
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16906,10 +17508,9 @@ func (o *RES_2_H) cycles() []uint8 { // 0x94
 }
 
 func (o *RES_2_H) String() string { // 0x94
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "2" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *RES_2_H) SymbolicString() string { // 0x94
 	return "RES 2,H"
 }
@@ -16937,6 +17538,9 @@ func (o *RES_2_L) Write(w io.Writer) (int, error) { // 0x95
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16949,10 +17553,9 @@ func (o *RES_2_L) cycles() []uint8 { // 0x95
 }
 
 func (o *RES_2_L) String() string { // 0x95
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "2" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *RES_2_L) SymbolicString() string { // 0x95
 	return "RES 2,L"
 }
@@ -16980,6 +17583,9 @@ func (o *RES_2_HLPtr) Write(w io.Writer) (int, error) { // 0x96
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -16992,10 +17598,9 @@ func (o *RES_2_HLPtr) cycles() []uint8 { // 0x96
 }
 
 func (o *RES_2_HLPtr) String() string { // 0x96
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "2" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *RES_2_HLPtr) SymbolicString() string { // 0x96
 	return "RES 2,(HL)"
 }
@@ -17023,6 +17628,9 @@ func (o *RES_2_A) Write(w io.Writer) (int, error) { // 0x97
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17035,10 +17643,9 @@ func (o *RES_2_A) cycles() []uint8 { // 0x97
 }
 
 func (o *RES_2_A) String() string { // 0x97
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "2" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *RES_2_A) SymbolicString() string { // 0x97
 	return "RES 2,A"
 }
@@ -17066,6 +17673,9 @@ func (o *RES_3_B) Write(w io.Writer) (int, error) { // 0x98
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17078,10 +17688,9 @@ func (o *RES_3_B) cycles() []uint8 { // 0x98
 }
 
 func (o *RES_3_B) String() string { // 0x98
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "3" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *RES_3_B) SymbolicString() string { // 0x98
 	return "RES 3,B"
 }
@@ -17109,6 +17718,9 @@ func (o *RES_3_C) Write(w io.Writer) (int, error) { // 0x99
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17121,10 +17733,9 @@ func (o *RES_3_C) cycles() []uint8 { // 0x99
 }
 
 func (o *RES_3_C) String() string { // 0x99
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "3" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *RES_3_C) SymbolicString() string { // 0x99
 	return "RES 3,C"
 }
@@ -17152,6 +17763,9 @@ func (o *RES_3_D) Write(w io.Writer) (int, error) { // 0x9a
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17164,10 +17778,9 @@ func (o *RES_3_D) cycles() []uint8 { // 0x9a
 }
 
 func (o *RES_3_D) String() string { // 0x9a
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "3" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *RES_3_D) SymbolicString() string { // 0x9a
 	return "RES 3,D"
 }
@@ -17195,6 +17808,9 @@ func (o *RES_3_E) Write(w io.Writer) (int, error) { // 0x9b
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17207,10 +17823,9 @@ func (o *RES_3_E) cycles() []uint8 { // 0x9b
 }
 
 func (o *RES_3_E) String() string { // 0x9b
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "3" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *RES_3_E) SymbolicString() string { // 0x9b
 	return "RES 3,E"
 }
@@ -17238,6 +17853,9 @@ func (o *RES_3_H) Write(w io.Writer) (int, error) { // 0x9c
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17250,10 +17868,9 @@ func (o *RES_3_H) cycles() []uint8 { // 0x9c
 }
 
 func (o *RES_3_H) String() string { // 0x9c
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "3" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *RES_3_H) SymbolicString() string { // 0x9c
 	return "RES 3,H"
 }
@@ -17281,6 +17898,9 @@ func (o *RES_3_L) Write(w io.Writer) (int, error) { // 0x9d
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17293,10 +17913,9 @@ func (o *RES_3_L) cycles() []uint8 { // 0x9d
 }
 
 func (o *RES_3_L) String() string { // 0x9d
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "3" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *RES_3_L) SymbolicString() string { // 0x9d
 	return "RES 3,L"
 }
@@ -17324,6 +17943,9 @@ func (o *RES_3_HLPtr) Write(w io.Writer) (int, error) { // 0x9e
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17336,10 +17958,9 @@ func (o *RES_3_HLPtr) cycles() []uint8 { // 0x9e
 }
 
 func (o *RES_3_HLPtr) String() string { // 0x9e
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "3" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *RES_3_HLPtr) SymbolicString() string { // 0x9e
 	return "RES 3,(HL)"
 }
@@ -17367,6 +17988,9 @@ func (o *RES_3_A) Write(w io.Writer) (int, error) { // 0x9f
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17379,10 +18003,9 @@ func (o *RES_3_A) cycles() []uint8 { // 0x9f
 }
 
 func (o *RES_3_A) String() string { // 0x9f
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "3" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *RES_3_A) SymbolicString() string { // 0x9f
 	return "RES 3,A"
 }
@@ -17410,6 +18033,9 @@ func (o *RRC_D) Write(w io.Writer) (int, error) { // 0xa
 		return written, err
 	}
 
+	// D is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17422,10 +18048,9 @@ func (o *RRC_D) cycles() []uint8 { // 0xa
 }
 
 func (o *RRC_D) String() string { // 0xa
-
-	return fmt.Sprintf("RRC %v", o.operand1)
-
+	return "RRC" + " " + "D" /* operand1 */
 }
+
 func (o *RRC_D) SymbolicString() string { // 0xa
 	return "RRC D"
 }
@@ -17453,6 +18078,9 @@ func (o *RES_4_B) Write(w io.Writer) (int, error) { // 0xa0
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17465,10 +18093,9 @@ func (o *RES_4_B) cycles() []uint8 { // 0xa0
 }
 
 func (o *RES_4_B) String() string { // 0xa0
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "4" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *RES_4_B) SymbolicString() string { // 0xa0
 	return "RES 4,B"
 }
@@ -17496,6 +18123,9 @@ func (o *RES_4_C) Write(w io.Writer) (int, error) { // 0xa1
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17508,10 +18138,9 @@ func (o *RES_4_C) cycles() []uint8 { // 0xa1
 }
 
 func (o *RES_4_C) String() string { // 0xa1
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "4" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *RES_4_C) SymbolicString() string { // 0xa1
 	return "RES 4,C"
 }
@@ -17539,6 +18168,9 @@ func (o *RES_4_D) Write(w io.Writer) (int, error) { // 0xa2
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17551,10 +18183,9 @@ func (o *RES_4_D) cycles() []uint8 { // 0xa2
 }
 
 func (o *RES_4_D) String() string { // 0xa2
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "4" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *RES_4_D) SymbolicString() string { // 0xa2
 	return "RES 4,D"
 }
@@ -17582,6 +18213,9 @@ func (o *RES_4_E) Write(w io.Writer) (int, error) { // 0xa3
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17594,10 +18228,9 @@ func (o *RES_4_E) cycles() []uint8 { // 0xa3
 }
 
 func (o *RES_4_E) String() string { // 0xa3
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "4" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *RES_4_E) SymbolicString() string { // 0xa3
 	return "RES 4,E"
 }
@@ -17625,6 +18258,9 @@ func (o *RES_4_H) Write(w io.Writer) (int, error) { // 0xa4
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17637,10 +18273,9 @@ func (o *RES_4_H) cycles() []uint8 { // 0xa4
 }
 
 func (o *RES_4_H) String() string { // 0xa4
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "4" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *RES_4_H) SymbolicString() string { // 0xa4
 	return "RES 4,H"
 }
@@ -17668,6 +18303,9 @@ func (o *RES_4_L) Write(w io.Writer) (int, error) { // 0xa5
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17680,10 +18318,9 @@ func (o *RES_4_L) cycles() []uint8 { // 0xa5
 }
 
 func (o *RES_4_L) String() string { // 0xa5
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "4" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *RES_4_L) SymbolicString() string { // 0xa5
 	return "RES 4,L"
 }
@@ -17711,6 +18348,9 @@ func (o *RES_4_HLPtr) Write(w io.Writer) (int, error) { // 0xa6
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17723,10 +18363,9 @@ func (o *RES_4_HLPtr) cycles() []uint8 { // 0xa6
 }
 
 func (o *RES_4_HLPtr) String() string { // 0xa6
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "4" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *RES_4_HLPtr) SymbolicString() string { // 0xa6
 	return "RES 4,(HL)"
 }
@@ -17754,6 +18393,9 @@ func (o *RES_4_A) Write(w io.Writer) (int, error) { // 0xa7
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17766,10 +18408,9 @@ func (o *RES_4_A) cycles() []uint8 { // 0xa7
 }
 
 func (o *RES_4_A) String() string { // 0xa7
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "4" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *RES_4_A) SymbolicString() string { // 0xa7
 	return "RES 4,A"
 }
@@ -17797,6 +18438,9 @@ func (o *RES_5_B) Write(w io.Writer) (int, error) { // 0xa8
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17809,10 +18453,9 @@ func (o *RES_5_B) cycles() []uint8 { // 0xa8
 }
 
 func (o *RES_5_B) String() string { // 0xa8
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "5" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *RES_5_B) SymbolicString() string { // 0xa8
 	return "RES 5,B"
 }
@@ -17840,6 +18483,9 @@ func (o *RES_5_C) Write(w io.Writer) (int, error) { // 0xa9
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17852,10 +18498,9 @@ func (o *RES_5_C) cycles() []uint8 { // 0xa9
 }
 
 func (o *RES_5_C) String() string { // 0xa9
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "5" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *RES_5_C) SymbolicString() string { // 0xa9
 	return "RES 5,C"
 }
@@ -17883,6 +18528,9 @@ func (o *RES_5_D) Write(w io.Writer) (int, error) { // 0xaa
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17895,10 +18543,9 @@ func (o *RES_5_D) cycles() []uint8 { // 0xaa
 }
 
 func (o *RES_5_D) String() string { // 0xaa
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "5" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *RES_5_D) SymbolicString() string { // 0xaa
 	return "RES 5,D"
 }
@@ -17926,6 +18573,9 @@ func (o *RES_5_E) Write(w io.Writer) (int, error) { // 0xab
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17938,10 +18588,9 @@ func (o *RES_5_E) cycles() []uint8 { // 0xab
 }
 
 func (o *RES_5_E) String() string { // 0xab
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "5" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *RES_5_E) SymbolicString() string { // 0xab
 	return "RES 5,E"
 }
@@ -17969,6 +18618,9 @@ func (o *RES_5_H) Write(w io.Writer) (int, error) { // 0xac
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -17981,10 +18633,9 @@ func (o *RES_5_H) cycles() []uint8 { // 0xac
 }
 
 func (o *RES_5_H) String() string { // 0xac
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "5" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *RES_5_H) SymbolicString() string { // 0xac
 	return "RES 5,H"
 }
@@ -18012,6 +18663,9 @@ func (o *RES_5_L) Write(w io.Writer) (int, error) { // 0xad
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18024,10 +18678,9 @@ func (o *RES_5_L) cycles() []uint8 { // 0xad
 }
 
 func (o *RES_5_L) String() string { // 0xad
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "5" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *RES_5_L) SymbolicString() string { // 0xad
 	return "RES 5,L"
 }
@@ -18055,6 +18708,9 @@ func (o *RES_5_HLPtr) Write(w io.Writer) (int, error) { // 0xae
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18067,10 +18723,9 @@ func (o *RES_5_HLPtr) cycles() []uint8 { // 0xae
 }
 
 func (o *RES_5_HLPtr) String() string { // 0xae
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "5" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *RES_5_HLPtr) SymbolicString() string { // 0xae
 	return "RES 5,(HL)"
 }
@@ -18098,6 +18753,9 @@ func (o *RES_5_A) Write(w io.Writer) (int, error) { // 0xaf
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18110,10 +18768,9 @@ func (o *RES_5_A) cycles() []uint8 { // 0xaf
 }
 
 func (o *RES_5_A) String() string { // 0xaf
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "5" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *RES_5_A) SymbolicString() string { // 0xaf
 	return "RES 5,A"
 }
@@ -18141,6 +18798,9 @@ func (o *RRC_E) Write(w io.Writer) (int, error) { // 0xb
 		return written, err
 	}
 
+	// E is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18153,10 +18813,9 @@ func (o *RRC_E) cycles() []uint8 { // 0xb
 }
 
 func (o *RRC_E) String() string { // 0xb
-
-	return fmt.Sprintf("RRC %v", o.operand1)
-
+	return "RRC" + " " + "E" /* operand1 */
 }
+
 func (o *RRC_E) SymbolicString() string { // 0xb
 	return "RRC E"
 }
@@ -18184,6 +18843,9 @@ func (o *RES_6_B) Write(w io.Writer) (int, error) { // 0xb0
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18196,10 +18858,9 @@ func (o *RES_6_B) cycles() []uint8 { // 0xb0
 }
 
 func (o *RES_6_B) String() string { // 0xb0
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "6" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *RES_6_B) SymbolicString() string { // 0xb0
 	return "RES 6,B"
 }
@@ -18227,6 +18888,9 @@ func (o *RES_6_C) Write(w io.Writer) (int, error) { // 0xb1
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18239,10 +18903,9 @@ func (o *RES_6_C) cycles() []uint8 { // 0xb1
 }
 
 func (o *RES_6_C) String() string { // 0xb1
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "6" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *RES_6_C) SymbolicString() string { // 0xb1
 	return "RES 6,C"
 }
@@ -18270,6 +18933,9 @@ func (o *RES_6_D) Write(w io.Writer) (int, error) { // 0xb2
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18282,10 +18948,9 @@ func (o *RES_6_D) cycles() []uint8 { // 0xb2
 }
 
 func (o *RES_6_D) String() string { // 0xb2
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "6" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *RES_6_D) SymbolicString() string { // 0xb2
 	return "RES 6,D"
 }
@@ -18313,6 +18978,9 @@ func (o *RES_6_E) Write(w io.Writer) (int, error) { // 0xb3
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18325,10 +18993,9 @@ func (o *RES_6_E) cycles() []uint8 { // 0xb3
 }
 
 func (o *RES_6_E) String() string { // 0xb3
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "6" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *RES_6_E) SymbolicString() string { // 0xb3
 	return "RES 6,E"
 }
@@ -18356,6 +19023,9 @@ func (o *RES_6_H) Write(w io.Writer) (int, error) { // 0xb4
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18368,10 +19038,9 @@ func (o *RES_6_H) cycles() []uint8 { // 0xb4
 }
 
 func (o *RES_6_H) String() string { // 0xb4
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "6" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *RES_6_H) SymbolicString() string { // 0xb4
 	return "RES 6,H"
 }
@@ -18399,6 +19068,9 @@ func (o *RES_6_L) Write(w io.Writer) (int, error) { // 0xb5
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18411,10 +19083,9 @@ func (o *RES_6_L) cycles() []uint8 { // 0xb5
 }
 
 func (o *RES_6_L) String() string { // 0xb5
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "6" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *RES_6_L) SymbolicString() string { // 0xb5
 	return "RES 6,L"
 }
@@ -18442,6 +19113,9 @@ func (o *RES_6_HLPtr) Write(w io.Writer) (int, error) { // 0xb6
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18454,10 +19128,9 @@ func (o *RES_6_HLPtr) cycles() []uint8 { // 0xb6
 }
 
 func (o *RES_6_HLPtr) String() string { // 0xb6
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "6" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *RES_6_HLPtr) SymbolicString() string { // 0xb6
 	return "RES 6,(HL)"
 }
@@ -18485,6 +19158,9 @@ func (o *RES_6_A) Write(w io.Writer) (int, error) { // 0xb7
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18497,10 +19173,9 @@ func (o *RES_6_A) cycles() []uint8 { // 0xb7
 }
 
 func (o *RES_6_A) String() string { // 0xb7
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "6" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *RES_6_A) SymbolicString() string { // 0xb7
 	return "RES 6,A"
 }
@@ -18528,6 +19203,9 @@ func (o *RES_7_B) Write(w io.Writer) (int, error) { // 0xb8
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18540,10 +19218,9 @@ func (o *RES_7_B) cycles() []uint8 { // 0xb8
 }
 
 func (o *RES_7_B) String() string { // 0xb8
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "7" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *RES_7_B) SymbolicString() string { // 0xb8
 	return "RES 7,B"
 }
@@ -18571,6 +19248,9 @@ func (o *RES_7_C) Write(w io.Writer) (int, error) { // 0xb9
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18583,10 +19263,9 @@ func (o *RES_7_C) cycles() []uint8 { // 0xb9
 }
 
 func (o *RES_7_C) String() string { // 0xb9
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "7" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *RES_7_C) SymbolicString() string { // 0xb9
 	return "RES 7,C"
 }
@@ -18614,6 +19293,9 @@ func (o *RES_7_D) Write(w io.Writer) (int, error) { // 0xba
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18626,10 +19308,9 @@ func (o *RES_7_D) cycles() []uint8 { // 0xba
 }
 
 func (o *RES_7_D) String() string { // 0xba
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "7" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *RES_7_D) SymbolicString() string { // 0xba
 	return "RES 7,D"
 }
@@ -18657,6 +19338,9 @@ func (o *RES_7_E) Write(w io.Writer) (int, error) { // 0xbb
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18669,10 +19353,9 @@ func (o *RES_7_E) cycles() []uint8 { // 0xbb
 }
 
 func (o *RES_7_E) String() string { // 0xbb
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "7" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *RES_7_E) SymbolicString() string { // 0xbb
 	return "RES 7,E"
 }
@@ -18700,6 +19383,9 @@ func (o *RES_7_H) Write(w io.Writer) (int, error) { // 0xbc
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18712,10 +19398,9 @@ func (o *RES_7_H) cycles() []uint8 { // 0xbc
 }
 
 func (o *RES_7_H) String() string { // 0xbc
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "7" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *RES_7_H) SymbolicString() string { // 0xbc
 	return "RES 7,H"
 }
@@ -18743,6 +19428,9 @@ func (o *RES_7_L) Write(w io.Writer) (int, error) { // 0xbd
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18755,10 +19443,9 @@ func (o *RES_7_L) cycles() []uint8 { // 0xbd
 }
 
 func (o *RES_7_L) String() string { // 0xbd
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "7" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *RES_7_L) SymbolicString() string { // 0xbd
 	return "RES 7,L"
 }
@@ -18786,6 +19473,9 @@ func (o *RES_7_HLPtr) Write(w io.Writer) (int, error) { // 0xbe
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18798,10 +19488,9 @@ func (o *RES_7_HLPtr) cycles() []uint8 { // 0xbe
 }
 
 func (o *RES_7_HLPtr) String() string { // 0xbe
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "7" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *RES_7_HLPtr) SymbolicString() string { // 0xbe
 	return "RES 7,(HL)"
 }
@@ -18829,6 +19518,9 @@ func (o *RES_7_A) Write(w io.Writer) (int, error) { // 0xbf
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18841,10 +19533,9 @@ func (o *RES_7_A) cycles() []uint8 { // 0xbf
 }
 
 func (o *RES_7_A) String() string { // 0xbf
-
-	return fmt.Sprintf("RES %v %v", o.operand1, o.operand2)
-
+	return "RES" + " " + "7" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *RES_7_A) SymbolicString() string { // 0xbf
 	return "RES 7,A"
 }
@@ -18872,6 +19563,9 @@ func (o *RRC_H) Write(w io.Writer) (int, error) { // 0xc
 		return written, err
 	}
 
+	// H is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18884,10 +19578,9 @@ func (o *RRC_H) cycles() []uint8 { // 0xc
 }
 
 func (o *RRC_H) String() string { // 0xc
-
-	return fmt.Sprintf("RRC %v", o.operand1)
-
+	return "RRC" + " " + "H" /* operand1 */
 }
+
 func (o *RRC_H) SymbolicString() string { // 0xc
 	return "RRC H"
 }
@@ -18915,6 +19608,9 @@ func (o *SET_0_B) Write(w io.Writer) (int, error) { // 0xc0
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18927,10 +19623,9 @@ func (o *SET_0_B) cycles() []uint8 { // 0xc0
 }
 
 func (o *SET_0_B) String() string { // 0xc0
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "0" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *SET_0_B) SymbolicString() string { // 0xc0
 	return "SET 0,B"
 }
@@ -18958,6 +19653,9 @@ func (o *SET_0_C) Write(w io.Writer) (int, error) { // 0xc1
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -18970,10 +19668,9 @@ func (o *SET_0_C) cycles() []uint8 { // 0xc1
 }
 
 func (o *SET_0_C) String() string { // 0xc1
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "0" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *SET_0_C) SymbolicString() string { // 0xc1
 	return "SET 0,C"
 }
@@ -19001,6 +19698,9 @@ func (o *SET_0_D) Write(w io.Writer) (int, error) { // 0xc2
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19013,10 +19713,9 @@ func (o *SET_0_D) cycles() []uint8 { // 0xc2
 }
 
 func (o *SET_0_D) String() string { // 0xc2
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "0" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *SET_0_D) SymbolicString() string { // 0xc2
 	return "SET 0,D"
 }
@@ -19044,6 +19743,9 @@ func (o *SET_0_E) Write(w io.Writer) (int, error) { // 0xc3
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19056,10 +19758,9 @@ func (o *SET_0_E) cycles() []uint8 { // 0xc3
 }
 
 func (o *SET_0_E) String() string { // 0xc3
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "0" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *SET_0_E) SymbolicString() string { // 0xc3
 	return "SET 0,E"
 }
@@ -19087,6 +19788,9 @@ func (o *SET_0_H) Write(w io.Writer) (int, error) { // 0xc4
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19099,10 +19803,9 @@ func (o *SET_0_H) cycles() []uint8 { // 0xc4
 }
 
 func (o *SET_0_H) String() string { // 0xc4
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "0" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *SET_0_H) SymbolicString() string { // 0xc4
 	return "SET 0,H"
 }
@@ -19130,6 +19833,9 @@ func (o *SET_0_L) Write(w io.Writer) (int, error) { // 0xc5
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19142,10 +19848,9 @@ func (o *SET_0_L) cycles() []uint8 { // 0xc5
 }
 
 func (o *SET_0_L) String() string { // 0xc5
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "0" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *SET_0_L) SymbolicString() string { // 0xc5
 	return "SET 0,L"
 }
@@ -19173,6 +19878,9 @@ func (o *SET_0_HLPtr) Write(w io.Writer) (int, error) { // 0xc6
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19185,10 +19893,9 @@ func (o *SET_0_HLPtr) cycles() []uint8 { // 0xc6
 }
 
 func (o *SET_0_HLPtr) String() string { // 0xc6
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "0" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *SET_0_HLPtr) SymbolicString() string { // 0xc6
 	return "SET 0,(HL)"
 }
@@ -19216,6 +19923,9 @@ func (o *SET_0_A) Write(w io.Writer) (int, error) { // 0xc7
 		return written, err
 	}
 
+	// 0 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19228,10 +19938,9 @@ func (o *SET_0_A) cycles() []uint8 { // 0xc7
 }
 
 func (o *SET_0_A) String() string { // 0xc7
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "0" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *SET_0_A) SymbolicString() string { // 0xc7
 	return "SET 0,A"
 }
@@ -19259,6 +19968,9 @@ func (o *SET_1_B) Write(w io.Writer) (int, error) { // 0xc8
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19271,10 +19983,9 @@ func (o *SET_1_B) cycles() []uint8 { // 0xc8
 }
 
 func (o *SET_1_B) String() string { // 0xc8
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "1" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *SET_1_B) SymbolicString() string { // 0xc8
 	return "SET 1,B"
 }
@@ -19302,6 +20013,9 @@ func (o *SET_1_C) Write(w io.Writer) (int, error) { // 0xc9
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19314,10 +20028,9 @@ func (o *SET_1_C) cycles() []uint8 { // 0xc9
 }
 
 func (o *SET_1_C) String() string { // 0xc9
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "1" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *SET_1_C) SymbolicString() string { // 0xc9
 	return "SET 1,C"
 }
@@ -19345,6 +20058,9 @@ func (o *SET_1_D) Write(w io.Writer) (int, error) { // 0xca
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19357,10 +20073,9 @@ func (o *SET_1_D) cycles() []uint8 { // 0xca
 }
 
 func (o *SET_1_D) String() string { // 0xca
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "1" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *SET_1_D) SymbolicString() string { // 0xca
 	return "SET 1,D"
 }
@@ -19388,6 +20103,9 @@ func (o *SET_1_E) Write(w io.Writer) (int, error) { // 0xcb
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19400,10 +20118,9 @@ func (o *SET_1_E) cycles() []uint8 { // 0xcb
 }
 
 func (o *SET_1_E) String() string { // 0xcb
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "1" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *SET_1_E) SymbolicString() string { // 0xcb
 	return "SET 1,E"
 }
@@ -19431,6 +20148,9 @@ func (o *SET_1_H) Write(w io.Writer) (int, error) { // 0xcc
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19443,10 +20163,9 @@ func (o *SET_1_H) cycles() []uint8 { // 0xcc
 }
 
 func (o *SET_1_H) String() string { // 0xcc
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "1" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *SET_1_H) SymbolicString() string { // 0xcc
 	return "SET 1,H"
 }
@@ -19474,6 +20193,9 @@ func (o *SET_1_L) Write(w io.Writer) (int, error) { // 0xcd
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19486,10 +20208,9 @@ func (o *SET_1_L) cycles() []uint8 { // 0xcd
 }
 
 func (o *SET_1_L) String() string { // 0xcd
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "1" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *SET_1_L) SymbolicString() string { // 0xcd
 	return "SET 1,L"
 }
@@ -19517,6 +20238,9 @@ func (o *SET_1_HLPtr) Write(w io.Writer) (int, error) { // 0xce
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19529,10 +20253,9 @@ func (o *SET_1_HLPtr) cycles() []uint8 { // 0xce
 }
 
 func (o *SET_1_HLPtr) String() string { // 0xce
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "1" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *SET_1_HLPtr) SymbolicString() string { // 0xce
 	return "SET 1,(HL)"
 }
@@ -19560,6 +20283,9 @@ func (o *SET_1_A) Write(w io.Writer) (int, error) { // 0xcf
 		return written, err
 	}
 
+	// 1 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19572,10 +20298,9 @@ func (o *SET_1_A) cycles() []uint8 { // 0xcf
 }
 
 func (o *SET_1_A) String() string { // 0xcf
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "1" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *SET_1_A) SymbolicString() string { // 0xcf
 	return "SET 1,A"
 }
@@ -19603,6 +20328,9 @@ func (o *RRC_L) Write(w io.Writer) (int, error) { // 0xd
 		return written, err
 	}
 
+	// L is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19615,10 +20343,9 @@ func (o *RRC_L) cycles() []uint8 { // 0xd
 }
 
 func (o *RRC_L) String() string { // 0xd
-
-	return fmt.Sprintf("RRC %v", o.operand1)
-
+	return "RRC" + " " + "L" /* operand1 */
 }
+
 func (o *RRC_L) SymbolicString() string { // 0xd
 	return "RRC L"
 }
@@ -19646,6 +20373,9 @@ func (o *SET_2_B) Write(w io.Writer) (int, error) { // 0xd0
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19658,10 +20388,9 @@ func (o *SET_2_B) cycles() []uint8 { // 0xd0
 }
 
 func (o *SET_2_B) String() string { // 0xd0
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "2" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *SET_2_B) SymbolicString() string { // 0xd0
 	return "SET 2,B"
 }
@@ -19689,6 +20418,9 @@ func (o *SET_2_C) Write(w io.Writer) (int, error) { // 0xd1
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19701,10 +20433,9 @@ func (o *SET_2_C) cycles() []uint8 { // 0xd1
 }
 
 func (o *SET_2_C) String() string { // 0xd1
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "2" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *SET_2_C) SymbolicString() string { // 0xd1
 	return "SET 2,C"
 }
@@ -19732,6 +20463,9 @@ func (o *SET_2_D) Write(w io.Writer) (int, error) { // 0xd2
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19744,10 +20478,9 @@ func (o *SET_2_D) cycles() []uint8 { // 0xd2
 }
 
 func (o *SET_2_D) String() string { // 0xd2
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "2" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *SET_2_D) SymbolicString() string { // 0xd2
 	return "SET 2,D"
 }
@@ -19775,6 +20508,9 @@ func (o *SET_2_E) Write(w io.Writer) (int, error) { // 0xd3
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19787,10 +20523,9 @@ func (o *SET_2_E) cycles() []uint8 { // 0xd3
 }
 
 func (o *SET_2_E) String() string { // 0xd3
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "2" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *SET_2_E) SymbolicString() string { // 0xd3
 	return "SET 2,E"
 }
@@ -19818,6 +20553,9 @@ func (o *SET_2_H) Write(w io.Writer) (int, error) { // 0xd4
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19830,10 +20568,9 @@ func (o *SET_2_H) cycles() []uint8 { // 0xd4
 }
 
 func (o *SET_2_H) String() string { // 0xd4
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "2" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *SET_2_H) SymbolicString() string { // 0xd4
 	return "SET 2,H"
 }
@@ -19861,6 +20598,9 @@ func (o *SET_2_L) Write(w io.Writer) (int, error) { // 0xd5
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19873,10 +20613,9 @@ func (o *SET_2_L) cycles() []uint8 { // 0xd5
 }
 
 func (o *SET_2_L) String() string { // 0xd5
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "2" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *SET_2_L) SymbolicString() string { // 0xd5
 	return "SET 2,L"
 }
@@ -19904,6 +20643,9 @@ func (o *SET_2_HLPtr) Write(w io.Writer) (int, error) { // 0xd6
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19916,10 +20658,9 @@ func (o *SET_2_HLPtr) cycles() []uint8 { // 0xd6
 }
 
 func (o *SET_2_HLPtr) String() string { // 0xd6
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "2" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *SET_2_HLPtr) SymbolicString() string { // 0xd6
 	return "SET 2,(HL)"
 }
@@ -19947,6 +20688,9 @@ func (o *SET_2_A) Write(w io.Writer) (int, error) { // 0xd7
 		return written, err
 	}
 
+	// 2 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -19959,10 +20703,9 @@ func (o *SET_2_A) cycles() []uint8 { // 0xd7
 }
 
 func (o *SET_2_A) String() string { // 0xd7
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "2" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *SET_2_A) SymbolicString() string { // 0xd7
 	return "SET 2,A"
 }
@@ -19990,6 +20733,9 @@ func (o *SET_3_B) Write(w io.Writer) (int, error) { // 0xd8
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20002,10 +20748,9 @@ func (o *SET_3_B) cycles() []uint8 { // 0xd8
 }
 
 func (o *SET_3_B) String() string { // 0xd8
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "3" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *SET_3_B) SymbolicString() string { // 0xd8
 	return "SET 3,B"
 }
@@ -20033,6 +20778,9 @@ func (o *SET_3_C) Write(w io.Writer) (int, error) { // 0xd9
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20045,10 +20793,9 @@ func (o *SET_3_C) cycles() []uint8 { // 0xd9
 }
 
 func (o *SET_3_C) String() string { // 0xd9
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "3" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *SET_3_C) SymbolicString() string { // 0xd9
 	return "SET 3,C"
 }
@@ -20076,6 +20823,9 @@ func (o *SET_3_D) Write(w io.Writer) (int, error) { // 0xda
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20088,10 +20838,9 @@ func (o *SET_3_D) cycles() []uint8 { // 0xda
 }
 
 func (o *SET_3_D) String() string { // 0xda
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "3" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *SET_3_D) SymbolicString() string { // 0xda
 	return "SET 3,D"
 }
@@ -20119,6 +20868,9 @@ func (o *SET_3_E) Write(w io.Writer) (int, error) { // 0xdb
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20131,10 +20883,9 @@ func (o *SET_3_E) cycles() []uint8 { // 0xdb
 }
 
 func (o *SET_3_E) String() string { // 0xdb
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "3" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *SET_3_E) SymbolicString() string { // 0xdb
 	return "SET 3,E"
 }
@@ -20162,6 +20913,9 @@ func (o *SET_3_H) Write(w io.Writer) (int, error) { // 0xdc
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20174,10 +20928,9 @@ func (o *SET_3_H) cycles() []uint8 { // 0xdc
 }
 
 func (o *SET_3_H) String() string { // 0xdc
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "3" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *SET_3_H) SymbolicString() string { // 0xdc
 	return "SET 3,H"
 }
@@ -20205,6 +20958,9 @@ func (o *SET_3_L) Write(w io.Writer) (int, error) { // 0xdd
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20217,10 +20973,9 @@ func (o *SET_3_L) cycles() []uint8 { // 0xdd
 }
 
 func (o *SET_3_L) String() string { // 0xdd
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "3" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *SET_3_L) SymbolicString() string { // 0xdd
 	return "SET 3,L"
 }
@@ -20248,6 +21003,9 @@ func (o *SET_3_HLPtr) Write(w io.Writer) (int, error) { // 0xde
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20260,10 +21018,9 @@ func (o *SET_3_HLPtr) cycles() []uint8 { // 0xde
 }
 
 func (o *SET_3_HLPtr) String() string { // 0xde
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "3" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *SET_3_HLPtr) SymbolicString() string { // 0xde
 	return "SET 3,(HL)"
 }
@@ -20291,6 +21048,9 @@ func (o *SET_3_A) Write(w io.Writer) (int, error) { // 0xdf
 		return written, err
 	}
 
+	// 3 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20303,10 +21063,9 @@ func (o *SET_3_A) cycles() []uint8 { // 0xdf
 }
 
 func (o *SET_3_A) String() string { // 0xdf
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "3" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *SET_3_A) SymbolicString() string { // 0xdf
 	return "SET 3,A"
 }
@@ -20334,6 +21093,9 @@ func (o *RRC_HLPtr) Write(w io.Writer) (int, error) { // 0xe
 		return written, err
 	}
 
+	// (HL) is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20346,10 +21108,9 @@ func (o *RRC_HLPtr) cycles() []uint8 { // 0xe
 }
 
 func (o *RRC_HLPtr) String() string { // 0xe
-
-	return fmt.Sprintf("RRC %v", o.operand1)
-
+	return "RRC" + " " + "(HL)" /* operand1 */
 }
+
 func (o *RRC_HLPtr) SymbolicString() string { // 0xe
 	return "RRC (HL)"
 }
@@ -20377,6 +21138,9 @@ func (o *SET_4_B) Write(w io.Writer) (int, error) { // 0xe0
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20389,10 +21153,9 @@ func (o *SET_4_B) cycles() []uint8 { // 0xe0
 }
 
 func (o *SET_4_B) String() string { // 0xe0
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "4" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *SET_4_B) SymbolicString() string { // 0xe0
 	return "SET 4,B"
 }
@@ -20420,6 +21183,9 @@ func (o *SET_4_C) Write(w io.Writer) (int, error) { // 0xe1
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20432,10 +21198,9 @@ func (o *SET_4_C) cycles() []uint8 { // 0xe1
 }
 
 func (o *SET_4_C) String() string { // 0xe1
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "4" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *SET_4_C) SymbolicString() string { // 0xe1
 	return "SET 4,C"
 }
@@ -20463,6 +21228,9 @@ func (o *SET_4_D) Write(w io.Writer) (int, error) { // 0xe2
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20475,10 +21243,9 @@ func (o *SET_4_D) cycles() []uint8 { // 0xe2
 }
 
 func (o *SET_4_D) String() string { // 0xe2
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "4" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *SET_4_D) SymbolicString() string { // 0xe2
 	return "SET 4,D"
 }
@@ -20506,6 +21273,9 @@ func (o *SET_4_E) Write(w io.Writer) (int, error) { // 0xe3
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20518,10 +21288,9 @@ func (o *SET_4_E) cycles() []uint8 { // 0xe3
 }
 
 func (o *SET_4_E) String() string { // 0xe3
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "4" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *SET_4_E) SymbolicString() string { // 0xe3
 	return "SET 4,E"
 }
@@ -20549,6 +21318,9 @@ func (o *SET_4_H) Write(w io.Writer) (int, error) { // 0xe4
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20561,10 +21333,9 @@ func (o *SET_4_H) cycles() []uint8 { // 0xe4
 }
 
 func (o *SET_4_H) String() string { // 0xe4
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "4" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *SET_4_H) SymbolicString() string { // 0xe4
 	return "SET 4,H"
 }
@@ -20592,6 +21363,9 @@ func (o *SET_4_L) Write(w io.Writer) (int, error) { // 0xe5
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20604,10 +21378,9 @@ func (o *SET_4_L) cycles() []uint8 { // 0xe5
 }
 
 func (o *SET_4_L) String() string { // 0xe5
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "4" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *SET_4_L) SymbolicString() string { // 0xe5
 	return "SET 4,L"
 }
@@ -20635,6 +21408,9 @@ func (o *SET_4_HLPtr) Write(w io.Writer) (int, error) { // 0xe6
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20647,10 +21423,9 @@ func (o *SET_4_HLPtr) cycles() []uint8 { // 0xe6
 }
 
 func (o *SET_4_HLPtr) String() string { // 0xe6
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "4" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *SET_4_HLPtr) SymbolicString() string { // 0xe6
 	return "SET 4,(HL)"
 }
@@ -20678,6 +21453,9 @@ func (o *SET_4_A) Write(w io.Writer) (int, error) { // 0xe7
 		return written, err
 	}
 
+	// 4 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20690,10 +21468,9 @@ func (o *SET_4_A) cycles() []uint8 { // 0xe7
 }
 
 func (o *SET_4_A) String() string { // 0xe7
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "4" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *SET_4_A) SymbolicString() string { // 0xe7
 	return "SET 4,A"
 }
@@ -20721,6 +21498,9 @@ func (o *SET_5_B) Write(w io.Writer) (int, error) { // 0xe8
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20733,10 +21513,9 @@ func (o *SET_5_B) cycles() []uint8 { // 0xe8
 }
 
 func (o *SET_5_B) String() string { // 0xe8
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "5" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *SET_5_B) SymbolicString() string { // 0xe8
 	return "SET 5,B"
 }
@@ -20764,6 +21543,9 @@ func (o *SET_5_C) Write(w io.Writer) (int, error) { // 0xe9
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20776,10 +21558,9 @@ func (o *SET_5_C) cycles() []uint8 { // 0xe9
 }
 
 func (o *SET_5_C) String() string { // 0xe9
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "5" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *SET_5_C) SymbolicString() string { // 0xe9
 	return "SET 5,C"
 }
@@ -20807,6 +21588,9 @@ func (o *SET_5_D) Write(w io.Writer) (int, error) { // 0xea
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20819,10 +21603,9 @@ func (o *SET_5_D) cycles() []uint8 { // 0xea
 }
 
 func (o *SET_5_D) String() string { // 0xea
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "5" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *SET_5_D) SymbolicString() string { // 0xea
 	return "SET 5,D"
 }
@@ -20850,6 +21633,9 @@ func (o *SET_5_E) Write(w io.Writer) (int, error) { // 0xeb
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20862,10 +21648,9 @@ func (o *SET_5_E) cycles() []uint8 { // 0xeb
 }
 
 func (o *SET_5_E) String() string { // 0xeb
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "5" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *SET_5_E) SymbolicString() string { // 0xeb
 	return "SET 5,E"
 }
@@ -20893,6 +21678,9 @@ func (o *SET_5_H) Write(w io.Writer) (int, error) { // 0xec
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20905,10 +21693,9 @@ func (o *SET_5_H) cycles() []uint8 { // 0xec
 }
 
 func (o *SET_5_H) String() string { // 0xec
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "5" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *SET_5_H) SymbolicString() string { // 0xec
 	return "SET 5,H"
 }
@@ -20936,6 +21723,9 @@ func (o *SET_5_L) Write(w io.Writer) (int, error) { // 0xed
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20948,10 +21738,9 @@ func (o *SET_5_L) cycles() []uint8 { // 0xed
 }
 
 func (o *SET_5_L) String() string { // 0xed
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "5" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *SET_5_L) SymbolicString() string { // 0xed
 	return "SET 5,L"
 }
@@ -20979,6 +21768,9 @@ func (o *SET_5_HLPtr) Write(w io.Writer) (int, error) { // 0xee
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -20991,10 +21783,9 @@ func (o *SET_5_HLPtr) cycles() []uint8 { // 0xee
 }
 
 func (o *SET_5_HLPtr) String() string { // 0xee
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "5" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *SET_5_HLPtr) SymbolicString() string { // 0xee
 	return "SET 5,(HL)"
 }
@@ -21022,6 +21813,9 @@ func (o *SET_5_A) Write(w io.Writer) (int, error) { // 0xef
 		return written, err
 	}
 
+	// 5 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21034,10 +21828,9 @@ func (o *SET_5_A) cycles() []uint8 { // 0xef
 }
 
 func (o *SET_5_A) String() string { // 0xef
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "5" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *SET_5_A) SymbolicString() string { // 0xef
 	return "SET 5,A"
 }
@@ -21065,6 +21858,9 @@ func (o *RRC_A) Write(w io.Writer) (int, error) { // 0xf
 		return written, err
 	}
 
+	// A is implicit in this instruction.
+	//  is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21077,10 +21873,9 @@ func (o *RRC_A) cycles() []uint8 { // 0xf
 }
 
 func (o *RRC_A) String() string { // 0xf
-
-	return fmt.Sprintf("RRC %v", o.operand1)
-
+	return "RRC" + " " + "A" /* operand1 */
 }
+
 func (o *RRC_A) SymbolicString() string { // 0xf
 	return "RRC A"
 }
@@ -21108,6 +21903,9 @@ func (o *SET_6_B) Write(w io.Writer) (int, error) { // 0xf0
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21120,10 +21918,9 @@ func (o *SET_6_B) cycles() []uint8 { // 0xf0
 }
 
 func (o *SET_6_B) String() string { // 0xf0
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "6" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *SET_6_B) SymbolicString() string { // 0xf0
 	return "SET 6,B"
 }
@@ -21151,6 +21948,9 @@ func (o *SET_6_C) Write(w io.Writer) (int, error) { // 0xf1
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21163,10 +21963,9 @@ func (o *SET_6_C) cycles() []uint8 { // 0xf1
 }
 
 func (o *SET_6_C) String() string { // 0xf1
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "6" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *SET_6_C) SymbolicString() string { // 0xf1
 	return "SET 6,C"
 }
@@ -21194,6 +21993,9 @@ func (o *SET_6_D) Write(w io.Writer) (int, error) { // 0xf2
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21206,10 +22008,9 @@ func (o *SET_6_D) cycles() []uint8 { // 0xf2
 }
 
 func (o *SET_6_D) String() string { // 0xf2
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "6" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *SET_6_D) SymbolicString() string { // 0xf2
 	return "SET 6,D"
 }
@@ -21237,6 +22038,9 @@ func (o *SET_6_E) Write(w io.Writer) (int, error) { // 0xf3
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21249,10 +22053,9 @@ func (o *SET_6_E) cycles() []uint8 { // 0xf3
 }
 
 func (o *SET_6_E) String() string { // 0xf3
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "6" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *SET_6_E) SymbolicString() string { // 0xf3
 	return "SET 6,E"
 }
@@ -21280,6 +22083,9 @@ func (o *SET_6_H) Write(w io.Writer) (int, error) { // 0xf4
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21292,10 +22098,9 @@ func (o *SET_6_H) cycles() []uint8 { // 0xf4
 }
 
 func (o *SET_6_H) String() string { // 0xf4
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "6" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *SET_6_H) SymbolicString() string { // 0xf4
 	return "SET 6,H"
 }
@@ -21323,6 +22128,9 @@ func (o *SET_6_L) Write(w io.Writer) (int, error) { // 0xf5
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21335,10 +22143,9 @@ func (o *SET_6_L) cycles() []uint8 { // 0xf5
 }
 
 func (o *SET_6_L) String() string { // 0xf5
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "6" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *SET_6_L) SymbolicString() string { // 0xf5
 	return "SET 6,L"
 }
@@ -21366,6 +22173,9 @@ func (o *SET_6_HLPtr) Write(w io.Writer) (int, error) { // 0xf6
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21378,10 +22188,9 @@ func (o *SET_6_HLPtr) cycles() []uint8 { // 0xf6
 }
 
 func (o *SET_6_HLPtr) String() string { // 0xf6
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "6" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *SET_6_HLPtr) SymbolicString() string { // 0xf6
 	return "SET 6,(HL)"
 }
@@ -21409,6 +22218,9 @@ func (o *SET_6_A) Write(w io.Writer) (int, error) { // 0xf7
 		return written, err
 	}
 
+	// 6 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21421,10 +22233,9 @@ func (o *SET_6_A) cycles() []uint8 { // 0xf7
 }
 
 func (o *SET_6_A) String() string { // 0xf7
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "6" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *SET_6_A) SymbolicString() string { // 0xf7
 	return "SET 6,A"
 }
@@ -21452,6 +22263,9 @@ func (o *SET_7_B) Write(w io.Writer) (int, error) { // 0xf8
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// B is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21464,10 +22278,9 @@ func (o *SET_7_B) cycles() []uint8 { // 0xf8
 }
 
 func (o *SET_7_B) String() string { // 0xf8
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "7" /* operand1 */ + " " + "B" /* operand2 */
 }
+
 func (o *SET_7_B) SymbolicString() string { // 0xf8
 	return "SET 7,B"
 }
@@ -21495,6 +22308,9 @@ func (o *SET_7_C) Write(w io.Writer) (int, error) { // 0xf9
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// C is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21507,10 +22323,9 @@ func (o *SET_7_C) cycles() []uint8 { // 0xf9
 }
 
 func (o *SET_7_C) String() string { // 0xf9
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "7" /* operand1 */ + " " + "C" /* operand2 */
 }
+
 func (o *SET_7_C) SymbolicString() string { // 0xf9
 	return "SET 7,C"
 }
@@ -21538,6 +22353,9 @@ func (o *SET_7_D) Write(w io.Writer) (int, error) { // 0xfa
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// D is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21550,10 +22368,9 @@ func (o *SET_7_D) cycles() []uint8 { // 0xfa
 }
 
 func (o *SET_7_D) String() string { // 0xfa
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "7" /* operand1 */ + " " + "D" /* operand2 */
 }
+
 func (o *SET_7_D) SymbolicString() string { // 0xfa
 	return "SET 7,D"
 }
@@ -21581,6 +22398,9 @@ func (o *SET_7_E) Write(w io.Writer) (int, error) { // 0xfb
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// E is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21593,10 +22413,9 @@ func (o *SET_7_E) cycles() []uint8 { // 0xfb
 }
 
 func (o *SET_7_E) String() string { // 0xfb
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "7" /* operand1 */ + " " + "E" /* operand2 */
 }
+
 func (o *SET_7_E) SymbolicString() string { // 0xfb
 	return "SET 7,E"
 }
@@ -21624,6 +22443,9 @@ func (o *SET_7_H) Write(w io.Writer) (int, error) { // 0xfc
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// H is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21636,10 +22458,9 @@ func (o *SET_7_H) cycles() []uint8 { // 0xfc
 }
 
 func (o *SET_7_H) String() string { // 0xfc
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "7" /* operand1 */ + " " + "H" /* operand2 */
 }
+
 func (o *SET_7_H) SymbolicString() string { // 0xfc
 	return "SET 7,H"
 }
@@ -21667,6 +22488,9 @@ func (o *SET_7_L) Write(w io.Writer) (int, error) { // 0xfd
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// L is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21679,10 +22503,9 @@ func (o *SET_7_L) cycles() []uint8 { // 0xfd
 }
 
 func (o *SET_7_L) String() string { // 0xfd
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "7" /* operand1 */ + " " + "L" /* operand2 */
 }
+
 func (o *SET_7_L) SymbolicString() string { // 0xfd
 	return "SET 7,L"
 }
@@ -21710,6 +22533,9 @@ func (o *SET_7_HLPtr) Write(w io.Writer) (int, error) { // 0xfe
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// (HL) is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21722,10 +22548,9 @@ func (o *SET_7_HLPtr) cycles() []uint8 { // 0xfe
 }
 
 func (o *SET_7_HLPtr) String() string { // 0xfe
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "7" /* operand1 */ + " " + "(HL)" /* operand2 */
 }
+
 func (o *SET_7_HLPtr) SymbolicString() string { // 0xfe
 	return "SET 7,(HL)"
 }
@@ -21753,6 +22578,9 @@ func (o *SET_7_A) Write(w io.Writer) (int, error) { // 0xff
 		return written, err
 	}
 
+	// 7 is implicit in this instruction.
+	// A is implicit in this instruction.
+
 	return written, err
 }
 
@@ -21765,10 +22593,9 @@ func (o *SET_7_A) cycles() []uint8 { // 0xff
 }
 
 func (o *SET_7_A) String() string { // 0xff
-
-	return fmt.Sprintf("SET %v %v", o.operand1, o.operand2)
-
+	return "SET" + " " + "7" /* operand1 */ + " " + "A" /* operand2 */
 }
+
 func (o *SET_7_A) SymbolicString() string { // 0xff
 	return "SET 7,A"
 }
@@ -21789,14 +22616,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &NOP{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -21809,7 +22636,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_BC_d16{}
 
 		{
-			s := "BC"
+			s := "BC" // BC is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -21817,7 +22644,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -21830,14 +22656,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &STOP_0{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -21850,7 +22676,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_DE_d16{}
 
 		{
-			s := "DE"
+			s := "DE" // DE is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -21858,7 +22684,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -21871,14 +22696,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_DEDeref_A{}
 
 		{
-			s := "(DE)"
+			s := "(DE)" // (DE) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -21891,14 +22716,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &INC_DE{}
 
 		{
-			s := "DE"
+			s := "DE" // DE is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -21911,14 +22736,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &INC_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -21931,14 +22756,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DEC_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -21951,7 +22776,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_D_d8{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -21959,7 +22784,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -21972,14 +22796,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RLA{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -21993,14 +22817,13 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 
 		{
 			s, err := readImmediateSigned8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22013,14 +22836,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_HL_DE{}
 
 		{
-			s := "HL"
+			s := "HL" // HL is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "DE"
+			s := "DE" // DE is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22033,14 +22856,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_DEDeref{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "(DE)"
+			s := "(DE)" // (DE) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22053,14 +22876,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DEC_DE{}
 
 		{
-			s := "DE"
+			s := "DE" // DE is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22073,14 +22896,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &INC_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22093,14 +22916,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DEC_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22113,7 +22936,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_E_d8{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22121,7 +22944,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -22134,14 +22956,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RRA{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22154,14 +22976,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_BCDeref_A{}
 
 		{
-			s := "(BC)"
+			s := "(BC)" // (BC) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22174,7 +22996,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &JR_NZ_r8{}
 
 		{
-			s := "NZ"
+			s := "NZ" // NZ is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22182,7 +23004,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediateSigned8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -22195,7 +23016,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_HL_d16{}
 
 		{
-			s := "HL"
+			s := "HL" // HL is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22203,7 +23024,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -22216,15 +23036,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_HLPtrInc_A{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL+)" // (HL+) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22237,14 +23056,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &INC_HL{}
 
 		{
-			s := "HL"
+			s := "HL" // HL is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22257,14 +23076,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &INC_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22277,14 +23096,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DEC_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22297,7 +23116,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_H_d8{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22305,7 +23124,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -22318,14 +23136,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DAA{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22338,7 +23156,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &JR_Z_r8{}
 
 		{
-			s := "Z"
+			s := "Z" // Z is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22346,7 +23164,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediateSigned8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -22359,14 +23176,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_HL_HL{}
 
 		{
-			s := "HL"
+			s := "HL" // HL is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "HL"
+			s := "HL" // HL is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22379,15 +23196,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_HLPtrInc{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL+)" // (HL+) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22400,14 +23216,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DEC_HL{}
 
 		{
-			s := "HL"
+			s := "HL" // HL is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22420,14 +23236,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &INC_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22440,14 +23256,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DEC_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22460,7 +23276,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_L_d8{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22468,7 +23284,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -22481,14 +23296,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CPL{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22501,14 +23316,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &INC_BC{}
 
 		{
-			s := "BC"
+			s := "BC" // BC is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22521,7 +23336,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &JR_NC_r8{}
 
 		{
-			s := "NC"
+			s := "NC" // NC is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22529,7 +23344,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediateSigned8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -22542,7 +23356,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_SP_d16{}
 
 		{
-			s := "SP"
+			s := "SP" // SP is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22550,7 +23364,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -22563,15 +23376,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_HLPtrDec_A{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL-)" // (HL-) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22584,14 +23396,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &INC_SP{}
 
 		{
-			s := "SP"
+			s := "SP" // SP is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22604,15 +23416,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &INC_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22625,15 +23436,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DEC_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22646,8 +23456,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_HLPtr_d8{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22655,7 +23464,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -22668,14 +23476,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SCF{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22688,7 +23496,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &JR_C_r8{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22696,7 +23504,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediateSigned8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -22709,14 +23516,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_HL_SP{}
 
 		{
-			s := "HL"
+			s := "HL" // HL is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "SP"
+			s := "SP" // SP is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22729,15 +23536,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_HLPtrDec{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL-)" // (HL-) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22750,14 +23556,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DEC_SP{}
 
 		{
-			s := "SP"
+			s := "SP" // SP is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22770,14 +23576,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &INC_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22790,14 +23596,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DEC_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22810,7 +23616,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_d8{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22818,7 +23624,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -22831,14 +23636,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CCF{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22851,14 +23656,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &INC_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22871,14 +23676,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_B_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22891,14 +23696,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_B_C{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22911,14 +23716,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_B_D{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22931,14 +23736,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_B_E{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22951,14 +23756,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_B_H{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22971,14 +23776,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_B_L{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -22991,15 +23796,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_B_HLPtr{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23012,14 +23816,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_B_A{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23032,14 +23836,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_C_B{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23052,14 +23856,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_C_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23072,14 +23876,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_C_D{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23092,14 +23896,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_C_E{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23112,14 +23916,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_C_H{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23132,14 +23936,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_C_L{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23152,15 +23956,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_C_HLPtr{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23173,14 +23976,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_C_A{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23193,14 +23996,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DEC_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23213,14 +24016,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_D_B{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23233,14 +24036,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_D_C{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23253,14 +24056,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_D_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23273,14 +24076,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_D_E{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23293,14 +24096,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_D_H{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23313,14 +24116,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_D_L{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23333,15 +24136,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_D_HLPtr{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23354,14 +24156,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_D_A{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23374,14 +24176,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_E_B{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23394,14 +24196,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_E_C{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23414,14 +24216,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_E_D{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23434,14 +24236,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_E_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23454,14 +24256,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_E_H{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23474,14 +24276,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_E_L{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23494,15 +24296,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_E_HLPtr{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23515,14 +24316,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_E_A{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23535,7 +24336,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_B_d8{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23543,7 +24344,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -23556,14 +24356,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_H_B{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23576,14 +24376,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_H_C{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23596,14 +24396,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_H_D{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23616,14 +24416,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_H_E{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23636,14 +24436,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_H_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23656,14 +24456,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_H_L{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23676,15 +24476,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_H_HLPtr{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23697,14 +24496,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_H_A{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23717,14 +24516,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_L_B{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23737,14 +24536,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_L_C{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23757,14 +24556,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_L_D{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23777,14 +24576,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_L_E{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23797,14 +24596,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_L_H{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23817,14 +24616,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_L_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23837,15 +24636,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_L_HLPtr{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23858,14 +24656,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_L_A{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23878,14 +24676,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RLCA{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23898,15 +24696,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_HLPtr_B{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23919,15 +24716,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_HLPtr_C{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23940,15 +24736,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_HLPtr_D{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23961,15 +24756,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_HLPtr_E{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -23982,15 +24776,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_HLPtr_H{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24003,15 +24796,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_HLPtr_L{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24024,14 +24816,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &HALT{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24044,15 +24836,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_HLPtr_A{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24065,14 +24856,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_B{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24085,14 +24876,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_C{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24105,14 +24896,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_D{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24125,14 +24916,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_E{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24145,14 +24936,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_H{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24165,14 +24956,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_L{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24185,15 +24976,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_HLPtr{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24206,14 +24996,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24227,14 +25017,13 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "SP"
+			s := "SP" // SP is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24247,14 +25036,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_A_B{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24267,14 +25056,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_A_C{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24287,14 +25076,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_A_D{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24307,14 +25096,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_A_E{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24327,14 +25116,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_A_H{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24347,14 +25136,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_A_L{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24367,15 +25156,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_A_HLPtr{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24388,14 +25176,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_A_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24408,14 +25196,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADC_A_B{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24428,14 +25216,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADC_A_C{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24448,14 +25236,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADC_A_D{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24468,14 +25256,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADC_A_E{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24488,14 +25276,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADC_A_H{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24508,14 +25296,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADC_A_L{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24528,15 +25316,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADC_A_HLPtr{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24549,14 +25336,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADC_A_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24569,14 +25356,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_HL_BC{}
 
 		{
-			s := "HL"
+			s := "HL" // HL is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "BC"
+			s := "BC" // BC is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24589,14 +25376,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SUB_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24609,14 +25396,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SUB_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24629,14 +25416,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SUB_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24649,14 +25436,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SUB_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24669,14 +25456,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SUB_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24689,14 +25476,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SUB_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24709,15 +25496,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SUB_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24730,14 +25516,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SUB_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24750,14 +25536,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SBC_A_B{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24770,14 +25556,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SBC_A_C{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24790,14 +25576,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SBC_A_D{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24810,14 +25596,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SBC_A_E{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24830,14 +25616,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SBC_A_H{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24850,14 +25636,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SBC_A_L{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24870,15 +25656,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SBC_A_HLPtr{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24891,14 +25676,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SBC_A_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24911,14 +25696,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_BCDeref{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "(BC)"
+			s := "(BC)" // (BC) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24931,14 +25716,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &AND_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24951,14 +25736,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &AND_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24971,14 +25756,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &AND_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -24991,14 +25776,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &AND_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25011,14 +25796,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &AND_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25031,14 +25816,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &AND_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25051,15 +25836,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &AND_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25072,14 +25856,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &AND_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25092,14 +25876,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &XOR_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25112,14 +25896,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &XOR_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25132,14 +25916,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &XOR_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25152,14 +25936,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &XOR_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25172,14 +25956,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &XOR_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25192,14 +25976,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &XOR_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25212,15 +25996,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &XOR_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25233,14 +26016,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &XOR_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25253,14 +26036,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DEC_BC{}
 
 		{
-			s := "BC"
+			s := "BC" // BC is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25273,14 +26056,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &OR_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25293,14 +26076,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &OR_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25313,14 +26096,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &OR_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25333,14 +26116,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &OR_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25353,14 +26136,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &OR_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25373,14 +26156,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &OR_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25393,15 +26176,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &OR_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25414,14 +26196,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &OR_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25434,14 +26216,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CP_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25454,14 +26236,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CP_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25474,14 +26256,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CP_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25494,14 +26276,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CP_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25514,14 +26296,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CP_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25534,14 +26316,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CP_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25554,15 +26336,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CP_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25575,14 +26356,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CP_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25595,14 +26376,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &INC_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25615,14 +26396,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RET_NZ{}
 
 		{
-			s := "NZ"
+			s := "NZ" // NZ is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25635,14 +26416,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &POP_BC{}
 
 		{
-			s := "BC"
+			s := "BC" // BC is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25655,7 +26436,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &JP_NZ_a16{}
 
 		{
-			s := "NZ"
+			s := "NZ" // NZ is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25663,7 +26444,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -25677,14 +26457,13 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25697,7 +26476,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CALL_NZ_a16{}
 
 		{
-			s := "NZ"
+			s := "NZ" // NZ is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25705,7 +26484,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -25718,14 +26496,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &PUSH_BC{}
 
 		{
-			s := "BC"
+			s := "BC" // BC is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25738,7 +26516,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_A_d8{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25746,7 +26524,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -25759,14 +26536,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RST_00H{}
 
 		{
-			s := "00H"
+			s := "00H" // 00H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25779,14 +26556,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RET_Z{}
 
 		{
-			s := "Z"
+			s := "Z" // Z is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25799,14 +26576,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RET{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25819,7 +26596,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &JP_Z_a16{}
 
 		{
-			s := "Z"
+			s := "Z" // Z is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25827,7 +26604,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -25843,7 +26619,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CALL_Z_a16{}
 
 		{
-			s := "Z"
+			s := "Z" // Z is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25851,7 +26627,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -25865,14 +26640,13 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25885,7 +26659,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADC_A_d8{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25893,7 +26667,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -25906,14 +26679,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RST_08H{}
 
 		{
-			s := "08H"
+			s := "08H" // 08H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25926,14 +26699,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DEC_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25946,14 +26719,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RET_NC{}
 
 		{
-			s := "NC"
+			s := "NC" // NC is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25966,14 +26739,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &POP_DE{}
 
 		{
-			s := "DE"
+			s := "DE" // DE is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25986,7 +26759,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &JP_NC_a16{}
 
 		{
-			s := "NC"
+			s := "NC" // NC is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -25994,7 +26767,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -26007,7 +26779,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CALL_NC_a16{}
 
 		{
-			s := "NC"
+			s := "NC" // NC is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26015,7 +26787,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -26028,14 +26799,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &PUSH_DE{}
 
 		{
-			s := "DE"
+			s := "DE" // DE is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26049,14 +26820,13 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26069,14 +26839,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RST_10H{}
 
 		{
-			s := "10H"
+			s := "10H" // 10H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26089,14 +26859,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RET_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26109,14 +26879,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RETI{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26129,7 +26899,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &JP_C_a16{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26137,7 +26907,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -26150,7 +26919,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &CALL_C_a16{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26158,7 +26927,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -26171,7 +26939,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &SBC_A_d8{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26179,7 +26947,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -26192,14 +26959,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RST_18H{}
 
 		{
-			s := "18H"
+			s := "18H" // 18H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26212,7 +26979,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_C_d8{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26220,7 +26987,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -26234,14 +27000,13 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 
 		{
 			s, err := readImmediate8BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26254,14 +27019,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &POP_HL{}
 
 		{
-			s := "HL"
+			s := "HL" // HL is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26274,14 +27039,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_CDeref_A{}
 
 		{
-			s := "(C)"
+			s := "(C)" // (C) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26294,14 +27059,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &PUSH_HL{}
 
 		{
-			s := "HL"
+			s := "HL" // HL is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26315,14 +27080,13 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26335,14 +27099,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RST_20H{}
 
 		{
-			s := "20H"
+			s := "20H" // 20H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26355,7 +27119,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &ADD_SP_r8{}
 
 		{
-			s := "SP"
+			s := "SP" // SP is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26363,7 +27127,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediateSigned8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -26376,15 +27139,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &JP_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26398,14 +27160,13 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26419,14 +27180,13 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26439,14 +27199,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RST_28H{}
 
 		{
-			s := "28H"
+			s := "28H" // 28H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26459,14 +27219,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RRCA{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26479,7 +27239,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LDH_A_a8Deref{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26487,7 +27247,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate8BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -26500,14 +27259,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &POP_AF{}
 
 		{
-			s := "AF"
+			s := "AF" // AF is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26520,14 +27279,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_CDeref{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "(C)"
+			s := "(C)" // (C) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26540,14 +27299,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &DI{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26560,14 +27319,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &PUSH_AF{}
 
 		{
-			s := "AF"
+			s := "AF" // AF is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26581,14 +27340,13 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26601,14 +27359,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RST_30H{}
 
 		{
-			s := "30H"
+			s := "30H" // 30H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26621,7 +27379,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_HL_SP_plus_r8{}
 
 		{
-			s := "HL"
+			s := "HL" // HL is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26629,7 +27387,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediateSigned8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -26642,14 +27399,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_SP_HL{}
 
 		{
-			s := "SP"
+			s := "SP" // SP is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "HL"
+			s := "HL" // HL is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26662,7 +27419,7 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &LD_A_a16Deref{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26670,7 +27427,6 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		}
 		{
 			s, err := readImmediate16BitAddress(data)
-
 			if err != nil {
 				return nil, err
 			}
@@ -26683,14 +27439,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &EI{}
 
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26704,14 +27460,13 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 
 		{
 			s, err := readImmediate8BitData(data)
-
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26724,14 +27479,14 @@ func ReadInstruction(data io.Reader) (Instruction, error) {
 		o := &RST_38H{}
 
 		{
-			s := "38H"
+			s := "38H" // 38H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26759,14 +27514,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RLC_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26779,14 +27534,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RLC_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26799,14 +27554,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RL_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26819,14 +27574,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RL_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26839,14 +27594,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RL_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26859,14 +27614,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RL_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26879,14 +27634,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RL_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26899,14 +27654,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RL_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26919,15 +27674,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RL_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26940,14 +27694,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RL_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26960,14 +27714,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RR_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -26980,14 +27734,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RR_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27000,14 +27754,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RR_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27020,14 +27774,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RR_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27040,14 +27794,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RR_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27060,14 +27814,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RR_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27080,15 +27834,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RR_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27101,14 +27854,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RR_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27121,14 +27874,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RLC_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27141,14 +27894,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SLA_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27161,14 +27914,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SLA_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27181,14 +27934,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SLA_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27201,14 +27954,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SLA_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27221,14 +27974,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SLA_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27241,14 +27994,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SLA_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27261,15 +28014,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SLA_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27282,14 +28034,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SLA_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27302,14 +28054,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRA_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27322,14 +28074,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRA_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27342,14 +28094,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRA_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27362,14 +28114,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRA_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27382,14 +28134,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRA_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27402,14 +28154,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRA_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27422,15 +28174,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRA_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27443,14 +28194,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRA_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27463,14 +28214,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RLC_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27483,14 +28234,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SWAP_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27503,14 +28254,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SWAP_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27523,14 +28274,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SWAP_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27543,14 +28294,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SWAP_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27563,14 +28314,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SWAP_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27583,14 +28334,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SWAP_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27603,15 +28354,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SWAP_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27624,14 +28374,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SWAP_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27644,14 +28394,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRL_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27664,14 +28414,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRL_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27684,14 +28434,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRL_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27704,14 +28454,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRL_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27724,14 +28474,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRL_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27744,14 +28494,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRL_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27764,15 +28514,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRL_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27785,14 +28534,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SRL_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27805,14 +28554,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RLC_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27825,14 +28574,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_0_B{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27845,14 +28594,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_0_C{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27865,14 +28614,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_0_D{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27885,14 +28634,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_0_E{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27905,14 +28654,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_0_H{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27925,14 +28674,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_0_L{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27945,15 +28694,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_0_HLPtr{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27966,14 +28714,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_0_A{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -27986,14 +28734,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_1_B{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28006,14 +28754,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_1_C{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28026,14 +28774,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_1_D{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28046,14 +28794,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_1_E{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28066,14 +28814,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_1_H{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28086,14 +28834,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_1_L{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28106,15 +28854,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_1_HLPtr{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28127,14 +28874,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_1_A{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28147,14 +28894,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RLC_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28167,14 +28914,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_2_B{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28187,14 +28934,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_2_C{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28207,14 +28954,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_2_D{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28227,14 +28974,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_2_E{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28247,14 +28994,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_2_H{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28267,14 +29014,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_2_L{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28287,15 +29034,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_2_HLPtr{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28308,14 +29054,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_2_A{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28328,14 +29074,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_3_B{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28348,14 +29094,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_3_C{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28368,14 +29114,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_3_D{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28388,14 +29134,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_3_E{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28408,14 +29154,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_3_H{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28428,14 +29174,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_3_L{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28448,15 +29194,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_3_HLPtr{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28469,14 +29214,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_3_A{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28489,15 +29234,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RLC_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28510,14 +29254,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_4_B{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28530,14 +29274,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_4_C{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28550,14 +29294,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_4_D{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28570,14 +29314,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_4_E{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28590,14 +29334,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_4_H{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28610,14 +29354,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_4_L{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28630,15 +29374,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_4_HLPtr{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28651,14 +29394,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_4_A{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28671,14 +29414,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_5_B{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28691,14 +29434,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_5_C{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28711,14 +29454,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_5_D{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28731,14 +29474,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_5_E{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28751,14 +29494,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_5_H{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28771,14 +29514,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_5_L{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28791,15 +29534,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_5_HLPtr{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28812,14 +29554,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_5_A{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28832,14 +29574,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RLC_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28852,14 +29594,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_6_B{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28872,14 +29614,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_6_C{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28892,14 +29634,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_6_D{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28912,14 +29654,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_6_E{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28932,14 +29674,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_6_H{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28952,14 +29694,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_6_L{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28972,15 +29714,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_6_HLPtr{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -28993,14 +29734,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_6_A{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29013,14 +29754,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_7_B{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29033,14 +29774,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_7_C{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29053,14 +29794,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_7_D{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29073,14 +29814,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_7_E{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29093,14 +29834,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_7_H{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29113,14 +29854,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_7_L{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29133,15 +29874,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_7_HLPtr{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29154,14 +29894,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &BIT_7_A{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29174,14 +29914,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RRC_B{}
 
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29194,14 +29934,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_0_B{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29214,14 +29954,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_0_C{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29234,14 +29974,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_0_D{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29254,14 +29994,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_0_E{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29274,14 +30014,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_0_H{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29294,14 +30034,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_0_L{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29314,15 +30054,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_0_HLPtr{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29335,14 +30074,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_0_A{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29355,14 +30094,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_1_B{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29375,14 +30114,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_1_C{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29395,14 +30134,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_1_D{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29415,14 +30154,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_1_E{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29435,14 +30174,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_1_H{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29455,14 +30194,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_1_L{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29475,15 +30214,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_1_HLPtr{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29496,14 +30234,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_1_A{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29516,14 +30254,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RRC_C{}
 
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29536,14 +30274,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_2_B{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29556,14 +30294,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_2_C{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29576,14 +30314,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_2_D{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29596,14 +30334,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_2_E{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29616,14 +30354,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_2_H{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29636,14 +30374,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_2_L{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29656,15 +30394,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_2_HLPtr{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29677,14 +30414,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_2_A{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29697,14 +30434,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_3_B{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29717,14 +30454,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_3_C{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29737,14 +30474,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_3_D{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29757,14 +30494,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_3_E{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29777,14 +30514,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_3_H{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29797,14 +30534,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_3_L{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29817,15 +30554,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_3_HLPtr{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29838,14 +30574,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_3_A{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29858,14 +30594,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RRC_D{}
 
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29878,14 +30614,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_4_B{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29898,14 +30634,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_4_C{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29918,14 +30654,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_4_D{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29938,14 +30674,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_4_E{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29958,14 +30694,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_4_H{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29978,14 +30714,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_4_L{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -29998,15 +30734,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_4_HLPtr{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30019,14 +30754,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_4_A{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30039,14 +30774,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_5_B{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30059,14 +30794,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_5_C{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30079,14 +30814,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_5_D{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30099,14 +30834,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_5_E{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30119,14 +30854,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_5_H{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30139,14 +30874,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_5_L{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30159,15 +30894,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_5_HLPtr{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30180,14 +30914,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_5_A{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30200,14 +30934,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RRC_E{}
 
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30220,14 +30954,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_6_B{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30240,14 +30974,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_6_C{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30260,14 +30994,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_6_D{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30280,14 +31014,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_6_E{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30300,14 +31034,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_6_H{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30320,14 +31054,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_6_L{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30340,15 +31074,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_6_HLPtr{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30361,14 +31094,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_6_A{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30381,14 +31114,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_7_B{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30401,14 +31134,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_7_C{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30421,14 +31154,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_7_D{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30441,14 +31174,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_7_E{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30461,14 +31194,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_7_H{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30481,14 +31214,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_7_L{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30501,15 +31234,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_7_HLPtr{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30522,14 +31254,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RES_7_A{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30542,14 +31274,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RRC_H{}
 
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30562,14 +31294,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_0_B{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30582,14 +31314,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_0_C{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30602,14 +31334,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_0_D{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30622,14 +31354,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_0_E{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30642,14 +31374,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_0_H{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30662,14 +31394,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_0_L{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30682,15 +31414,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_0_HLPtr{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30703,14 +31434,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_0_A{}
 
 		{
-			s := "0"
+			s := "0" // 0 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30723,14 +31454,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_1_B{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30743,14 +31474,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_1_C{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30763,14 +31494,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_1_D{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30783,14 +31514,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_1_E{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30803,14 +31534,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_1_H{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30823,14 +31554,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_1_L{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30843,15 +31574,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_1_HLPtr{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30864,14 +31594,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_1_A{}
 
 		{
-			s := "1"
+			s := "1" // 1 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30884,14 +31614,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RRC_L{}
 
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30904,14 +31634,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_2_B{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30924,14 +31654,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_2_C{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30944,14 +31674,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_2_D{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30964,14 +31694,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_2_E{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -30984,14 +31714,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_2_H{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31004,14 +31734,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_2_L{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31024,15 +31754,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_2_HLPtr{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31045,14 +31774,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_2_A{}
 
 		{
-			s := "2"
+			s := "2" // 2 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31065,14 +31794,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_3_B{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31085,14 +31814,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_3_C{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31105,14 +31834,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_3_D{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31125,14 +31854,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_3_E{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31145,14 +31874,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_3_H{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31165,14 +31894,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_3_L{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31185,15 +31914,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_3_HLPtr{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31206,14 +31934,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_3_A{}
 
 		{
-			s := "3"
+			s := "3" // 3 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31226,15 +31954,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RRC_HLPtr{}
 
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31247,14 +31974,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_4_B{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31267,14 +31994,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_4_C{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31287,14 +32014,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_4_D{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31307,14 +32034,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_4_E{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31327,14 +32054,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_4_H{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31347,14 +32074,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_4_L{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31367,15 +32094,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_4_HLPtr{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31388,14 +32114,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_4_A{}
 
 		{
-			s := "4"
+			s := "4" // 4 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31408,14 +32134,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_5_B{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31428,14 +32154,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_5_C{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31448,14 +32174,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_5_D{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31468,14 +32194,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_5_E{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31488,14 +32214,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_5_H{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31508,14 +32234,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_5_L{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31528,15 +32254,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_5_HLPtr{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31549,14 +32274,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_5_A{}
 
 		{
-			s := "5"
+			s := "5" // 5 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31569,14 +32294,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &RRC_A{}
 
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := ""
+			s := "" //  is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31589,14 +32314,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_6_B{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31609,14 +32334,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_6_C{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31629,14 +32354,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_6_D{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31649,14 +32374,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_6_E{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31669,14 +32394,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_6_H{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31689,14 +32414,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_6_L{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31709,15 +32434,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_6_HLPtr{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31730,14 +32454,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_6_A{}
 
 		{
-			s := "6"
+			s := "6" // 6 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31750,14 +32474,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_7_B{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "B"
+			s := "B" // B is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31770,14 +32494,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_7_C{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "C"
+			s := "C" // C is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31790,14 +32514,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_7_D{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "D"
+			s := "D" // D is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31810,14 +32534,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_7_E{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "E"
+			s := "E" // E is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31830,14 +32554,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_7_H{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "H"
+			s := "H" // H is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31850,14 +32574,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_7_L{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "L"
+			s := "L" // L is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31870,15 +32594,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_7_HLPtr{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s, err := readImmediate16BitData(data)
-
+			s := "(HL)" // (HL) is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
@@ -31891,14 +32614,14 @@ func readCBPrefixedInstruction(data io.Reader) (Instruction, error) {
 		o := &SET_7_A{}
 
 		{
-			s := "7"
+			s := "7" // 7 is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
 			o.operand1 = s
 		}
 		{
-			s := "A"
+			s := "A" // A is implicit in this instruction.
 			if err != nil {
 				return nil, err
 			}
